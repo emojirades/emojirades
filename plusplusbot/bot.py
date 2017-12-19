@@ -1,3 +1,4 @@
+import os
 
 from plusplusbot.slack import SlackClient
 from plusplusbot.scorekeeper import ScoreKeeper
@@ -11,7 +12,7 @@ class PlusPlusBot(object):
     def __init__(self, score_file=None):
         self.logger = logging.getLogger("PlusPlusBot.bot.Bot")
 
-        self.slack = SlackClient(slack_config)
+        self.slack = SlackClient(os.environ.get('SLACK_BOT_TOKEN'), self.logger)
         self.scorekeeper = ScoreKeeper(score_file)
         self.logger.debug("Initialised application instance")
 

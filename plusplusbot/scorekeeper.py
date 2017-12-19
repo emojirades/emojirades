@@ -42,7 +42,7 @@ class ScoreKeeper(object):
     def leaderboard(self, limit=leaderboard_limit):
         return sorted(self.scoreboard, key=lambda i: (i[1], i[0]), reverse=True)[:10]
 
-    def history(self, limit=history_limit)
+    def history(self, limit=history_limit):
         return self.history[::-1][:limit]
 
     def export(self, output=None):

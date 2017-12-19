@@ -9,9 +9,9 @@ import sys
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-v", "--verbose", action="count", default=0, help="Logging level")
+    parser.add_argument("-v", "--verbose", action="count", dest="v", default=0, help="Logging level")
     parser.add_argument("--log-file", default=sys.stderr, help="File we will log to")
-    parser.add_argument("--score-file", help="CSV file we use to persist scores")
+    parser.add_argument("--score-file", help="CSV file we use to persist scores", required=True)
 
     args = parser.parse_args()
 
@@ -22,7 +22,7 @@ if __name__ == "__main__":
     else:
         log_level = logging.WARNING
 
-    logging.basicConfig(log_level)
+    logging.basicConfig(level=log_level)
     logger = logging.getLogger("PlusPlusBot")
     logger.debug("Initialised application")
 

@@ -1,5 +1,6 @@
-from slackclient._server import SlackConnectionError, SlackLoginError
-from slackclient import SlackClient
+import time
+from slackclient.server import SlackConnectionError, SlackLoginError
+from slackclient import SlackClient as SC
 
 import re
 
@@ -9,21 +10,24 @@ import re
 class SlackClient(object):
     def __init__(self, config, logger):
         self.config = config
+        self.logger = logger
+        self.slack_client = SC(config)
 
-        self.slack_client = None
-        self.bot_id = config.get("bot_id", None)
-        self.channel_id = config.get("channel_id", None)
+        starterboth = self.slack_client.api_call("auth.test")
+        self.bot_id = starterboth["user_id"]
+        # self.channel_id = config.get("channel_id", None)
+        self.channel_id = None
 
-        self.ready = False
+        self.ready = True
         self.last_ts = float(0)
 
-    @static
+    @staticmethod
     def build_help_message(actions):
         message = "Available commands are:\n```"
         message += "{0:<20}{1}\n".format("Command", "Help")
 
         for action in actions:
-            message += "{0:<20}{1}\n".format(action.command, action.help)
+            message += "{0:<20}{1}\n".format(action[0], action[1])
 
         return message
 
@@ -33,6 +37,8 @@ class SlackClient(object):
         :param event: 
         :return: 
         """
+
+        self.logger.debug("Handling event: {}".format(event))
         # We only want text based events
         if "text" not in event:
             return False
@@ -92,11 +98,12 @@ class SlackClient(object):
                 if not event:
                     continue
 
-                action, args, kwargs = self.match_event(event, actions)
+                # action, args, kwargs = self.match_event(event, actions)
+                action = self.match_event(event, actions)
 
                 if action:
                     self.logger.debug("Matched: {0}".format(event))
-                    action(*args, **kwargs)
+                    #action(*args, **kwargs)
                 else:
                     self.logger.debug("No Match: {0}".format(event))
 
