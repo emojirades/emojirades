@@ -2,8 +2,24 @@ from abc import ABC, abstractmethod, abstractproperty
 import re
 import logging
 
-
 class Command(ABC):
+
+    # TODO: replace hardcoded pattern with this map
+    pattern_map = {
+        "me": {
+            "pattern": "<@{me}>",
+            "replace": "@epp"
+        },
+        "player": {
+            "pattern": "<@([0-9A-Z]+)>",
+            "replace": "@player"
+        },
+        "score": {
+            "pattern": "(-?[0-9]+)",
+            "replace": "<numeric score>"
+        }
+    }
+
     def __init__(self, scorekeeper, slack, event):
 
         self.logger = logging.getLogger("PlusPlusBot.Command")
@@ -32,6 +48,10 @@ class Command(ABC):
     @abstractmethod
     def execute(self):
         pass
+
+    @classmethod
+    def prepare_commands(cls):
+        return {command.pattern: (command, command.description) for command in commands}
 
 
 class PlusPlusCommand(Command):
@@ -62,7 +82,7 @@ class PlusPlusCommand(Command):
 class SetCommand(Command):
 
     pattern = "<@([0-9A-Z]+)> set (-?[0-9]+)"
-    description = "Increment the users score"
+    description = "Manually set the users score"
 
     def prepare_args(self, event):
         args_matches = re.match(self.pattern, event["text"])
@@ -123,3 +143,37 @@ class LeaderboardCommand(Command):
 
         return "\n".join(["{}. <@{}> [{} point{}]".format(index + 1, *user, "s" if user[1] > 1 else "")
                           for index, user in enumerate(leaderboard)])
+
+
+class HelpCommand(Command):
+
+    pattern = "<@{me}> help"
+    description = "Shows this help"
+
+    def format_command(self, pattern):
+
+        #pattern = pattern.replace("{me}", self.slack.bot_id)
+        pattern =pattern.replace("\\", "")
+
+        for replacer in self.pattern_map.values():
+            pattern = pattern.replace(replacer["pattern"], replacer["replace"])
+
+        return pattern
+`
+    def execute(self):
+        message = "Available commands are:\n```"
+        message += "{0:<50}{1}\n".format("Command", "Help")
+
+        for command in commands:
+            message += "{0:<50}{1}\n".format(self.format_command(command.pattern), command.description)
+
+        message += "```"
+        return message
+
+commands = [
+    PlusPlusCommand,
+    MinusMinusCommand,
+    SetCommand,
+    LeaderboardCommand,
+    HelpCommand
+]

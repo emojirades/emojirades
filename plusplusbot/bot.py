@@ -5,7 +5,7 @@ import time
 from plusplusbot.slack import SlackClient
 from plusplusbot.scorekeeper import ScoreKeeper
 
-from plusplusbot.commands import *
+from plusplusbot.commands import Command
 
 import logging
 
@@ -35,7 +35,7 @@ class PlusPlusBot(object):
         return False
 
     def listen_for_actions(self):
-        actions = self.prepare_commands()
+        actions = Command.prepare_commands()
 
         if not self.slack.ready:
             raise RuntimeError("is_ready has not been called/returned false")
@@ -44,7 +44,6 @@ class PlusPlusBot(object):
             raise RuntimeError("Failed to connect to the Slack API")
 
         self.logger.info("Slack is connected and listening for actions")
-        #help_message = self.build_help_message(actions)
 
         while True:
             for event in self.slack.sc.rtm_read():
@@ -65,22 +64,3 @@ class PlusPlusBot(object):
                     self.logger.debug("No Match: {0}".format(event))
 
             time.sleep(1)
-
-    def prepare_commands(self):
-        commands = [
-            PlusPlusCommand,
-            MinusMinusCommand,
-            LeaderboardCommand,
-            SetCommand
-        ]
-
-        return {command.pattern: (command, command.description) for command in commands}
-
-    def build_help_message(self):
-        message = "Available commands are:\n```"
-        message += "{0:<20}{1}\n".format("Command", "Help")
-
-        for action in self.actions:
-            message += "{0:<20}{1}\n".format(action[0], action[1])
-
-        return message
