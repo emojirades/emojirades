@@ -4,17 +4,22 @@ import logging
 
 
 class Command(ABC):
-    def __init__(self, scorekeeper, event):
+    def __init__(self, scorekeeper, slack, event):
 
         self.logger = logging.getLogger("PlusPlusBot.Command")
 
         self.scorekeeper = scorekeeper
+        self.slack = slack
         self.args = {}
 
         self.prepare_args(event)
 
     def prepare_args(self, event):
         pass
+
+    @classmethod
+    def match(cls, text, **kwargs):
+        return re.match(cls.pattern.format(**kwargs), text)
 
     @abstractproperty
     def pattern(self):
@@ -77,3 +82,17 @@ class MinusMinusCommand(Command):
             return "Oops <@{}>, you're now at {} point{}".format(target_user,
                                                                      score,
                                                                      "s" if score > 1 else "")
+
+
+class LeaderboardCommand(Command):
+
+    pattern = "<@({me})> leaderboard"
+    description = "Shows all the users scores"
+
+    def execute(self):
+        self.logger.debug("Printing leaderboard: {}".format(self.scorekeeper.leaderboard()))
+
+        leaderboard = self.scorekeeper.leaderboard()
+
+        return "\n".join(["{}. <@{}> [{} point{}]".format(index + 1, *user, "s" if user[1] > 1 else "")
+                          for index, user in enumerate(leaderboard)])

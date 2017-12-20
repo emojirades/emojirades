@@ -28,4 +28,4 @@ if __name__ == "__main__":
 
     bot = PlusPlusBot(args.score_file)
     logger.info("Listening for commands")
-    bot.listen()
+    bot.listen_for_actions()
