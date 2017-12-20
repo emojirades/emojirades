@@ -36,7 +36,7 @@ class Command(ABC):
 
 class PlusPlusCommand(Command):
 
-    pattern = "<@([0-9A-Z].*)> \+\+"
+    pattern = "<@([0-9A-Z]+)> \+\+"
     description = "Increment the users score"
 
     def prepare_args(self, event):
@@ -59,9 +59,36 @@ class PlusPlusCommand(Command):
                                                                      "s" if score > 1 else "")
 
 
+class SetCommand(Command):
+
+    pattern = "<@([0-9A-Z]+)> set (-?[0-9]+)"
+    description = "Increment the users score"
+
+    def prepare_args(self, event):
+        args_matches = re.match(self.pattern, event["text"])
+
+        self.args["target_user"] = args_matches[1]
+        self.args["user"] = event["user"]
+        self.args["new_score"] = args_matches[2]
+
+    def execute(self):
+
+        target_user = self.args["target_user"]
+        new_score = int(self.args["new_score"])
+
+        if self.args["user"] != target_user:
+            self.logger.debug("Setting {} score to: {}".format(target_user, new_score))
+            self.scorekeeper.overwrite(target_user, new_score)
+            self.scorekeeper.flush()
+
+            return "<@{}> now at {} point{}".format(target_user,
+                                                    new_score,
+                                                    "s" if new_score > 1 else "")
+
+
 class MinusMinusCommand(Command):
 
-    pattern = "<@([0-9A-Z].*)> --"
+    pattern = "<@([0-9A-Z]+)> --"
     description = "Decrement the users score"
 
     def prepare_args(self, event):
@@ -73,7 +100,7 @@ class MinusMinusCommand(Command):
         target_user = self.args["target_user"]
 
         if self.args["user"] != target_user:
-            self.logger.debug("Incrementing user's score: {}".format(target_user))
+            self.logger.debug("Decrementing user's score: {}".format(target_user))
             self.scorekeeper.minusminus(target_user)
             self.scorekeeper.flush()
 
@@ -86,7 +113,7 @@ class MinusMinusCommand(Command):
 
 class LeaderboardCommand(Command):
 
-    pattern = "<@({me})> leaderboard"
+    pattern = "<@{me}> leaderboard"
     description = "Shows all the users scores"
 
     def execute(self):

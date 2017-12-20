@@ -70,7 +70,8 @@ class PlusPlusBot(object):
         commands = [
             PlusPlusCommand,
             MinusMinusCommand,
-            LeaderboardCommand
+            LeaderboardCommand,
+            SetCommand
         ]
 
         return {command.pattern: (command, command.description) for command in commands}
