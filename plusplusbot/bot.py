@@ -19,11 +19,13 @@ class PlusPlusBot(object):
         self.logger.debug("Initialised application instance")
 
     def listen(self):
-        self.slack.listen_for_actions({
-            PlusPlusCommand.pattern: (PlusPlusCommand, "Increment the users score"),
-            "<@[0-9A-Z].*> --": (self.scorekeeper.minusminus, "Decrement the users score"),
-            "<@[0-9A-Z].*> set [0-9]+": (self.scorekeeper.overwrite, "Manually set the users score"),
-            "@{me} leaderboard": (self.scorekeeper.leaderboard, "Shows all the users scores"),
-            "@{me} history": (self.scorekeeper.history, "Shows the last few actions"),
-            "@{me} export": (self.scorekeeper.export, "Export leader∂board in CSV"),
-        })
+        self.slack.listen_for_actions(self.prepare_commands())
+
+    def prepare_commands(self):
+        commands = [
+            PlusPlusCommand,
+            MinusMinusCommand
+        ]
+
+        return {command.pattern: (command, command.description) for command in commands}
+

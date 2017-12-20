@@ -20,6 +20,10 @@ class Command(ABC):
     def pattern(self):
         pass
 
+    @abstractproperty
+    def description(self):
+        pass
+
     @abstractmethod
     def execute(self):
         pass
@@ -28,6 +32,7 @@ class Command(ABC):
 class PlusPlusCommand(Command):
 
     pattern = "<@([0-9A-Z].*)> \+\+"
+    description = "Increment the users score"
 
     def prepare_args(self, event):
         self.args["target_user"] = re.match(self.pattern, event["text"])[1]
@@ -48,3 +53,27 @@ class PlusPlusCommand(Command):
                                                                      score,
                                                                      "s" if score > 1 else "")
 
+
+class MinusMinusCommand(Command):
+
+    pattern = "<@([0-9A-Z].*)> --"
+    description = "Decrement the users score"
+
+    def prepare_args(self, event):
+        self.args["target_user"] = re.match(self.pattern, event["text"])[1]
+        self.args["user"] = event["user"]
+
+    def execute(self):
+
+        target_user = self.args["target_user"]
+
+        if self.args["user"] != target_user:
+            self.logger.debug("Incrementing user's score: {}".format(target_user))
+            self.scorekeeper.minusminus(target_user)
+            self.scorekeeper.flush()
+
+            score = self.scorekeeper.scoreboard[target_user]
+
+            return "Oops <@{}>, you're now at {} point{}".format(target_user,
+                                                                     score,
+                                                                     "s" if score > 1 else "")
