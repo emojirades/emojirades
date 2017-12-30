@@ -1,6 +1,8 @@
 # emojirades-plusplus
 Slack bot that understands the emojirades game and handles score keeping
 
+[![Build Status](https://travis-ci.org/michael-robbins/emojirades-plusplus.svg?branch=master)](https://travis-ci.org/michael-robbins/emojirades-plusplus)
+
 # Installation Guide
 `# Preferably run on a virtualenv`
 
