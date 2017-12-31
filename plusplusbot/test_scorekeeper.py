@@ -1,6 +1,7 @@
 from .scorekeeper import ScoreKeeper
 
 import tempfile
+import csv
 
 
 def test_new_file_load():
@@ -8,3 +9,13 @@ def test_new_file_load():
         keeper = ScoreKeeper(filename=temp_file.name)
 
         assert len(keeper.scoreboard.keys()) == 0
+
+def test_existing_file_load():
+    writer = csv.writer(delimiter=',')
+
+    with tempfile.NamedTemporaryFile() as temp_file:
+        writer.writerow(['U12345', '10'])
+
+        keeper = ScoreKeeper(filename=temp_file.name)
+
+        assert len(keeper.scoreboard.keys()) == 1
