@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod, abstractproperty
+
 import re
 import logging
 
@@ -21,7 +22,6 @@ class Command(ABC):
     }
 
     def __init__(self, scorekeeper, slack, event):
-
         self.logger = logging.getLogger("PlusPlusBot.Command")
 
         self.scorekeeper = scorekeeper
@@ -55,7 +55,6 @@ class Command(ABC):
 
 
 class PlusPlusCommand(Command):
-
     pattern = "<@([0-9A-Z]+)> \+\+"
     description = "Increment the users score"
 
@@ -64,7 +63,6 @@ class PlusPlusCommand(Command):
         self.args["user"] = event["user"]
 
     def execute(self):
-
         target_user = self.args["target_user"]
 
         if self.args["user"] != target_user:
@@ -80,7 +78,6 @@ class PlusPlusCommand(Command):
 
 
 class SetCommand(Command):
-
     pattern = "<@([0-9A-Z]+)> set (-?[0-9]+)"
     description = "Manually set the users score"
 
@@ -92,7 +89,6 @@ class SetCommand(Command):
         self.args["new_score"] = args_matches[2]
 
     def execute(self):
-
         target_user = self.args["target_user"]
         new_score = int(self.args["new_score"])
 
@@ -107,7 +103,6 @@ class SetCommand(Command):
 
 
 class MinusMinusCommand(Command):
-
     pattern = "<@([0-9A-Z]+)> --"
     description = "Decrement the users score"
 
@@ -116,7 +111,6 @@ class MinusMinusCommand(Command):
         self.args["user"] = event["user"]
 
     def execute(self):
-
         target_user = self.args["target_user"]
 
         if self.args["user"] != target_user:
@@ -132,7 +126,6 @@ class MinusMinusCommand(Command):
 
 
 class LeaderboardCommand(Command):
-
     pattern = "<@{me}> leaderboard"
     description = "Shows all the users scores"
 
@@ -146,12 +139,10 @@ class LeaderboardCommand(Command):
 
 
 class HelpCommand(Command):
-
     pattern = "<@{me}> help"
     description = "Shows this help"
 
     def format_command(self, pattern):
-
         #pattern = pattern.replace("{me}", self.slack.bot_id)
         pattern =pattern.replace("\\", "")
 
@@ -159,7 +150,7 @@ class HelpCommand(Command):
             pattern = pattern.replace(replacer["pattern"], replacer["replace"])
 
         return pattern
-`
+
     def execute(self):
         message = "Available commands are:\n```"
         message += "{0:<50}{1}\n".format("Command", "Help")
