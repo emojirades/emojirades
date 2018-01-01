@@ -30,6 +30,7 @@ Register your bot on slack, or pass me your email so I can add you to my Dev Sla
 `main.py --score-file test.csv -vvv`
 
 # Release process (for master branch)
-1. Bump version in setup.py
-2. Perform release in GitHub
-3. TravisCI will automatically build and deploy on a tagged commit
+1. Create release branch containing new version in setup.py
+2. Perform a PR into master
+3. Perform release in GitHub
+4. TravisCI will automatically build and deploy on a tagged commit into master (the release does this)
