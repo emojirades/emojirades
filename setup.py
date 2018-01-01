@@ -19,6 +19,7 @@ setup(
     packages=["plusplusbot"],
     install_requires=[
         "slackclient>=1.1,<2",
+        "boto3>=1.5,<2"
     ],
     python_requires="~=3.5",
     extras_require={

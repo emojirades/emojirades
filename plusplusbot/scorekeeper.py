@@ -2,6 +2,7 @@
 from collections import defaultdict
 
 import logging
+import boto3
 import csv
 import io
 import os
@@ -24,8 +25,17 @@ class ScoreKeeper(object):
             self.logger.info("Loaded scores from {0}".format(self.filename))
 
     def load_scores(self, filename):
-        with open(filename, newline='') as score_file:
-            return {user: int(score) for (user, score) in csv.reader(score_file)}
+        if filename.startswith("s3://"):
+            s3 = boto3.resource("s3")
+
+            _, _, bucket, key = filename.split('/', 3)
+
+            remote_file = s3.Object(bucket, key)
+            score_file = io.StringIO(remote_file.get()["Body"].read().decode("utf-8"))
+        else:
+            score_file = open(filename, "rt", newline='')
+
+        return {user: int(score) for (user, score) in csv.reader(score_file)}
 
     def plusplus(self, user):
         self.scoreboard[user] += 1
@@ -58,4 +68,13 @@ class ScoreKeeper(object):
         if filename is None:
             filename = self.filename
 
-        self.export(open(filename, "w", newline=''))
+        if filename.startswith("s3://"):
+            s3 = boto3.resource("s3")
+
+            _, _, bucket, key = filename.split('/', 3)
+
+            remote_file = s3.Object(bucket, key)
+            remote_file.put(Body=self.export())
+        else:
+            with open(filename, "w", newline='') as output_file:
+                self.export(output_file)
