@@ -33,8 +33,10 @@ class ScoreKeeper(object):
 
             remote_file = s3.Object(bucket, key)
             score_file = io.StringIO(remote_file.get()["Body"].read().decode("utf-8"))
-        else:
+        elif os.path.exists(filename) and os.stat(filename).st_size > 0:
             score_file = open(filename, "rt", newline='')
+        else:
+            return {}
 
         return {user: int(score) for (user, score) in csv.reader(score_file)}
 
