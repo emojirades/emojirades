@@ -100,13 +100,21 @@ class SetCommand(Command):
         target_user = self.args["target_user"]
         new_score = int(self.args["new_score"])
 
-        if self.args["user"] != target_user:
-            self.logger.debug("Setting {} score to: {}".format(target_user, new_score))
-            self.scorekeeper.overwrite(target_user, new_score)
-            self.scorekeeper.flush()
+        if self.args["user"] == target_user:
+            return ":thinking_face: you can't do that to yourself"
 
-            message = "<@{0}> manually set to {1} point{2}"
-            return message.format(target_user, new_score, "s" if new_score > 1 else "")
+        if self.slack.is_bot(target_user):
+            return ":thinking_face: robots aren't allowed to play Emojirades"
+
+        if not self.slack.is_admin(self.args["user"]):
+            return ":thinking_face: you don't have permission to do that"
+
+        self.logger.debug("Setting {} score to: {}".format(target_user, new_score))
+        self.scorekeeper.overwrite(target_user, new_score)
+        self.scorekeeper.flush()
+
+        message = "<@{0}> manually set to {1} point{2}"
+        return message.format(target_user, new_score, "s" if new_score > 1 else "")
 
     def __str__(self):
         return "SetCommand"

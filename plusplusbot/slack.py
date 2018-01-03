@@ -17,3 +17,6 @@ class SlackClient(object):
 
     def is_bot(self, userid):
         return self.sc.api_call("users.info", user=userid)['user']['is_bot'] or userid == "USLACKBOT"
+
+    def is_admin(self, userid):
+        return self.sc.api_call("users.info", user=userid)['user']['is_admin']
