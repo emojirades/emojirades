@@ -55,7 +55,7 @@ class Command(ABC):
 
 
 class PlusPlusCommand(Command):
-    pattern = "<@([0-9A-Z]+)> \+\+"
+    pattern = "<@([0-9A-Z]+)>[\s]*\+\+"
     description = "Increment the users score"
 
     def prepare_args(self, event):
@@ -65,16 +65,20 @@ class PlusPlusCommand(Command):
     def execute(self):
         target_user = self.args["target_user"]
 
-        if self.args["user"] != target_user:
-            self.logger.debug("Incrementing user's score: {}".format(target_user))
-            self.scorekeeper.plusplus(target_user)
-            self.scorekeeper.flush()
+        if self.args["user"] == self.args["target_user"]:
+            return ":thinking_face: you're not allowed to award points to yourself..."
 
-            score = self.scorekeeper.scoreboard[target_user]
+        self.logger.debug("Incrementing user's score: {}".format(target_user))
+        self.scorekeeper.plusplus(target_user)
+        self.scorekeeper.flush()
 
-            return "Congrats <@{}>, you're now at {} point{}".format(target_user,
-                                                                     score,
-                                                                     "s" if score > 1 else "")
+        score = self.scorekeeper.scoreboard[target_user]
+
+        message = "Congrats <@{0}>, you're now at {1} point{2}"
+        return message.format(target_user, score, "s" if score > 1 else "")
+
+    def __str__(self):
+        return "PlusPlusCommand"
 
 
 class SetCommand(Command):
@@ -97,9 +101,11 @@ class SetCommand(Command):
             self.scorekeeper.overwrite(target_user, new_score)
             self.scorekeeper.flush()
 
-            return "<@{}> now at {} point{}".format(target_user,
-                                                    new_score,
-                                                    "s" if new_score > 1 else "")
+            message = "<@{0}> manually set to {1} point{2}"
+            return message.format(target_user, new_score, "s" if new_score > 1 else "")
+
+    def __str__(self):
+        return "SetCommand"
 
 
 class MinusMinusCommand(Command):
@@ -120,9 +126,11 @@ class MinusMinusCommand(Command):
 
             score = self.scorekeeper.scoreboard[target_user]
 
-            return "Oops <@{}>, you're now at {} point{}".format(target_user,
-                                                                     score,
-                                                                     "s" if score > 1 else "")
+            message = "Oops <@{0}>, you're now at {1} point{2}"
+            return message.format(target_user, score, "s" if score > 1 else "")
+
+    def __str__(self):
+        return "MinusMinusCommand"
 
 
 class LeaderboardCommand(Command):
@@ -130,12 +138,31 @@ class LeaderboardCommand(Command):
     description = "Shows all the users scores"
 
     def execute(self):
-        self.logger.debug("Printing leaderboard: {}".format(self.scorekeeper.leaderboard()))
-
         leaderboard = self.scorekeeper.leaderboard()
 
-        return "\n".join(["{}. <@{}> [{} point{}]".format(index + 1, *user, "s" if user[1] > 1 else "")
-                          for index, user in enumerate(leaderboard)])
+        self.logger.debug("Printing leaderboard: {0}".format(leaderboard))
+
+        return "\n".join(["{0}. <@{1}> [{2} point{3}]".format(index + 1, name, score, "s" if score > 1 else "")
+                          for index, (name, score) in enumerate(leaderboard)])
+
+
+    def __str__(self):
+        return "LeaderboardCommand"
+
+class HistoryCommand(Command):
+    pattern = "<@{me}> history"
+    description = "Shows the latest few actions performed"
+
+    def execute(self):
+        history = self.scorekeeper.history()
+
+        self.logger.debug("Printing history: {0}".format(history))
+
+        return "\n".join(["{0}. <@{1}> > '{2}'".format(index + 1, name, action)
+                          for index, (name, action) in enumerate(history)])
+
+    def __str__(self):
+        return "HistoryCommand"
 
 
 class HelpCommand(Command):
@@ -143,8 +170,7 @@ class HelpCommand(Command):
     description = "Shows this help"
 
     def format_command(self, pattern):
-        #pattern = pattern.replace("{me}", self.slack.bot_id)
-        pattern =pattern.replace("\\", "")
+        pattern = pattern.replace("\\", "")
 
         for replacer in self.pattern_map.values():
             pattern = pattern.replace(replacer["pattern"], replacer["replace"])
@@ -161,10 +187,15 @@ class HelpCommand(Command):
         message += "```"
         return message
 
+    def __str__(self):
+        return "HelpCommand"
+
+
 commands = [
     PlusPlusCommand,
     MinusMinusCommand,
     SetCommand,
     LeaderboardCommand,
-    HelpCommand
+    HistoryCommand,
+    HelpCommand,
 ]

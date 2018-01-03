@@ -7,6 +7,7 @@ import csv
 import io
 import os
 
+logging.getLogger('botocore').setLevel(logging.WARNING)
 module_logger = logging.getLogger("PlusPlusBot.scorekeeper")
 
 leaderboard_limit = 10
@@ -20,7 +21,7 @@ class ScoreKeeper(object):
         self.scoreboard = defaultdict(int)
         self.history = []
 
-        if self.filename and os.path.exists(filename) and os.stat(filename).st_size > 0:
+        if self.filename:
             self.scoreboard.update(self.load_scores(filename))
             self.logger.info("Loaded scores from {0}".format(self.filename))
 
@@ -74,7 +75,7 @@ class ScoreKeeper(object):
             _, _, bucket, key = filename.split('/', 3)
 
             remote_file = s3.Object(bucket, key)
-            remote_file.put(Body=self.export())
+            remote_file.put(Body=self.export().getvalue().encode("utf-8"))
         else:
             with open(filename, "w", newline='') as output_file:
                 self.export(output_file)
