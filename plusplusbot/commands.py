@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod, abstractproperty
 import re
 import logging
 
+
 class Command(ABC):
 
     # TODO: replace hardcoded pattern with this map
@@ -65,8 +66,11 @@ class PlusPlusCommand(Command):
     def execute(self):
         target_user = self.args["target_user"]
 
-        if self.args["user"] == self.args["target_user"]:
+        if self.args["user"] == target_user:
             return ":thinking_face: you're not allowed to award points to yourself..."
+
+        if self.slack.is_bot(target_user):
+            return ":thinking_face: robots aren't allowed to play Emojirades!"
 
         self.logger.debug("Incrementing user's score: {}".format(target_user))
         self.scorekeeper.plusplus(target_user)
@@ -96,13 +100,21 @@ class SetCommand(Command):
         target_user = self.args["target_user"]
         new_score = int(self.args["new_score"])
 
-        if self.args["user"] != target_user:
-            self.logger.debug("Setting {} score to: {}".format(target_user, new_score))
-            self.scorekeeper.overwrite(target_user, new_score)
-            self.scorekeeper.flush()
+        if self.args["user"] == target_user:
+            return ":thinking_face: you can't do that to yourself"
 
-            message = "<@{0}> manually set to {1} point{2}"
-            return message.format(target_user, new_score, "s" if new_score > 1 else "")
+        if self.slack.is_bot(target_user):
+            return ":thinking_face: robots aren't allowed to play Emojirades"
+
+        if not self.slack.is_admin(self.args["user"]):
+            return ":thinking_face: you don't have permission to do that"
+
+        self.logger.debug("Setting {} score to: {}".format(target_user, new_score))
+        self.scorekeeper.overwrite(target_user, new_score)
+        self.scorekeeper.flush()
+
+        message = "<@{0}> manually set to {1} point{2}"
+        return message.format(target_user, new_score, "s" if new_score > 1 else "")
 
     def __str__(self):
         return "SetCommand"
@@ -119,15 +131,20 @@ class MinusMinusCommand(Command):
     def execute(self):
         target_user = self.args["target_user"]
 
-        if self.args["user"] != target_user:
-            self.logger.debug("Decrementing user's score: {}".format(target_user))
-            self.scorekeeper.minusminus(target_user)
-            self.scorekeeper.flush()
+        if self.args["user"] == target_user:
+            return ":thinking_face: you're not allowed to deduct points from yourself..."
 
-            score = self.scorekeeper.scoreboard[target_user]
+        if self.slack.is_bot(target_user):
+            return ":thinking_face: robots aren't allowed to play Emojirades!"
 
-            message = "Oops <@{0}>, you're now at {1} point{2}"
-            return message.format(target_user, score, "s" if score > 1 else "")
+        self.logger.debug("Decrementing user's score: {}".format(target_user))
+        self.scorekeeper.minusminus(target_user)
+        self.scorekeeper.flush()
+
+        score = self.scorekeeper.scoreboard[target_user]
+
+        message = "Oops <@{0}>, you're now at {1} point{2}"
+        return message.format(target_user, score, "s" if score > 1 else "")
 
     def __str__(self):
         return "MinusMinusCommand"
@@ -145,9 +162,9 @@ class LeaderboardCommand(Command):
         return "\n".join(["{0}. <@{1}> [{2} point{3}]".format(index + 1, name, score, "s" if score > 1 else "")
                           for index, (name, score) in enumerate(leaderboard)])
 
-
     def __str__(self):
         return "LeaderboardCommand"
+
 
 class HistoryCommand(Command):
     pattern = "<@{me}> history"

@@ -1,10 +1,4 @@
-import time
-from slackclient.server import SlackConnectionError, SlackLoginError
 from slackclient import SlackClient as SC
-
-import re
-
-# TODO: this class needs to be fixed up
 
 
 class SlackClient(object):
@@ -20,3 +14,9 @@ class SlackClient(object):
 
         self.ready = True
         self.last_ts = float(0)
+
+    def is_bot(self, userid):
+        return self.sc.api_call("users.info", user=userid)['user']['is_bot'] or userid == "USLACKBOT"
+
+    def is_admin(self, userid):
+        return self.sc.api_call("users.info", user=userid)['user']['is_admin']
