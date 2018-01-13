@@ -1,0 +1,94 @@
+
+
+import botocore
+import pathlib
+import logging
+import boto3
+import csv
+
+def get_configuration_handler(filename):
+    if filename.startswith("s3://"):
+        return S3ConfigurationHandler
+    else:
+        return LocalConfigurationHandler
+
+class ConfigurationHandler(object):
+    def __init__(self, *args, **kwargs):
+
+        miss_positional = "{0} is missing a required positional argument '{1}' in position {2}"
+        miss_keyword = "{0} is missing a required keyword argument '{1}'"
+
+        for arg, pos in [("filename", 0)]:
+            if pos is not None:
+                if len(args) > pos:
+                    setattr(self, arg, args[pos])
+                else:
+                    raise TypeError(miss_positional.format(self, arg, pos))
+            elif arg in kwargs:
+                    setattr(self, arg, kwargs["filename"])
+            else:
+                raise TypeError(miss_keyword.format(self, arg))
+
+class S3ConfiguationHandler(ConfigurationHandler):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        _, _, self._bucket, self._key = self.filename.split('/', 3)
+
+        self._s3 = boto3.resource("s3")
+
+        self._object = self._s3.Object(self._bucket, self._key)
+
+    @property
+    def exists(self):
+        try:
+            self.s3.Object(self.bucket, self.key).load()
+            return True
+        except botocore.exceptions.ClientError as e:
+            if e.response["Error"]["Code"] == "404":
+                return False
+            else:
+                raise e
+
+    def load(self):
+        if self.exists():
+            return self._object.get()["Body"].read()
+        else:
+            return None
+
+    def save(self, content):
+        self._object.put(Body=content)
+
+    def flush(self):
+        pass
+
+class LocalConfigurationHandler(ConfigurationHandler):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self._object = pathlib.Path(self.filename)
+
+    @property
+    def exists(self):
+        return self._object.exists()
+
+    def create(self, content=b''):
+        if self.exists():
+            return True
+
+        with self._object.open('wb') as local_file:
+            local_file.write(content)
+
+    def load(self):
+        if self.exists():
+            with self._object.open('rb') as local_file:
+                return local_file.read()
+        else:
+            return None
+
+    def save(self, content):
+        with self._object.open('wb') as local_file:
+            local_file.write(content)
+
+    def flush(self):
+        pass
