@@ -16,12 +16,15 @@ def get_handler(filename):
         def load(self):
             bytes_content = super().load()
 
-            content = content.decode("utf-8")
+            self._content = bytes_content.decode("utf-8")
 
         def save(self):
-            pass
+            bytes_content = self._content.encode("utf-8")
+
+            super().save(bytes_content)
 
     return EmojiradesConfigurationHandler(filename)
+
 
 class EmojiradesGame(object):
     def __init__(self, filename):
