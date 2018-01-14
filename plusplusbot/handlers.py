@@ -50,7 +50,7 @@ class S3ConfiguationHandler(ConfigurationHandler):
                 raise e
 
     def load(self):
-        if self.exists():
+        if self.exists:
             return self._object.get()["Body"].read()
         else:
             return None
@@ -72,14 +72,14 @@ class LocalConfigurationHandler(ConfigurationHandler):
         return self._object.exists()
 
     def create(self, content=b''):
-        if self.exists():
+        if self.exists:
             return True
 
         with self._object.open('wb') as local_file:
             local_file.write(content)
 
     def load(self):
-        if self.exists():
+        if self.exists:
             with self._object.open('rb') as local_file:
                 return local_file.read()
         else:
