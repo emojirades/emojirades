@@ -23,12 +23,12 @@ def get_handler(filename):
             super().__init__(*args, **kwargs)
 
         def load(self):
-            bytes_contents = super().load()
+            bytes_content = super().load()
 
-            if byte_contents is None:
+            if bytes_content is None:
                 return None
 
-            score_file = io.StringIO(bytes_contents.decode("utf-8"))
+            score_file = io.StringIO(bytes_content.decode("utf-8"))
 
             return {user: int(score) for (user, score) in csv.reader(score_file)}
 
