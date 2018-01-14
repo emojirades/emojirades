@@ -74,5 +74,5 @@ class ScoreKeeper(object):
     def history(self, limit=history_limit):
         return self.history[::-1][:limit]
 
-    def flush(self):
+    def save(self):
         self.config.save(self.scoreboard)
