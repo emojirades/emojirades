@@ -42,6 +42,8 @@ def get_handler(filename):
 
             super().save(bytes_content)
 
+    return ScoreKeeperConfigurationHander(filename)
+
 
 class ScoreKeeper(object):
     def __init__(self, filename):
