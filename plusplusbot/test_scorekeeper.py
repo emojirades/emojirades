@@ -34,5 +34,5 @@ def test_file_format():
 
     keeper = ScoreKeeper(filename=temp_file.name)
     assert len(keeper.scoreboard.keys()) == 2
-    assert keeper.scoreboard["U12345"] == 2
+    assert keeper.scoreboard["U12345"] == 11
     assert keeper.scoreboard["U54321"] == 1
