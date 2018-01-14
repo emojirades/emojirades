@@ -13,10 +13,10 @@ module_logger = logging.getLogger("PlusPlusBot.bot")
 
 
 class PlusPlusBot(object):
-    def __init__(self, score_file=None):
+    def __init__(self, scorefile=None):
         self.logger = logging.getLogger("PlusPlusBot.bot.Bot")
 
-        self.scorekeeper = ScoreKeeper(score_file)
+        self.scorekeeper = ScoreKeeper(scorefile)
 
         slack_bot_token = os.environ.get("SLACK_BOT_TOKEN", None)
 

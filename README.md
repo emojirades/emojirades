@@ -7,17 +7,17 @@ Slack bot that understands the emojirades game and handles score keeping
 `# Preferably run on a virtualenv`
 
 ## Install the dependencies
-`pip install -r requirements.txt --upgrade`
+`pip3 install -r requirements.txt --upgrade`
 
 ## Install the module ( For Dev )
 ```
 cd emojirades-plusplus
-pip install -e .
+pip3 install -e .
 ```
 
 ## Run the tests
 ```
-pip install -r test_requirements.txt --upgrade
+pip3 install -r test_requirements.txt --upgrade
 pytest
 ```
 
@@ -27,7 +27,7 @@ Register your bot on slack, or pass me your email so I can add you to my Dev Sla
 `export SLACK_BOT_TOKEN='xoxb-*******'`
 
 ## Run the daemon
-`main.py --score-file test.csv -vvv`
+`emojirades-plusplus --score-file test.csv -vvv`
 
 # Release process (for master branch)
 1. Create release branch containing new version in setup.py
