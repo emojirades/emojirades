@@ -50,9 +50,9 @@ class ScoreKeeper(object):
         self.scoreboard = defaultdict(int)
         self.history = []
 
-        if self.filename:
+        if filename:
             self.scoreboard.update(self.config.load())
-            self.logger.info("Loaded scores from {0}".format(self.filename))
+            self.logger.info("Loaded scores from {0}".format(filename))
 
     def plusplus(self, user):
         self.scoreboard[user] += 1
@@ -72,5 +72,5 @@ class ScoreKeeper(object):
     def history(self, limit=history_limit):
         return self.history[::-1][:limit]
 
-    def flush(self, filename=None):
+    def flush(self):
         self.config.save(self.scoreboard)
