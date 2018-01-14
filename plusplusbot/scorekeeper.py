@@ -19,8 +19,8 @@ def get_handler(filename):
         """
         Handles CRUD for the ScoreKeeper configuration file
         """
-        def __init__(self, filename):
-            super().load()
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
 
         def load(self):
             bytes_contents = super().load()

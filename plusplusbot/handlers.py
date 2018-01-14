@@ -36,7 +36,6 @@ class S3ConfiguationHandler(ConfigurationHandler):
         _, _, self._bucket, self._key = self.filename.split('/', 3)
 
         self._s3 = boto3.resource("s3")
-
         self._object = self._s3.Object(self._bucket, self._key)
 
     @property
