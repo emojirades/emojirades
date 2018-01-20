@@ -1,14 +1,12 @@
 
-from .handlers import get_configuration_handler
+from plusplusbot.handlers import get_configuration_handler
+from plusplusbot.commands import Command
 from collections import defaultdict
 
 import logging
-import boto3
 import csv
 import io
-import os
 
-logging.getLogger('botocore').setLevel(logging.WARNING)
 module_logger = logging.getLogger("PlusPlusBot.scorekeeper")
 
 leaderboard_limit = 10
@@ -76,3 +74,161 @@ class ScoreKeeper(object):
 
     def save(self):
         self.config.save(self.scoreboard)
+
+    @property
+    def commands(self):
+        return [
+            PlusPlusCommand,
+            MinusMinusCommand,
+            SetCommand,
+            LeaderboardCommand,
+            HistoryCommand,
+        ]
+
+
+class ScoreKeeperCommand(Command):
+    def __init__(self, *args, **kwargs):
+        kwargs["handles"] = ["scorekeeper"]
+        super().__init__(*args, **kwargs)
+
+
+class PlusPlusCommand(ScoreKeeperCommand):
+    pattern = "<@([0-9A-Z]+)>[\s]*\+\+"
+    description = "Increment the users score"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def prepare_args(self, event):
+        self.args["target_user"] = re.match(self.pattern, event["text"])[1]
+        self.args["user"] = event["user"]
+
+    def execute(self):
+        target_user = self.args["target_user"]
+
+        if self.args["user"] == target_user:
+            return (None, ":thinking_face: you're not allowed to award points to yourself...")
+
+        if self.slack.is_bot(target_user):
+            return (None, ":thinking_face: robots aren't allowed to play Emojirades!")
+
+        self.logger.debug("Incrementing user's score: {}".format(target_user))
+        self.scorekeeper.plusplus(target_user)
+        self.scorekeeper.flush()
+
+        score = self.scorekeeper.scoreboard[target_user]
+
+        message = "Congrats <@{0}>, you're now at {1} point{2}"
+        return (None, message.format(target_user, score, "s" if score > 1 else ""))
+
+    def __str__(self):
+        return "PlusPlusCommand"
+
+
+class SetCommand(ScoreKeeperCommand):
+    pattern = "<@([0-9A-Z]+)> set (-?[0-9]+)"
+    description = "Manually set the users score"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def prepare_args(self, event):
+        args_matches = re.match(self.pattern, event["text"])
+
+        self.args["target_user"] = args_matches[1]
+        self.args["user"] = event["user"]
+        self.args["new_score"] = args_matches[2]
+
+    def execute(self):
+        target_user = self.args["target_user"]
+        new_score = int(self.args["new_score"])
+
+        if self.args["user"] == target_user:
+            return ":thinking_face: you can't do that to yourself"
+
+        if self.slack.is_bot(target_user):
+            return ":thinking_face: robots aren't allowed to play Emojirades"
+
+        if not self.slack.is_admin(self.args["user"]):
+            return ":thinking_face: you don't have permission to do that"
+
+        self.logger.debug("Setting {} score to: {}".format(target_user, new_score))
+        self.scorekeeper.overwrite(target_user, new_score)
+        self.scorekeeper.flush()
+
+        message = "<@{0}> manually set to {1} point{2}"
+        return (None, message.format(target_user, new_score, "s" if new_score > 1 else ""))
+
+    def __str__(self):
+        return "SetCommand"
+
+
+class MinusMinusCommand(ScoreKeeperCommand):
+    pattern = "<@([0-9A-Z]+)> --"
+    description = "Decrement the users score"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def prepare_args(self, event):
+        self.args["target_user"] = re.match(self.pattern, event["text"])[1]
+        self.args["user"] = event["user"]
+
+    def execute(self):
+        target_user = self.args["target_user"]
+
+        if self.args["user"] == target_user:
+            return ":thinking_face: you're not allowed to deduct points from yourself..."
+
+        if self.slack.is_bot(target_user):
+            return ":thinking_face: robots aren't allowed to play Emojirades!"
+
+        self.logger.debug("Decrementing user's score: {}".format(target_user))
+        self.scorekeeper.minusminus(target_user)
+        self.scorekeeper.flush()
+
+        score = self.scorekeeper.scoreboard[target_user]
+
+        message = "Oops <@{0}>, you're now at {1} point{2}"
+        return (None, message.format(target_user, score, "s" if score > 1 else ""))
+
+    def __str__(self):
+        return "MinusMinusCommand"
+
+
+class LeaderboardCommand(ScoreKeeperCommand):
+    pattern = "<@{me}> leaderboard"
+    description = "Shows all the users scores"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def execute(self):
+        leaderboard = self.scorekeeper.leaderboard()
+
+        self.logger.debug("Printing leaderboard: {0}".format(leaderboard))
+
+        return (None, "\n".join(["{0}. <@{1}> [{2} point{3}]".format(index + 1, name, score, "s" if score > 1 else "")
+                                for index, (name, score) in enumerate(leaderboard)]))
+
+    def __str__(self):
+        return "LeaderboardCommand"
+
+
+class HistoryCommand(ScoreKeeperCommand):
+    pattern = "<@{me}> history"
+    description = "Shows the latest few actions performed"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def execute(self):
+        history = self.scorekeeper.history()
+
+        self.logger.debug("Printing history: {0}".format(history))
+
+        return (None, "\n".join(["{0}. <@{1}> > '{2}'".format(index + 1, name, action)
+                                for index, (name, action) in enumerate(history)]))
+
+    def __str__(self):
+        return "HistoryCommand"
