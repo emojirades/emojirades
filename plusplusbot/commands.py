@@ -22,15 +22,8 @@ class Command(ABC):
         }
     }
 
-    def __init__(self, slack, event, handles=None):
+    def __init__(self, slack, event, **kwargs):
         self.logger = logging.getLogger("PlusPlusBot.Command")
-
-        if handles is not None:
-            for handle in handles:
-                if handle in kwargs:
-                    setattr(self, handle, kwargs[handle])
-                else:
-                    raise RuntimeError("GameStateCommand requires a handle to '{0}'".format(handle))
 
         self.slack = slack
         self.args = {}

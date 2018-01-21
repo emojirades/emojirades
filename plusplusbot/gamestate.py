@@ -16,7 +16,7 @@ def get_handler(filename):
         """
         Handles CRUD for the Game State configuration file
         """
-        def __init__(self, filename):
+        def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
 
         def load(self):
@@ -59,8 +59,6 @@ class GameState(object):
         set_emojirade : waiting -> provided
         winner_posted : provided -> guessing
         correct_guess : guessing -> guessed
-        
-        
     """
 
     class InvalidStateException(Exception):
@@ -82,12 +80,14 @@ class GameState(object):
         self.state = defaultdict(state_factory)
 
         if filename:
-            self.state.update(self.config.load())
-            self.logger.info("Loaded game state from {0}".format(filename))
+            existing_state = self.config.load()
 
-    @property
+            if existing_state is not None:
+                self.state.update(existing_state)
+                self.logger.info("Loaded game state from {0}".format(filename))
+
     def in_progress(self, channel):
-        return self.state[channel]["step"] != "bootstrap"
+        return self.state[channel]["step"] != "new_game"
 
     def infer_commands(self, event):
         """ Keeps tabs on the conversation and updates gamestate if required """
@@ -107,7 +107,7 @@ class GameState(object):
                 guess = event["text"].lower()
 
                 if guess == emojirade:
-                    return CorrectGuess
+                    yield CorrectGuess
 
     def set_admin(self, channel, admin):
         """ Sets a new game admin! """
@@ -115,6 +115,14 @@ class GameState(object):
             return False
 
         self.state[channel]["admins"].append(admin)
+        return True
+
+    def remove_admin(self, channel, admin):
+        """ Removes the admin status of a user """
+        if admin not in self.state[channel]["admins"]:
+            return False
+
+        self.state[channel]["admins"].remove(admin)
         return True
 
     def new_game(self, channel, old_winner, winner):
@@ -151,6 +159,7 @@ class GameState(object):
     def commands(self):
         return [
             SetAdmin,
+            RemoveAdmin,
             NewGame,
             SetEmojirade,
         ]
@@ -158,20 +167,34 @@ class GameState(object):
 
 class GameStateCommand(Command):
     def __init__(self, *args, **kwargs):
-        kwargs["handles"] = ["gamestate"]
+        self.gamestate = kwargs.pop("gamestate")
         super().__init__(*args, **kwargs)
 
 
 def admin_check(f):
     def wrapped_command(self):
-        if self.state[channel]["admins"] and self.args["user"] not in self.state[channel]["admins"]:
+        channel = self.args["channel"]
+
+        if self.gamestate.state[channel]["admins"] and self.args["user"] not in self.gamestate.state[channel]["admins"]:
             yield (None, "Sorry {user} but you need to be a game admin to do that :upside_down_face:".format(**self.args))
             return (None, "Game admins currently are: {0}".format("<@{0}>".join(self.state[channel]["admins"])))
 
-        f()
+        for channel, response in f(self):
+            yield channel, response
 
     return wrapped_command
 
+def only_in_progress(f):
+    def wrapped_command(self):
+        channel = self.args["channel"]
+
+        if not self.gamestate.in_progress(channel):
+            return (None, "Sorry but we need the game to be in progress first! Get someone to kick it off!")
+
+        for channel, response in f(self):
+            yield channel, response
+
+    return wrapped_command
 
 class SetAdmin(GameStateCommand):
     pattern = "<@{me}> promote <@([0-9A-Z]+)>"
@@ -181,16 +204,40 @@ class SetAdmin(GameStateCommand):
         super().__init__(*args, **kwargs)
 
     def prepare_args(self, event):
-        self.args["channel"] = event["channel"]
-        self.args["admin"] = re.match(self.pattern, event["text"])[1]
         self.args["user"] = event["user"]
+        self.args["channel"] = event["channel"]
+
+        rendered_pattern = self.pattern.format(me=self.slack.bot_id)
+        self.args["admin"] = re.match(rendered_pattern, event["text"]).group(1)
 
     @admin_check
     def execute(self):
         if self.gamestate.set_admin(self.args["channel"], self.args["admin"]):
-            return (None, "{user} has promoted {admin} to a game admin :tada:".format(**self.args))
+            yield (None, "<@{user}> has promoted <@{admin}> to a game admin :tada:".format(**self.args))
         else:
-            return (None, "{admin} is already an admin :face_with_rolling_eyes:".format(**self.args))
+            yield (None, "<@{admin}> is already an admin :face_with_rolling_eyes:".format(**self.args))
+
+
+class RemoveAdmin(GameStateCommand):
+    pattern = "<@{me}> demote <@([0-9A-Z]+)>"
+    description = "Removes a user from the admins group"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def prepare_args(self, event):
+        self.args["user"] = event["user"]
+        self.args["channel"] = event["channel"]
+
+        rendered_pattern = self.pattern.format(me=self.slack.bot_id)
+        self.args["admin"] = re.match(rendered_pattern, event["text"]).group(1)
+
+    @admin_check
+    def execute(self):
+        if self.gamestate.remove_admin(self.args["channel"], self.args["admin"]):
+            yield (None, "<@{user}> has demoted <@{admin}> to a pleb :cold_sweat:".format(**self.args))
+        else:
+            yield (None, "<@{admin}> isn't an admin :face_with_rolling_eyes:".format(**self.args))
 
 
 class NewGame(GameStateCommand):
@@ -201,19 +248,24 @@ class NewGame(GameStateCommand):
         super().__init__(*args, **kwargs)
 
     def prepare_args(self, event):
-        self.args["channel"] = event["channel"]
-        self.args["old_winner"] = re.match(self.pattern, event["text"])[1]
-        self.args["winner"] = re.match(self.pattern, event["text"])[2]
+        rendered_pattern = self.pattern.format(me=self.slack.bot_id)
+
         self.args["user"] = event["user"]
+        self.args["channel"] = event["channel"]
+        self.args["old_winner"] = re.match(rendered_pattern, event["text"]).group(1)
+        self.args["winner"] = re.match(rendered_pattern, event["text"]).group(2)
 
     @admin_check
     def execute(self):
         if self.args["winner"] == self.args["old_winner"]:
-            return (None, "Sorry, but the old and current winner cannot be the same person ({winner})...".format(**self.args))
+            yield (None, "Sorry, but the old and current winner cannot be the same person (<@{winner}>)...".format(**self.args))
+            raise StopIteration
 
         self.gamestate.new_game(self.args["channel"], self.args["old_winner"], self.args["winner"])
-        yield (None, "{user} has set the old winner to {old_winner} and the winner to {winner}".format(**self.args))
-        return (None, "It's now {old_winner}'s turn to provide {winner} with the next 'rade!".format(**self.args))
+        yield (None, "<@{user}> has set the old winner to <@{old_winner}> and the winner to <@{winner}>".format(**self.args))
+        yield (None, "It's now <@{old_winner}>'s turn to provide <@{winner}> with the next 'rade!".format(**self.args))
+        yield (self.args["old_winner"], "You'll now need to send me the new 'rade for <@{winner}>".format(**self.args))
+        yield (self.args["old_winner"], "Please reply back in the format 'emojirade Point Break' if 'Point Break' was the new 'rade")
 
 
 class SetEmojirade(GameStateCommand):
@@ -224,13 +276,18 @@ class SetEmojirade(GameStateCommand):
         super().__init__(*args, **kwargs)
 
     def prepare_args(self, event):
-        self.args["channel"] = event["channel"]
-        self.args["emojirade"] = re.match(self.pattern, event["text"])[1]
         self.args["user"] = event["user"]
+        self.args["emojirade"] = re.match(self.pattern, event["text"]).group(1)
 
+        for game in self.gamestate.state:
+            if game["step"] == "waiting":
+                self.args["channel"] = game["channel"]
+
+    @only_in_progress
     def execute(self):
         if self.args["user"] != self.gamestate.state[self.args["channel"]]["old_winner"]:
-            return (None, "Err {user} it's not your turn to provide the new 'rade :sweat:")
+            yield (None, "Err <@{user}> it's not your turn to provide the new 'rade :sweat:")
+            raise StopIteration
 
         self.gamestate.set_emojirade(self.args["channel"], self.args["emojirade"])
 
@@ -238,10 +295,10 @@ class SetEmojirade(GameStateCommand):
         game_channel = self.gamestate.state[self.args["channel"]]["channel"]
 
         # DM the winner with the new rade
-        yield (winner, "Hey, {user} just set the new 'rade to '{emojirade}'".format(**self.args))
+        yield (winner, "Hey, <@{user}> just set the new 'rade to '{emojirade}'".format(**self.args))
 
         # Let everyone else know
-        return (game_channel, ":mailbox: {user} has sent the 'rade to {winner}".format(**self.args, winner=winner))
+        yield (game_channel, ":mailbox: <@{user}> has sent the 'rade to <@{winner}>".format(**self.args, winner=winner))
 
 
 class CorrectGuess(GameStateCommand):
@@ -253,9 +310,10 @@ class CorrectGuess(GameStateCommand):
 
     def prepare_args(self, event):
         self.args["channel"] = event["channel"]
-        self.args["target_user"] = re.match(self.pattern, event["text"])[1]
+        self.args["target_user"] = re.match(self.pattern, event["text"]).group(1)
         self.args["user"] = event["user"]
 
+    @only_in_progress
     def execute(self):
         if self.args["user"] == self.args["target_user"]:
             return (None, "You're not allowed to award yourself the win >.>")
@@ -264,6 +322,6 @@ class CorrectGuess(GameStateCommand):
             return (None, "You're not the old winner, stop awarding other people the win >.>")
 
         self.gamestate.correct_guess(self.args["channel"], self.args["target_user"])
-        yield (None, "Congratz :tada: {target_user}".format(**self.args))
-        yield (self.args["user"], "You'll now need to send me the new 'rade for {target_user}".format(**self.args))
+        yield (None, "Congratz :tada: <@{target_user}>".format(**self.args))
+        yield (self.args["user"], "You'll now need to send me the new 'rade for <@{target_user}>".format(**self.args))
         yield (self.args["user"], "Please reply back in the format 'emojirade Point Break' if 'Point Break' was the new 'rade")

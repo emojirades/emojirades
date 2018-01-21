@@ -14,7 +14,7 @@ module_logger = logging.getLogger("PlusPlusBot.bot")
 
 
 class PlusPlusBot(object):
-    def __init__(self, scorefile=None, statefile=None):
+    def __init__(self, scorefile, statefile):
         self.logger = logging.getLogger("PlusPlusBot.bot.Bot")
 
         self.scorekeeper = ScoreKeeper(scorefile)
@@ -47,6 +47,16 @@ class PlusPlusBot(object):
 
         return None
 
+    def decode_channel(self, channel):
+        """
+        Figures out the channel destination
+        """
+        if channel.startswith("U"):
+            # Channel is a User ID, which means the real channel is the IM with that user
+            return self.slack.find_im(channel)
+        else:
+            raise NotImplementedError("Returned channel '{0}' wasn't decoded".format(channel))
+
     def listen_for_actions(self):
         commands = Command.prepare_commands()
         commands.update(Command.prepare_commands(self.scorekeeper.commands))
@@ -62,14 +72,17 @@ class PlusPlusBot(object):
 
         while True:
             for event in self.slack.sc.rtm_read():
-                if not event:
+                if not event or "text" not in event or "channel" not in event:
+                    self.logger.debug("Skipping event due to being invalid")
                     continue
 
-                for Command in self.gamestate.infer_commands(event):
-                    action = Command(self.slack, event, scorekeeper=self.scorekeeper, gamestate=self.gamestate)
+                for GameCommand in self.gamestate.infer_commands(event):
+                    action = GameCommand(self.slack, event, gamestate=self.gamestate)
 
                     for channel, response in action.execute():
-                        if not channel:
+                        if channel is not None:
+                            channel = self.decode_channel(channel)
+                        else:
                             channel = event["channel"]
 
                         self.slack.sc.rtm_send_message(channel, response)
@@ -77,16 +90,11 @@ class PlusPlusBot(object):
                 action = self.match_event(event, commands)
 
                 if action:
-                    if not self.gamestate.in_progress:
-                        self.logger.info("Refusing action as gamestate is not in progress")
-
-                        message = "Gamestate is not in progress, please set an initial winner pair"
-                        self.slack.sc.rtm_send_message(event["channel"], message)
-                        continue
-
                     self.logger.debug("Matched {0} for event {1}".format(action, event))
                     for channel, response in action.execute():
-                        if not channel:
+                        if channel is not None:
+                            channel = self.decode_channel(channel)
+                        else:
                             channel = event["channel"]
 
                         self.slack.sc.rtm_send_message(channel, response)

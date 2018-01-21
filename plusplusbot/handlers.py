@@ -1,16 +1,9 @@
 
-
 import botocore
 import pathlib
 import logging
 import boto3
 import csv
-
-def get_configuration_handler(filename):
-    if filename.startswith("s3://"):
-        return S3ConfigurationHandler
-    else:
-        return LocalConfigurationHandler
 
 class ConfigurationHandler(object):
     def __init__(self, *args, **kwargs):
@@ -41,7 +34,7 @@ class S3ConfiguationHandler(ConfigurationHandler):
     @property
     def exists(self):
         try:
-            self.s3.Object(self.bucket, self.key).load()
+            self._s3.Object(self._bucket, self._key).load()
             return True
         except botocore.exceptions.ClientError as e:
             if e.response["Error"]["Code"] == "404":
@@ -91,3 +84,9 @@ class LocalConfigurationHandler(ConfigurationHandler):
 
     def flush(self):
         pass
+
+def get_configuration_handler(filename):
+    if filename.startswith("s3://"):
+        return S3ConfiguationHandler
+    else:
+        return LocalConfigurationHandler

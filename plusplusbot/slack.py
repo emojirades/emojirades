@@ -20,3 +20,10 @@ class SlackClient(object):
 
     def is_admin(self, userid):
         return self.sc.api_call("users.info", user=userid)['user']['is_admin']
+
+    def find_im(self, userid):
+        for im in self.sc.api_call("im.list")["ims"]:
+            if im["user"] == userid:
+                return im["id"]
+
+        return None

@@ -5,6 +5,7 @@ from collections import defaultdict
 
 import logging
 import csv
+import re
 import io
 
 module_logger = logging.getLogger("PlusPlusBot.scorekeeper")
@@ -51,8 +52,11 @@ class ScoreKeeper(object):
         self.history = []
 
         if filename:
-            self.scoreboard.update(self.config.load())
-            self.logger.info("Loaded scores from {0}".format(filename))
+            existing_state = self.config.load()
+
+            if existing_state is not None:
+                self.scoreboard.update(existing_state)
+                self.logger.info("Loaded scores from {0}".format(filename))
 
     def plusplus(self, user):
         self.scoreboard[user] += 1
@@ -88,8 +92,22 @@ class ScoreKeeper(object):
 
 class ScoreKeeperCommand(Command):
     def __init__(self, *args, **kwargs):
-        kwargs["handles"] = ["scorekeeper"]
+        self.scorekeeper = kwargs.pop("scorekeeper")
+        self.gamestate = kwargs.pop("gamestate")
         super().__init__(*args, **kwargs)
+
+
+def only_in_progress(f):
+    def wrapped_command(self):
+        channel = self.args["channel"]
+
+        if not self.gamestate.in_progress(channel):
+            return (None, "Sorry, but we need the game to be in progress first! Get someone to kick it off!")
+
+        for channel, response in f(self):
+            yield channel, response
+
+    return wrapped_command
 
 
 class PlusPlusCommand(ScoreKeeperCommand):
@@ -100,7 +118,8 @@ class PlusPlusCommand(ScoreKeeperCommand):
         super().__init__(*args, **kwargs)
 
     def prepare_args(self, event):
-        self.args["target_user"] = re.match(self.pattern, event["text"])[1]
+        self.args["target_user"] = re.match(self.pattern, event["text"]).group(1)
+        self.args["channel"] = event["channel"]
         self.args["user"] = event["user"]
 
     def execute(self):
@@ -133,11 +152,12 @@ class SetCommand(ScoreKeeperCommand):
         super().__init__(*args, **kwargs)
 
     def prepare_args(self, event):
-        args_matches = re.match(self.pattern, event["text"])
-
-        self.args["target_user"] = args_matches[1]
         self.args["user"] = event["user"]
-        self.args["new_score"] = args_matches[2]
+        self.args["channel"] = event["channel"]
+
+        matches = re.match(self.pattern, event["text"])
+        self.args["target_user"] = matches.group(1)
+        self.args["new_score"] = matches.group(2)
 
     def execute(self):
         target_user = self.args["target_user"]
@@ -171,7 +191,8 @@ class MinusMinusCommand(ScoreKeeperCommand):
         super().__init__(*args, **kwargs)
 
     def prepare_args(self, event):
-        self.args["target_user"] = re.match(self.pattern, event["text"])[1]
+        self.args["target_user"] = re.match(self.pattern, event["text"]).group(1)
+        self.args["channel"] = event["channel"]
         self.args["user"] = event["user"]
 
     def execute(self):
