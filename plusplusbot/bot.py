@@ -80,7 +80,7 @@ class PlusPlusBot(object):
                     continue
 
                 for GameCommand in self.gamestate.infer_commands(event):
-                    action = GameCommand(self.slack, event, gamestate=self.gamestate)
+                    action = GameCommand(self.slack, event, scorekeeper=self.scorekeeper, gamestate=self.gamestate)
 
                     for channel, response in action.execute():
                         if channel is not None:

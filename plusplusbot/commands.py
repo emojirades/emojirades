@@ -77,7 +77,7 @@ class HelpCommand(Command):
             message += "{0:<50}{1}\n".format(self.format_command(command.pattern), command.description)
 
         message += "```"
-        return (None, message)
+        yield (None, message)
 
     def __str__(self):
         return "HelpCommand"

@@ -1,5 +1,7 @@
 
 from plusplusbot.handlers import get_configuration_handler
+from plusplusbot.scorekeeper import InferredPlusPlusCommand
+from plusplusbot.wrappers import only_in_progress, admin_check
 from plusplusbot.commands import Command
 from collections import defaultdict
 
@@ -48,15 +50,15 @@ class GameState(object):
                8: Go to step 1
 
     Steps of the game:
-        bootstrap : The game has no previous winner, manual intervention required
+        new_game  : The game has no previous winner, manual intervention required
         waiting   : The old winner has not provided the winner with the new emojirade
         provided  : The winner has not posted anything since having recieved the emojirade
         guessing  : The winner has posted since having recieved the emojirade
         guessed   : The guesser has correctly guessed the emojirade
 
     Step transitions:
-        set_winners   : bootstrap -> waiting
-        set_emojirade : waiting -> provided
+        set_winners   : new_game -> waiting
+        set_emojirade : waiting  -> provided
         winner_posted : provided -> guessing
         correct_guess : guessing -> guessed
     """
@@ -87,7 +89,7 @@ class GameState(object):
                 self.logger.info("Loaded game state from {0}".format(filename))
 
     def in_progress(self, channel):
-        return self.state[channel]["step"] != "new_game"
+        return self.state[channel]["step"] not in ["new_game", "waiting"]
 
     def infer_commands(self, event):
         """ Keeps tabs on the conversation and updates gamestate if required """
@@ -107,7 +109,8 @@ class GameState(object):
                 guess = event["text"].lower()
 
                 if guess == emojirade:
-                    yield CorrectGuess
+                    yield InferredCorrectGuess
+                    yield InferredPlusPlusCommand
 
     def set_admin(self, channel, admin):
         """ Sets a new game admin! """
@@ -153,7 +156,7 @@ class GameState(object):
 
         self.state[channel]["old_winner"] = self.state[channel]["winner"]
         self.state[channel]["winner"] = winner
-        self.state[channel]["step"] = "guessed"
+        self.state[channel]["step"] = "waiting"
 
     @property
     def commands(self):
@@ -170,34 +173,6 @@ class GameStateCommand(Command):
         self.gamestate = kwargs.pop("gamestate")
         super().__init__(*args, **kwargs)
 
-
-def admin_check(f):
-    def wrapped_command(self):
-        channel = self.args["channel"]
-
-        if self.gamestate.state[channel]["admins"] and self.args["user"] not in self.gamestate.state[channel]["admins"]:
-            yield (None, "Sorry <@{user}> but you need to be a game admin to do that :upside_down_face:".format(**self.args))
-
-            admins = ["<@{0}>".format(admin) for admin in self.gamestate.state[channel]["admins"]]
-            yield (None, "Game admins currently are: {0}".format(", ".join(admins)))
-            raise StopIteration
-
-        for channel, response in f(self):
-            yield channel, response
-
-    return wrapped_command
-
-def only_in_progress(f):
-    def wrapped_command(self):
-        channel = self.args["channel"]
-
-        if not self.gamestate.in_progress(channel):
-            return (None, "Sorry but we need the game to be in progress first! Get someone to kick it off!")
-
-        for channel, response in f(self):
-            yield channel, response
-
-    return wrapped_command
 
 class SetAdmin(GameStateCommand):
     pattern = "<@{me}> promote <@([0-9A-Z]+)>"
@@ -268,7 +243,7 @@ class NewGame(GameStateCommand):
         yield (None, "<@{user}> has set the old winner to <@{old_winner}> and the winner to <@{winner}>".format(**self.args))
         yield (None, "It's now <@{old_winner}>'s turn to provide <@{winner}> with the next 'rade!".format(**self.args))
         yield (self.args["old_winner"], "You'll now need to send me the new 'rade for <@{winner}>".format(**self.args))
-        yield (self.args["old_winner"], "Please reply back in the format 'emojirade Point Break' if 'Point Break' was the new 'rade")
+        yield (self.args["old_winner"], "Please reply back in the format `emojirade Point Break` if `Point Break` was the new 'rade")
 
 
 class SetEmojirade(GameStateCommand):
@@ -299,10 +274,32 @@ class SetEmojirade(GameStateCommand):
         winner = self.gamestate.state[self.args["channel"]]["winner"]
 
         # DM the winner with the new rade
-        yield (winner, "Hey, <@{user}> just set the new 'rade to '{emojirade}'".format(**self.args))
+        yield (winner, "Hey, <@{user}> made the 'rade `{emojirade}`, good luck!".format(**self.args))
 
         # Let everyone else know
         yield (self.args["channel"], ":mailbox: <@{user}> has sent the 'rade to <@{winner}>".format(**self.args, winner=winner))
+
+class InferredCorrectGuess(GameStateCommand):
+    pattern = None
+    description = "Takes the user that send the event as the winner, this is only ever fired internally"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def prepare_args(self, event):
+        self.args["target_user"] = event["user"]
+        self.args["channel"] = event["channel"]
+        self.args["user"] = event["user"]
+
+    @only_in_progress
+    def execute(self):
+        self.gamestate.correct_guess(self.args["channel"], self.args["target_user"])
+
+        old_winner = self.gamestate.state[self.args["channel"]]["old_winner"]
+
+        yield (None, "<@{target_user}>++".format(**self.args))
+        yield (old_winner, "You'll now need to send me the new 'rade for <@{target_user}>".format(**self.args))
+        yield (old_winner, "Please reply back in the format `emojirade Point Break` if `Point Break` was the new 'rade")
 
 
 class CorrectGuess(GameStateCommand):
@@ -328,6 +325,6 @@ class CorrectGuess(GameStateCommand):
             raise StopIteration
 
         self.gamestate.correct_guess(self.args["channel"], self.args["target_user"])
-        yield (None, "Congratz :tada: <@{target_user}>".format(**self.args))
+        yield (None, "<@{target_user}>++".format(**self.args))
         yield (self.args["user"], "You'll now need to send me the new 'rade for <@{target_user}>".format(**self.args))
-        yield (self.args["user"], "Please reply back in the format 'emojirade Point Break' if 'Point Break' was the new 'rade")
+        yield (self.args["user"], "Please reply back in the format `emojirade Point Break` if `Point Break` was the new 'rade")

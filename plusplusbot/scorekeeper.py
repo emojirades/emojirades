@@ -1,6 +1,7 @@
 
 from plusplusbot.handlers import get_configuration_handler
 from plusplusbot.commands import Command
+from plusplusbot.wrappers import only_in_progress, admin_check
 from collections import defaultdict
 
 import logging
@@ -61,14 +62,17 @@ class ScoreKeeper(object):
     def plusplus(self, user):
         self.scoreboard[user] += 1
         self.history.append((user, "++"))
+        self.config.flush()
 
     def minusminus(self, user):
         self.scoreboard[user] -= 1
         self.history.append((user, "--"))
+        self.config.flush()
 
     def overwrite(self, user, score):
         self.scoreboard[user] = score
         self.history.append((user, score))
+        self.config.flush()
 
     def leaderboard(self, limit=leaderboard_limit):
         return sorted(self.scoreboard.items(), key=lambda i: (i[1], i[0]), reverse=True)[:limit]
@@ -97,17 +101,32 @@ class ScoreKeeperCommand(Command):
         super().__init__(*args, **kwargs)
 
 
-def only_in_progress(f):
-    def wrapped_command(self):
-        channel = self.args["channel"]
+class InferredPlusPlusCommand(ScoreKeeperCommand):
+    pattern = None
+    description = "Increments the users score"
 
-        if not self.gamestate.in_progress(channel):
-            return (None, "Sorry, but we need the game to be in progress first! Get someone to kick it off!")
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-        for channel, response in f(self):
-            yield channel, response
+    def prepare_args(self, event):
+        self.args["target_user"] = event["user"]
+        self.args["channel"] = event["channel"]
+        self.args["user"] = event["user"]
 
-    return wrapped_command
+    @only_in_progress
+    def execute(self):
+        target_user = self.args["target_user"]
+
+        self.logger.debug("Incrementing user's score: {}".format(target_user))
+        self.scorekeeper.plusplus(target_user)
+
+        score = self.scorekeeper.scoreboard[target_user]
+
+        message = "Congrats <@{0}>, you're now at {1} point{2}"
+        yield (None, message.format(target_user, score, "s" if score > 1 else ""))
+
+    def __str__(self):
+        return "InferredPlusPlusCommand"
 
 
 class PlusPlusCommand(ScoreKeeperCommand):
@@ -122,23 +141,25 @@ class PlusPlusCommand(ScoreKeeperCommand):
         self.args["channel"] = event["channel"]
         self.args["user"] = event["user"]
 
+    @only_in_progress
     def execute(self):
         target_user = self.args["target_user"]
 
         if self.args["user"] == target_user:
-            return (None, ":thinking_face: you're not allowed to award points to yourself...")
+            yield (None, ":thinking_face: you're not allowed to award points to yourself...")
+            raise StopIteration
 
         if self.slack.is_bot(target_user):
-            return (None, ":thinking_face: robots aren't allowed to play Emojirades!")
+            yield (None, ":thinking_face: robots aren't allowed to play Emojirades!")
+            raise StopIteration
 
         self.logger.debug("Incrementing user's score: {}".format(target_user))
         self.scorekeeper.plusplus(target_user)
-        self.scorekeeper.flush()
 
         score = self.scorekeeper.scoreboard[target_user]
 
         message = "Congrats <@{0}>, you're now at {1} point{2}"
-        return (None, message.format(target_user, score, "s" if score > 1 else ""))
+        yield (None, message.format(target_user, score, "s" if score > 1 else ""))
 
     def __str__(self):
         return "PlusPlusCommand"
@@ -159,25 +180,24 @@ class SetCommand(ScoreKeeperCommand):
         self.args["target_user"] = matches.group(1)
         self.args["new_score"] = matches.group(2)
 
+    @admin_check
     def execute(self):
         target_user = self.args["target_user"]
         new_score = int(self.args["new_score"])
 
         if self.args["user"] == target_user:
-            return ":thinking_face: you can't do that to yourself"
+            yield ":thinking_face: you can't do that to yourself"
+            raise StopIteration
 
         if self.slack.is_bot(target_user):
-            return ":thinking_face: robots aren't allowed to play Emojirades"
-
-        if not self.slack.is_admin(self.args["user"]):
-            return ":thinking_face: you don't have permission to do that"
+            yield ":thinking_face: robots aren't allowed to play Emojirades"
+            raise StopIteration
 
         self.logger.debug("Setting {} score to: {}".format(target_user, new_score))
         self.scorekeeper.overwrite(target_user, new_score)
-        self.scorekeeper.flush()
 
         message = "<@{0}> manually set to {1} point{2}"
-        return (None, message.format(target_user, new_score, "s" if new_score > 1 else ""))
+        yield (None, message.format(target_user, new_score, "s" if new_score > 1 else ""))
 
     def __str__(self):
         return "SetCommand"
@@ -195,23 +215,25 @@ class MinusMinusCommand(ScoreKeeperCommand):
         self.args["channel"] = event["channel"]
         self.args["user"] = event["user"]
 
+    @admin_check
     def execute(self):
         target_user = self.args["target_user"]
 
         if self.args["user"] == target_user:
-            return ":thinking_face: you're not allowed to deduct points from yourself..."
+            yield ":thinking_face: you're not allowed to deduct points from yourself..."
+            raise StopIteration
 
         if self.slack.is_bot(target_user):
-            return ":thinking_face: robots aren't allowed to play Emojirades!"
+            yield ":thinking_face: robots aren't allowed to play Emojirades!"
+            raise StopIteration
 
         self.logger.debug("Decrementing user's score: {}".format(target_user))
         self.scorekeeper.minusminus(target_user)
-        self.scorekeeper.flush()
 
         score = self.scorekeeper.scoreboard[target_user]
 
         message = "Oops <@{0}>, you're now at {1} point{2}"
-        return (None, message.format(target_user, score, "s" if score > 1 else ""))
+        yield (None, message.format(target_user, score, "s" if score > 1 else ""))
 
     def __str__(self):
         return "MinusMinusCommand"
@@ -229,8 +251,8 @@ class LeaderboardCommand(ScoreKeeperCommand):
 
         self.logger.debug("Printing leaderboard: {0}".format(leaderboard))
 
-        return (None, "\n".join(["{0}. <@{1}> [{2} point{3}]".format(index + 1, name, score, "s" if score > 1 else "")
-                                for index, (name, score) in enumerate(leaderboard)]))
+        yield (None, "\n".join(["{0}. <@{1}> [{2} point{3}]".format(index + 1, name, score, "s" if score > 1 else "")
+                               for index, (name, score) in enumerate(leaderboard)]))
 
     def __str__(self):
         return "LeaderboardCommand"
@@ -248,8 +270,8 @@ class HistoryCommand(ScoreKeeperCommand):
 
         self.logger.debug("Printing history: {0}".format(history))
 
-        return (None, "\n".join(["{0}. <@{1}> > '{2}'".format(index + 1, name, action)
-                                for index, (name, action) in enumerate(history)]))
+        yield (None, "\n".join(["{0}. <@{1}> > '{2}'".format(index + 1, name, action)
+                               for index, (name, action) in enumerate(history)]))
 
     def __str__(self):
         return "HistoryCommand"
