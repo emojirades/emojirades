@@ -4,6 +4,7 @@ import re
 from collections import defaultdict
 
 from plusplusbot.command.commands import Command
+from plusplusbot.command.gamestate_commands.inferred_correct_guess_command import InferredCorrectGuess
 from plusplusbot.handlers import get_configuration_handler
 from plusplusbot.command.scorekeeper_commands.inferred_plusplus_command import InferredPlusPlusCommand
 from plusplusbot.wrappers import only_in_progress, admin_check
@@ -86,7 +87,7 @@ class GameState(object):
                 self.logger.info("Loaded game state from {0}".format(filename))
 
     def in_progress(self, channel):
-        return self.state[channel]["step"] not in ["new_game", "waiting"]
+        return self.state[channel]["step"] not in ["new_game"]
 
     def infer_commands(self, event):
         """ Keeps tabs on the conversation and updates gamestate if required """
@@ -134,7 +135,7 @@ class GameState(object):
     def set_emojirade(self, channel, emojirade):
         """ New emojirade word(s) """
         if self.state[channel]["step"] != "waiting":
-            raise InvalidStateException("Expecting {channel}'s state to be 'waiting', it is actually {0}".format(channel, self.state[channel]["step"]))
+            raise self.InvalidStateException("Expecting {channel}'s state to be 'waiting', it is actually {0}".format(channel, self.state[channel]["step"]))
 
         self.state[channel]["emojirade"] = emojirade
         self.state[channel]["step"] = "provided"
@@ -142,14 +143,14 @@ class GameState(object):
     def winner_posted(self, channel):
         """ Winner has posted something after receiving the emojirade """
         if self.state[channel]["step"] != "provided":
-            raise InvalidStateException("Expecting GameState to be 'provided', it is actually {0}".format(self.state["step"]))
+            raise self.InvalidStateException("Expecting GameState to be 'provided', it is actually {0}".format(self.state["step"]))
 
         self.state[channel]["step"] = "guessing"
 
     def correct_guess(self, channel, winner):
         """ Guesser has guessed the correct emojirade """
         if self.state[channel]["step"] != "guessing":
-            raise InvalidStateException("Expecting GameState to be 'guessing', it is actually {0}".format(self.state[channel]["step"]))
+            raise self.InvalidStateException("Expecting GameState to be 'guessing', it is actually {0}".format(self.state[channel]["step"]))
 
         self.state[channel]["old_winner"] = self.state[channel]["winner"]
         self.state[channel]["winner"] = winner

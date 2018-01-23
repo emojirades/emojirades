@@ -3,7 +3,6 @@ import os
 import time
 
 from plusplusbot.command.command_registry import CommandRegistry
-from plusplusbot.command.commands import Command
 from plusplusbot.gamestate import GameState
 from plusplusbot.scorekeeper import ScoreKeeper
 from plusplusbot.slack import SlackClient
