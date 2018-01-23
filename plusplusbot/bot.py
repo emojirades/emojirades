@@ -1,14 +1,12 @@
+import logging
 import os
-
 import time
 
-from plusplusbot.slack import SlackClient
-from plusplusbot.scorekeeper import ScoreKeeper
+from plusplusbot.command.command_registry import CommandRegistry
+from plusplusbot.command.commands import Command
 from plusplusbot.gamestate import GameState
-
-from plusplusbot.commands import Command
-
-import logging
+from plusplusbot.scorekeeper import ScoreKeeper
+from plusplusbot.slack import SlackClient
 
 module_logger = logging.getLogger("PlusPlusBot.bot")
 
@@ -61,9 +59,9 @@ class PlusPlusBot(object):
             raise NotImplementedError("Returned channel '{0}' wasn't decoded".format(channel))
 
     def listen_for_actions(self):
-        commands = Command.prepare_commands()
-        commands.update(Command.prepare_commands(self.scorekeeper.commands))
-        commands.update(Command.prepare_commands(self.gamestate.commands))
+        commands = CommandRegistry.prepare_commands()
+        # commands.update(Command.prepare_commands(self.scorekeeper.commands))
+        # commands.update(Command.prepare_commands(self.gamestate.commands))
 
         if not self.slack.ready:
             raise RuntimeError("is_ready has not been called/returned false")
