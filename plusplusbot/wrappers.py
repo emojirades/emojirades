@@ -22,7 +22,7 @@ def only_in_progress(f):
         channel = self.args["channel"]
 
         if not self.gamestate.in_progress(channel):
-            return (None, "Sorry but we need the game to be in progress first! Get someone to kick it off!")
+            yield (None, "Sorry but we need the game to be in progress first! Get someone to kick it off!")
 
         for channel, response in f(self):
             yield channel, response
