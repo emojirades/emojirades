@@ -15,7 +15,7 @@ class SetEmojirade(GameStateCommand):
         self.args["user"] = event["user"]
         self.args["emojirade"] = re.match(self.pattern, event["text"]).group(1)
 
-        self.args["channel"] = "PLACEHOLDER" # TODO: Temp hack
+        self.args["channel"] = "PLACEHOLDER"  # TODO: Temp hack
 
         # Figure out the channel to use
         # TODO: Decide if we should be getting the user to enter the channel or not?

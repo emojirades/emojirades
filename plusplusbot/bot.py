@@ -59,8 +59,6 @@ class PlusPlusBot(object):
 
     def listen_for_actions(self):
         commands = CommandRegistry.prepare_commands()
-        # commands.update(Command.prepare_commands(self.scorekeeper.commands))
-        # commands.update(Command.prepare_commands(self.gamestate.commands))
 
         if not self.slack.ready:
             raise RuntimeError("is_ready has not been called/returned false")

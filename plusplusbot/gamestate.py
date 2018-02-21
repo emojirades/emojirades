@@ -3,11 +3,12 @@ import logging
 import re
 from collections import defaultdict
 
+from plusplusbot.handlers import get_configuration_handler
+from plusplusbot.wrappers import only_in_progress, admin_check
+
 from plusplusbot.command.commands import Command
 from plusplusbot.command.gamestate_commands.inferred_correct_guess_command import InferredCorrectGuess
-from plusplusbot.handlers import get_configuration_handler
 from plusplusbot.command.scorekeeper_commands.inferred_plusplus_command import InferredPlusPlusCommand
-from plusplusbot.wrappers import only_in_progress, admin_check
 
 module_logger = logging.getLogger("PlusPlusBot.gamestate")
 
@@ -155,4 +156,3 @@ class GameState(object):
         self.state[channel]["old_winner"] = self.state[channel]["winner"]
         self.state[channel]["winner"] = winner
         self.state[channel]["step"] = "waiting"
-
