@@ -9,8 +9,6 @@ class SlackClient(object):
 
         epp_bot = self.sc.api_call("auth.test")
         self.bot_id = epp_bot["user_id"]
-        # self.channel_id = config.get("channel_id", None)
-        # self.channel_id = None
 
         self.ready = True
         self.last_ts = float(0)

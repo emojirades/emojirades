@@ -1,5 +1,6 @@
-from plusplusbot.command.commands import Command
 import plusplusbot.command.command_registry
+
+from plusplusbot.command.commands import Command
 
 
 class HelpCommand(Command):

@@ -6,6 +6,10 @@ import boto3
 import csv
 
 class ConfigurationHandler(object):
+    """
+    Configuration Handlers deal with the transport of bytes to the 'file', wherever that may be
+    They can have .save() and .load() called on them, which take/return bytes
+    """
     def __init__(self, *args, **kwargs):
 
         miss_positional = "{0} is missing a required positional argument '{1}' in position {2}"

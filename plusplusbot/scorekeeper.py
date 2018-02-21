@@ -1,7 +1,8 @@
-import csv
 import io
-import logging
 import re
+import csv
+import logging
+
 from collections import defaultdict
 
 from plusplusbot.command.commands import Command
@@ -12,6 +13,7 @@ module_logger = logging.getLogger("PlusPlusBot.scorekeeper")
 
 leaderboard_limit = 10
 history_limit = 5
+
 
 def get_handler(filename):
     class ScoreKeeperConfigurationHandler(get_configuration_handler(filename)):
