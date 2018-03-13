@@ -7,7 +7,6 @@ from collections import defaultdict
 
 from plusplusbot.command.commands import Command
 from plusplusbot.handlers import get_configuration_handler
-from plusplusbot.wrappers import only_in_progress, admin_check
 
 module_logger = logging.getLogger("PlusPlusBot.scorekeeper")
 
@@ -63,17 +62,17 @@ class ScoreKeeper(object):
     def plusplus(self, user):
         self.scoreboard[user] += 1
         self.history.append((user, "++"))
-        self.config.flush()
+        self.save()
 
     def minusminus(self, user):
         self.scoreboard[user] -= 1
         self.history.append((user, "--"))
-        self.config.flush()
+        self.save()
 
     def overwrite(self, user, score):
         self.scoreboard[user] = score
         self.history.append((user, score))
-        self.config.flush()
+        self.save()
 
     def leaderboard(self, limit=leaderboard_limit):
         return sorted(self.scoreboard.items(), key=lambda i: (i[1], i[0]), reverse=True)[:limit]

@@ -4,10 +4,8 @@ import logging
 
 from collections import defaultdict
 
-from plusplusbot.handlers import get_configuration_handler
-from plusplusbot.wrappers import only_in_progress, admin_check
-
 from plusplusbot.command.commands import Command
+from plusplusbot.handlers import get_configuration_handler
 from plusplusbot.command.gamestate_commands.inferred_correct_guess_command import InferredCorrectGuess
 from plusplusbot.command.scorekeeper_commands.inferred_plusplus_command import InferredPlusPlusCommand
 
@@ -119,6 +117,8 @@ class GameState(object):
             return False
 
         self.state[channel]["admins"].append(admin)
+        self.save()
+
         return True
 
     def remove_admin(self, channel, admin):
@@ -127,6 +127,8 @@ class GameState(object):
             return False
 
         self.state[channel]["admins"].remove(admin)
+        self.save()
+
         return True
 
     def new_game(self, channel, old_winner, winner):
@@ -134,6 +136,7 @@ class GameState(object):
         self.state[channel]["old_winner"] = old_winner
         self.state[channel]["winner"] = winner
         self.state[channel]["step"] = "waiting"
+        self.save()
 
     def set_emojirade(self, channel, emojirade):
         """ New emojirade word(s) """
@@ -142,6 +145,7 @@ class GameState(object):
 
         self.state[channel]["emojirade"] = emojirade
         self.state[channel]["step"] = "provided"
+        self.save()
 
     def winner_posted(self, channel):
         """ Winner has posted something after receiving the emojirade """
@@ -149,6 +153,7 @@ class GameState(object):
             raise self.InvalidStateException("Expecting {0}'s state to be 'provided', it is actually {1}".format(channel, self.state["step"]))
 
         self.state[channel]["step"] = "guessing"
+        self.save()
 
     def correct_guess(self, channel, winner):
         """ Guesser has guessed the correct emojirade """
@@ -158,3 +163,25 @@ class GameState(object):
         self.state[channel]["old_winner"] = self.state[channel]["winner"]
         self.state[channel]["winner"] = winner
         self.state[channel]["step"] = "waiting"
+        self.save()
+
+    def game_status(self, channel):
+        """ Returns a string-ified version of the game state """
+        status = []
+
+        for k, v in self.state[channel].items():
+            if k == "old_winner" or k == "winner":
+                v = "<@{0}>".format(v)
+            elif k == "admins":
+                v = ", ".join(["<@{0}>".format(i) for i in v])
+            elif k == "emojirade":
+                v = "********"
+            else:
+                v = str(v)
+
+            status.append((k, v))
+
+        return "\n".join("{0}: {1}".format(k, v) for k, v in status)
+
+    def save(self):
+        self.config.save(self.state)
