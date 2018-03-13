@@ -1,4 +1,4 @@
-from .scorekeeper import ScoreKeeper
+from plusplusbot.scorekeeper import ScoreKeeper
 
 import tempfile
 import csv

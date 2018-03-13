@@ -1,18 +1,19 @@
+import io
+import re
+import csv
+import logging
 
-from .handlers import get_configuration_handler
 from collections import defaultdict
 
-import logging
-import boto3
-import csv
-import io
-import os
+from plusplusbot.command.commands import Command
+from plusplusbot.handlers import get_configuration_handler
+from plusplusbot.wrappers import only_in_progress, admin_check
 
-logging.getLogger('botocore').setLevel(logging.WARNING)
 module_logger = logging.getLogger("PlusPlusBot.scorekeeper")
 
 leaderboard_limit = 10
 history_limit = 5
+
 
 def get_handler(filename):
     class ScoreKeeperConfigurationHandler(get_configuration_handler(filename)):
@@ -53,20 +54,26 @@ class ScoreKeeper(object):
         self.history = []
 
         if filename:
-            self.scoreboard.update(self.config.load())
-            self.logger.info("Loaded scores from {0}".format(filename))
+            existing_state = self.config.load()
+
+            if existing_state is not None:
+                self.scoreboard.update(existing_state)
+                self.logger.info("Loaded scores from {0}".format(filename))
 
     def plusplus(self, user):
         self.scoreboard[user] += 1
         self.history.append((user, "++"))
+        self.config.flush()
 
     def minusminus(self, user):
         self.scoreboard[user] -= 1
         self.history.append((user, "--"))
+        self.config.flush()
 
     def overwrite(self, user, score):
         self.scoreboard[user] = score
         self.history.append((user, score))
+        self.config.flush()
 
     def leaderboard(self, limit=leaderboard_limit):
         return sorted(self.scoreboard.items(), key=lambda i: (i[1], i[0]), reverse=True)[:limit]

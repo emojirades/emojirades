@@ -1,18 +1,15 @@
 
-
 import botocore
 import pathlib
 import logging
 import boto3
 import csv
 
-def get_configuration_handler(filename):
-    if filename.startswith("s3://"):
-        return S3ConfigurationHandler
-    else:
-        return LocalConfigurationHandler
-
 class ConfigurationHandler(object):
+    """
+    Configuration Handlers deal with the transport of bytes to the 'file', wherever that may be
+    They can have .save() and .load() called on them, which take/return bytes
+    """
     def __init__(self, *args, **kwargs):
 
         miss_positional = "{0} is missing a required positional argument '{1}' in position {2}"
@@ -41,7 +38,7 @@ class S3ConfiguationHandler(ConfigurationHandler):
     @property
     def exists(self):
         try:
-            self.s3.Object(self.bucket, self.key).load()
+            self._s3.Object(self._bucket, self._key).load()
             return True
         except botocore.exceptions.ClientError as e:
             if e.response["Error"]["Code"] == "404":
@@ -91,3 +88,9 @@ class LocalConfigurationHandler(ConfigurationHandler):
 
     def flush(self):
         pass
+
+def get_configuration_handler(filename):
+    if filename.startswith("s3://"):
+        return S3ConfiguationHandler
+    else:
+        return LocalConfigurationHandler

@@ -12,6 +12,7 @@ if __name__ == "__main__":
     parser.add_argument("-v", "--verbose", action="count", dest="v", default=0, help="Logging level")
     parser.add_argument("--log-file", default=sys.stderr, help="File we will log to")
     parser.add_argument("--score-file", help="CSV file we use to persist scores", required=True)
+    parser.add_argument("--state-file", help="JSON file we use to persist game state", required=True)
 
     args = parser.parse_args()
 
@@ -26,6 +27,6 @@ if __name__ == "__main__":
     logger = logging.getLogger("PlusPlusBot")
     logger.debug("Initialised application")
 
-    bot = PlusPlusBot(args.score_file)
+    bot = PlusPlusBot(args.score_file, args.state_file)
     logger.info("Listening for commands")
     bot.listen_for_actions()

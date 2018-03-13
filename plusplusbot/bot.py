@@ -1,22 +1,21 @@
+import logging
 import os
-
 import time
 
-from plusplusbot.slack import SlackClient
+from plusplusbot.command.command_registry import CommandRegistry
+from plusplusbot.gamestate import GameState
 from plusplusbot.scorekeeper import ScoreKeeper
-
-from plusplusbot.commands import Command
-
-import logging
+from plusplusbot.slack import SlackClient
 
 module_logger = logging.getLogger("PlusPlusBot.bot")
 
 
 class PlusPlusBot(object):
-    def __init__(self, scorefile=None):
+    def __init__(self, scorefile, statefile):
         self.logger = logging.getLogger("PlusPlusBot.bot.Bot")
 
         self.scorekeeper = ScoreKeeper(scorefile)
+        self.gamestate = GameState(statefile)
 
         slack_bot_token = os.environ.get("SLACK_BOT_TOKEN", None)
 
@@ -41,12 +40,25 @@ class PlusPlusBot(object):
 
         for pattern, (Command, description) in commands.items():
             if Command.match(event["text"], me=self.slack.bot_id):
-                return Command(self.scorekeeper, self.slack, event)
+                return Command(self.slack, event, scorekeeper=self.scorekeeper, gamestate=self.gamestate)
 
         return None
 
+    def decode_channel(self, channel):
+        """
+        Figures out the channel destination
+        """
+        if channel.startswith("C"):
+            # Plain old channel, just return it
+            return channel
+        elif channel.startswith("U"):
+            # Channel is a User ID, which means the real channel is the IM with that user
+            return self.slack.find_im(channel)
+        else:
+            raise NotImplementedError("Returned channel '{0}' wasn't decoded".format(channel))
+
     def listen_for_actions(self):
-        actions = Command.prepare_commands()
+        commands = CommandRegistry.prepare_commands()
 
         if not self.slack.ready:
             raise RuntimeError("is_ready has not been called/returned false")
@@ -54,23 +66,36 @@ class PlusPlusBot(object):
         if not self.slack.sc.rtm_connect():
             raise RuntimeError("Failed to connect to the Slack API")
 
-        self.logger.info("Slack is connected and listening for actions")
+        self.logger.info("Slack is connected and listening for commands")
 
         while True:
             for event in self.slack.sc.rtm_read():
-                if not event:
+                if not event or "text" not in event or "channel" not in event:
+                    self.logger.debug("Skipping event due to being invalid")
                     continue
 
-                # action, args, kwargs = self.match_event(event, actions)
-                action = self.match_event(event, actions)
+                for GameCommand in self.gamestate.infer_commands(event):
+                    action = GameCommand(self.slack, event, scorekeeper=self.scorekeeper, gamestate=self.gamestate)
+
+                    for channel, response in action.execute():
+                        if channel is not None:
+                            channel = self.decode_channel(channel)
+                        else:
+                            channel = event["channel"]
+
+                        self.slack.sc.rtm_send_message(channel, response)
+
+                action = self.match_event(event, commands)
 
                 if action:
                     self.logger.debug("Matched {0} for event {1}".format(action, event))
-                    response = action.execute()
+                    for channel, response in action.execute():
+                        if channel is not None:
+                            channel = self.decode_channel(channel)
+                        else:
+                            channel = event["channel"]
 
-                    if response:
-                        self.slack.sc.rtm_send_message(event["channel"], response)
-
+                        self.slack.sc.rtm_send_message(channel, response)
                 else:
                     self.logger.debug("No match for event {0}".format(event))
 
