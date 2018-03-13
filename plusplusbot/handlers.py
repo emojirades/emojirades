@@ -5,6 +5,7 @@ import logging
 import boto3
 import csv
 
+
 class ConfigurationHandler(object):
     """
     Configuration Handlers deal with the transport of bytes to the 'file', wherever that may be
@@ -25,6 +26,7 @@ class ConfigurationHandler(object):
                     setattr(self, arg, kwargs["filename"])
             else:
                 raise TypeError(miss_keyword.format(self, arg))
+
 
 class S3ConfiguationHandler(ConfigurationHandler):
     def __init__(self, *args, **kwargs):
@@ -55,8 +57,6 @@ class S3ConfiguationHandler(ConfigurationHandler):
     def save(self, content):
         self._object.put(Body=content)
 
-    def flush(self):
-        pass
 
 class LocalConfigurationHandler(ConfigurationHandler):
     def __init__(self, *args, **kwargs):
@@ -86,8 +86,6 @@ class LocalConfigurationHandler(ConfigurationHandler):
         with self._object.open('wb') as local_file:
             local_file.write(content)
 
-    def flush(self):
-        pass
 
 def get_configuration_handler(filename):
     if filename.startswith("s3://"):
