@@ -63,17 +63,17 @@ class ScoreKeeper(object):
     def plusplus(self, user):
         self.scoreboard[user] += 1
         self.history.append((user, "++"))
-        self.config.flush()
+        self.config.save()
 
     def minusminus(self, user):
         self.scoreboard[user] -= 1
         self.history.append((user, "--"))
-        self.config.flush()
+        self.config.save()
 
     def overwrite(self, user, score):
         self.scoreboard[user] = score
         self.history.append((user, score))
-        self.config.flush()
+        self.config.save()
 
     def leaderboard(self, limit=leaderboard_limit):
         return sorted(self.scoreboard.items(), key=lambda i: (i[1], i[0]), reverse=True)[:limit]
