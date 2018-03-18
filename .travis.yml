@@ -1,21 +1,21 @@
 language: python
+python:
+  - "3.5"
+  - "3.6"
 
 jobs:
   include:
     - stage: test
-      python:
-      - '3.5'
-      - '3.6'
       script:
-      - pip install -r requirements.txt --upgrade
-      - pip install -r test_requirements.txt --upgrade
-      - pip install -e .
-      - pycodestyle
-      - pytest
+        - pip install -r requirements.txt --upgrade
+        - pip install -r test_requirements.txt --upgrade
+        - pip install -e .
+        - pycodestyle
+        - pytest
     - stage: deploy
       python:
-      - '3.6'
-      script: skip
+        - "3.6"
+      script: ignore
       deploy:
         provider: pypi
         username:
