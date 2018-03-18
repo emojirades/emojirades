@@ -1,7 +1,7 @@
 language: python
 python:
-  - "3.5"
-  - "3.6"
+  - 3.5
+  - 3.6
 
 install:
   - pip install -r requirements.txt --upgrade
@@ -13,7 +13,6 @@ script:
   - pytest
 
 deploy:
-  python: "3.6"
   provider: pypi
   username:
     secure: XVUJn3DEIuRxBucc0J/JOyzHXTYiwn9mCSAPUAaldwC6czIeDZ5vmy3pnruhThnd2nAiQbq7LyVMri+25NTbXKjY9pqebJNrizvKhrlezwFNvSn3viP4rKr9LgrR/1G3Xz7ikvOl+zKMmaey5xcmPvwAjBG3Ls1QNnUSuKMzvWM3Yx/AoHHGilxiQq6/7m6bq7gW+yWxgtjfZP4JE6E2JP/rIXysTydOINgiRhpKtRql27NGJAERHdFjylPwizBUJJARK6JQBvQoJdW+IzjPaY1TfCHzfDMBIDMGn94qjtDBf1BK6tw+FTVgcfdJpUTM1ErRcAGWMr/Zy4DkNygstXPMaeu1sX9xQ/GZxRBeknjuVTIg/0Mk6YsbN53kpswMNl/My5Ry5vqbqGe+fhjvrd83pkPImax+FvMv5LkYawRyWOjIVMSvxnXLSTE5PC5YZ+BtQedfuuacsD3oVmXdTRGo8hnNUO+LdV514ZRsCRTOIGHMhihg4FTHRXIVe9gLJLDCVk544lk1dU6aqJumQh+l76d2CIyIpjjhLPECc6fYZhDywPcc6ybzkI3tNdpoMegWTXnIVRPyfHHdVobDfORSpJARl6gqvqI0HpA7k78GselGU4dne5NcVWuMa60idmLfdTx9eAXnPMHu8Vq+uf0W8YsHUEf+AS3lze1/Zdc=
@@ -22,4 +21,5 @@ deploy:
   on:
     tags: true
     branch: master
+    python: 3.6
   distributions: "sdist bdist_wheel"
