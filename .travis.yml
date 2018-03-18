@@ -1,5 +1,3 @@
-language: python
-
 stages:
   - test
   - name: deploy
@@ -18,8 +16,7 @@ jobs:
         - pycodestyle
         - pytest
     - stage: deploy
-      python:
-        - "3.6"
+      python: "3.6"
       script: ignore
       deploy:
         provider: pypi
