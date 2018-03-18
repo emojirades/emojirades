@@ -8,17 +8,22 @@ install:
 - pip install -r test_requirements.txt --upgrade
 - pip install -e .
 
-script:
-- pycodestyle
-- pytest
-
-deploy:
-  provider: pypi
-  username:
-    secure: XVUJn3DEIuRxBucc0J/JOyzHXTYiwn9mCSAPUAaldwC6czIeDZ5vmy3pnruhThnd2nAiQbq7LyVMri+25NTbXKjY9pqebJNrizvKhrlezwFNvSn3viP4rKr9LgrR/1G3Xz7ikvOl+zKMmaey5xcmPvwAjBG3Ls1QNnUSuKMzvWM3Yx/AoHHGilxiQq6/7m6bq7gW+yWxgtjfZP4JE6E2JP/rIXysTydOINgiRhpKtRql27NGJAERHdFjylPwizBUJJARK6JQBvQoJdW+IzjPaY1TfCHzfDMBIDMGn94qjtDBf1BK6tw+FTVgcfdJpUTM1ErRcAGWMr/Zy4DkNygstXPMaeu1sX9xQ/GZxRBeknjuVTIg/0Mk6YsbN53kpswMNl/My5Ry5vqbqGe+fhjvrd83pkPImax+FvMv5LkYawRyWOjIVMSvxnXLSTE5PC5YZ+BtQedfuuacsD3oVmXdTRGo8hnNUO+LdV514ZRsCRTOIGHMhihg4FTHRXIVe9gLJLDCVk544lk1dU6aqJumQh+l76d2CIyIpjjhLPECc6fYZhDywPcc6ybzkI3tNdpoMegWTXnIVRPyfHHdVobDfORSpJARl6gqvqI0HpA7k78GselGU4dne5NcVWuMa60idmLfdTx9eAXnPMHu8Vq+uf0W8YsHUEf+AS3lze1/Zdc=
-  password:
-    secure: Dh7O7h/vw4Yj6QA3ZrrsD3yeVHr99kpBtvxDK7tq5eh4bt36Swk9CzKeVkXytV0EjmaUEMnb6GKCgiyK4ySlog6c5+syQtKWUpt3I6EJsq2WkOreq3/DHL9KB8N6NhA4sY1IkrKgMCELpV5LiY8K4OIn7PaebVPMr3IaRm/Sg9BD8wVeN8XHWxHqU+PNhI/Tdua4lk9UENnrFJXix0aWO+H6Si2e9fqfV8hAiCiLeIZv99bEndpvZ8sxz/5NwRrHHGMy4B+uSOMevVvKMUjSwK99URqyX2uH6knu1/ihGW3hmy8MNLUpjJavm/LR1i+6B7oVp2LjH5YYXQ+ZGY2GLdQptkn+U2LeIS7f+dXC78LO5pPcBc0UgZ8UejM54KomjwP3IxQK75xKmaOufmzNr9NbIx4DXTMGN8azM6glxrjOpK5FF0KEeGzGT8V7wirH9Z/FUwIFuEyknxNR7kQQoYh2tpnI9BX3ullb+EiCW/7JD/wDMNgQJSz9XsmquCU7URQlsZcrg5ipJITqTyNy3jQWSdAluSYban7vzLQz6nYELfWe7rjKf8KNtlGtbYZA9sVz9chG8iIIJn0Bq7Blkfgo74wPXa/8vOzKqU1h7WJ5Hxaja50sHIexCOFOP5OFFZRCEw4tVZE/FvjIPWZgEpLLWOmpYLltNrOyhU+8uPw=
-  on:
-    tags: true
-    branch: master
-  distributions: "sdist bdist_wheel"
+jobs:
+  include:
+    - stage: test
+      script:
+      - pycodestyle
+      - pytest
+    - stage: deploy
+      python: '3.6'
+      script: skip
+      deploy:
+        provider: pypi
+        username:
+          secure: XVUJn3DEIuRxBucc0J/JOyzHXTYiwn9mCSAPUAaldwC6czIeDZ5vmy3pnruhThnd2nAiQbq7LyVMri+25NTbXKjY9pqebJNrizvKhrlezwFNvSn3viP4rKr9LgrR/1G3Xz7ikvOl+zKMmaey5xcmPvwAjBG3Ls1QNnUSuKMzvWM3Yx/AoHHGilxiQq6/7m6bq7gW+yWxgtjfZP4JE6E2JP/rIXysTydOINgiRhpKtRql27NGJAERHdFjylPwizBUJJARK6JQBvQoJdW+IzjPaY1TfCHzfDMBIDMGn94qjtDBf1BK6tw+FTVgcfdJpUTM1ErRcAGWMr/Zy4DkNygstXPMaeu1sX9xQ/GZxRBeknjuVTIg/0Mk6YsbN53kpswMNl/My5Ry5vqbqGe+fhjvrd83pkPImax+FvMv5LkYawRyWOjIVMSvxnXLSTE5PC5YZ+BtQedfuuacsD3oVmXdTRGo8hnNUO+LdV514ZRsCRTOIGHMhihg4FTHRXIVe9gLJLDCVk544lk1dU6aqJumQh+l76d2CIyIpjjhLPECc6fYZhDywPcc6ybzkI3tNdpoMegWTXnIVRPyfHHdVobDfORSpJARl6gqvqI0HpA7k78GselGU4dne5NcVWuMa60idmLfdTx9eAXnPMHu8Vq+uf0W8YsHUEf+AS3lze1/Zdc=
+        password:
+          secure: Dh7O7h/vw4Yj6QA3ZrrsD3yeVHr99kpBtvxDK7tq5eh4bt36Swk9CzKeVkXytV0EjmaUEMnb6GKCgiyK4ySlog6c5+syQtKWUpt3I6EJsq2WkOreq3/DHL9KB8N6NhA4sY1IkrKgMCELpV5LiY8K4OIn7PaebVPMr3IaRm/Sg9BD8wVeN8XHWxHqU+PNhI/Tdua4lk9UENnrFJXix0aWO+H6Si2e9fqfV8hAiCiLeIZv99bEndpvZ8sxz/5NwRrHHGMy4B+uSOMevVvKMUjSwK99URqyX2uH6knu1/ihGW3hmy8MNLUpjJavm/LR1i+6B7oVp2LjH5YYXQ+ZGY2GLdQptkn+U2LeIS7f+dXC78LO5pPcBc0UgZ8UejM54KomjwP3IxQK75xKmaOufmzNr9NbIx4DXTMGN8azM6glxrjOpK5FF0KEeGzGT8V7wirH9Z/FUwIFuEyknxNR7kQQoYh2tpnI9BX3ullb+EiCW/7JD/wDMNgQJSz9XsmquCU7URQlsZcrg5ipJITqTyNy3jQWSdAluSYban7vzLQz6nYELfWe7rjKf8KNtlGtbYZA9sVz9chG8iIIJn0Bq7Blkfgo74wPXa/8vOzKqU1h7WJ5Hxaja50sHIexCOFOP5OFFZRCEw4tVZE/FvjIPWZgEpLLWOmpYLltNrOyhU+8uPw=
+        on:
+          tags: true
+          branch: master
+        distributions: "sdist bdist_wheel"
