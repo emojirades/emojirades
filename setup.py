@@ -16,7 +16,7 @@ setup(
     ],
     keywords="slack slackbot emojirades",
     license="GNU",
-    packages=["plusplusbot"],
+    packages=find_packages(),
     install_requires=[
         "slackclient>=1.1,<2",
         "boto3>=1.5,<2"
