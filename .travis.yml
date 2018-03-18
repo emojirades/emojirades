@@ -1,16 +1,16 @@
 language: python
 python:
-- '3.5'
-- '3.6'
+  - 3.5
+  - 3.6
 
 install:
-- pip install -r requirements.txt --upgrade
-- pip install -r test_requirements.txt --upgrade
-- pip install -e .
+  - pip install -r requirements.txt --upgrade
+  - pip install -r test_requirements.txt --upgrade
+  - pip install -e .
 
 script:
-- pycodestyle
-- pytest
+  - pycodestyle
+  - pytest
 
 deploy:
   provider: pypi
@@ -21,4 +21,5 @@ deploy:
   on:
     tags: true
     branch: master
-  distributions: "sdist bdist_wheel"
+    python: 3.6
+  distributions: sdist bdist_wheel
