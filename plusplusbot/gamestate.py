@@ -136,6 +136,7 @@ class GameState(object):
         self.state[channel]["old_winner"] = old_winner
         self.state[channel]["winner"] = winner
         self.state[channel]["step"] = "waiting"
+        self.state[channel]["emojirade"] = None
         self.save()
 
     def set_emojirade(self, channel, emojirade):
@@ -163,6 +164,7 @@ class GameState(object):
         self.state[channel]["old_winner"] = self.state[channel]["winner"]
         self.state[channel]["winner"] = winner
         self.state[channel]["step"] = "waiting"
+        self.state[channel]["emojirade"] = None
         self.save()
 
     def game_status(self, channel):
