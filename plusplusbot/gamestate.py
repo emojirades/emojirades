@@ -175,7 +175,7 @@ class GameState(object):
             elif k == "admins":
                 v = ", ".join(["<@{0}>".format(i) for i in v])
             elif k == "emojirade":
-                v = "********"
+                v = "`{0}`".format(v)
             else:
                 v = str(v)
 
