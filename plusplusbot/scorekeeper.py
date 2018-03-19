@@ -50,7 +50,7 @@ class ScoreKeeper(object):
         self.logger = logging.getLogger("PlusPlusBot.scorekeeper.ScoreKeeper")
         self.config = get_handler(filename)
         self.scoreboard = defaultdict(int)
-        self.history = []
+        self.command_history = []
 
         if filename:
             existing_state = self.config.load()
@@ -61,24 +61,27 @@ class ScoreKeeper(object):
 
     def plusplus(self, user):
         self.scoreboard[user] += 1
-        self.history.append((user, "++"))
+        self.command_history.append((user, "++"))
         self.save()
 
     def minusminus(self, user):
         self.scoreboard[user] -= 1
-        self.history.append((user, "--"))
+        self.command_history.append((user, "--"))
         self.save()
 
     def overwrite(self, user, score):
         self.scoreboard[user] = score
-        self.history.append((user, score))
+        self.command_history.append((user, score))
         self.save()
 
     def leaderboard(self, limit=leaderboard_limit):
         return sorted(self.scoreboard.items(), key=lambda i: (i[1], i[0]), reverse=True)[:limit]
 
     def history(self, limit=history_limit):
-        return self.history[::-1][:limit]
+        if not self.command_history:
+            return None
+
+        return self.command_history[::-1][:limit]
 
     def save(self):
         self.config.save(self.scoreboard)

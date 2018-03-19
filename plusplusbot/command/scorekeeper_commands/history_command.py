@@ -11,6 +11,11 @@ class HistoryCommand(ScoreKeeperCommand):
     def execute(self):
         history = self.scorekeeper.history()
 
+        if not history:
+            self.logger.debug("No history available")
+            yield (None, "No history available.")
+            raise StopIteration
+
         self.logger.debug("Printing history: {0}".format(history))
 
         yield (None, "\n".join(["{0}. <@{1}> > '{2}'".format(index + 1, name, action)
