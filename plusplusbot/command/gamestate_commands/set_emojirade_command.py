@@ -1,7 +1,7 @@
-import re
-
 from plusplusbot.command.gamestate_commands.gamestate_command import GameStateCommand
 from plusplusbot.wrappers import only_in_progress
+
+import re
 
 
 class SetEmojirade(GameStateCommand):
