@@ -1,7 +1,7 @@
-import re
-
 from plusplusbot.command.gamestate_commands.gamestate_command import GameStateCommand
 from plusplusbot.wrappers import admin_check
+
+import re
 
 
 class RemoveAdmin(GameStateCommand):

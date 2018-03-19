@@ -1,6 +1,8 @@
 from plusplusbot.command.scorekeeper_commands.scorekeeper_command import ScoreKeeperCommand
 from plusplusbot.wrappers import only_in_progress
 
+import re
+
 
 class PlusPlusCommand(ScoreKeeperCommand):
     pattern = "<@([0-9A-Z]+)>[\s]*\+\+"

@@ -1,6 +1,7 @@
+from abc import ABC, abstractmethod, abstractproperty
+
 import logging
 import re
-from abc import ABC, abstractmethod, abstractproperty
 
 
 class Command(ABC):

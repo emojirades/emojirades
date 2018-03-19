@@ -1,6 +1,8 @@
 from plusplusbot.command.scorekeeper_commands.scorekeeper_command import ScoreKeeperCommand
 from plusplusbot.wrappers import admin_check
 
+import re
+
 
 class MinusMinusCommand(ScoreKeeperCommand):
     pattern = "<@([0-9A-Z]+)> --"

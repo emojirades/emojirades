@@ -1,8 +1,7 @@
-import re
-
 from plusplusbot.command.gamestate_commands.gamestate_command import GameStateCommand
 from plusplusbot.wrappers import only_in_progress
 
+import re
 
 class CorrectGuess(GameStateCommand):
     pattern = "<@([0-9A-Z]+)>[\s]*\+\+"
