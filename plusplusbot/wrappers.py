@@ -29,3 +29,16 @@ def only_in_progress(f):
             yield channel, response
 
     return wrapped_command
+
+def only_actively_guessing(f):
+    def wrapped_command(self):
+        channel = self.args["channel"]
+
+        if not self.gamestate.actively_guessing(channel):
+            yield (None, "Sorry but we need to be actively guessing! Get the winner to start posting the next 'rade!")
+            raise StopIteration
+
+        for channel, response in f(self):
+            yield channel, response
+
+    return wrapped_command

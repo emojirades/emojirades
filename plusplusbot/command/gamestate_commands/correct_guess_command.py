@@ -1,5 +1,5 @@
 from plusplusbot.command.gamestate_commands.gamestate_command import GameStateCommand
-from plusplusbot.wrappers import only_in_progress
+from plusplusbot.wrappers import only_actively_guessing
 
 import re
 
@@ -15,14 +15,14 @@ class CorrectGuess(GameStateCommand):
         self.args["channel"] = event["channel"]
         self.args["user"] = event["user"]
 
-    @only_in_progress
+    @only_actively_guessing
     def execute(self):
         if self.args["user"] == self.args["target_user"]:
             yield (None, "You're not allowed to award yourself the win >.>")
             raise StopIteration
 
-        if self.args["user"] != self.gamestate.state[self.args["channel"]]["old_winner"]:
-            yield (None, "You're not the old winner, stop awarding other people the win >.>")
+        if self.args["user"] != self.gamestate.state[self.args["channel"]]["winner"]:
+            yield (None, "You're not the current player, stop awarding other people the win >.>")
             raise StopIteration
 
         self.gamestate.correct_guess(self.args["channel"], self.args["target_user"])
