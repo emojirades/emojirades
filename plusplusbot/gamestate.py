@@ -108,8 +108,12 @@ class GameState(object):
                 guess = event["text"].lower()
 
                 if emojirade in guess:
+                    self.logger.debug("emojirade='{0}' guess='{1}' status='correct'".format(emojirade, guess))
+
                     yield InferredCorrectGuess
                     yield InferredPlusPlusCommand
+                else:
+                    self.logger.debug("emojirade='{0}' guess='{1}' status='incorrect'".format(emojirade, guess))
 
     def set_admin(self, channel, admin):
         """ Sets a new game admin! """
