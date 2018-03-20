@@ -21,8 +21,8 @@ class CorrectGuess(GameStateCommand):
             yield (None, "You're not allowed to award yourself the win >.>")
             raise StopIteration
 
-        if self.args["user"] != self.gamestate.state[self.args["channel"]]["old_winner"]:
-            yield (None, "You're not the old winner, stop awarding other people the win >.>")
+        if self.args["user"] != self.gamestate.state[self.args["channel"]]["winner"]:
+            yield (None, "You're not the current player, stop awarding other people the win >.>")
             raise StopIteration
 
         self.gamestate.correct_guess(self.args["channel"], self.args["target_user"])
