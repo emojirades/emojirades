@@ -107,7 +107,7 @@ class GameState(object):
                 emojirade = self.state[channel]["emojirade"].lower()
                 guess = event["text"].lower()
 
-                if guess == emojirade:
+                if emojirade in guess:
                     yield InferredCorrectGuess
                     yield InferredPlusPlusCommand
 
