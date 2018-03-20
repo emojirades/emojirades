@@ -103,7 +103,7 @@ class GameState(object):
 
         # Check to see if the users guess is right!
         elif self.state[channel]["step"] == "guessing":
-            if user not in [self.state[channel]["old_winner"], self.state[channel]["winner"]]:
+            if user not in (self.state[channel]["old_winner"], self.state[channel]["winner"]):
                 emojirade = self.state[channel]["emojirade"].lower()
                 guess = event["text"].lower()
 
