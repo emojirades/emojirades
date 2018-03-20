@@ -90,6 +90,9 @@ class GameState(object):
     def in_progress(self, channel):
         return self.state[channel]["step"] not in ["new_game"]
 
+    def actively_guessing(self, channel):
+        return self.state[channel]["step"] == "guessing"
+
     def infer_commands(self, event):
         """ Keeps tabs on the conversation and updates gamestate if required """
         channel = event["channel"]
@@ -103,13 +106,17 @@ class GameState(object):
 
         # Check to see if the users guess is right!
         elif self.state[channel]["step"] == "guessing":
-            if user not in [self.state[channel]["old_winner"], self.state[channel]["winner"]]:
+            if user not in (self.state[channel]["old_winner"], self.state[channel]["winner"]):
                 emojirade = self.state[channel]["emojirade"].lower()
                 guess = event["text"].lower()
 
-                if guess == emojirade:
+                if emojirade in guess:
+                    self.logger.debug("emojirade='{0}' guess='{1}' status='correct'".format(emojirade, guess))
+
                     yield InferredCorrectGuess
                     yield InferredPlusPlusCommand
+                else:
+                    self.logger.debug("emojirade='{0}' guess='{1}' status='incorrect'".format(emojirade, guess))
 
     def set_admin(self, channel, admin):
         """ Sets a new game admin! """
