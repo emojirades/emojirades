@@ -90,6 +90,9 @@ class GameState(object):
     def in_progress(self, channel):
         return self.state[channel]["step"] not in ["new_game"]
 
+    def actively_guessing(self, channel):
+        return self.state[channel]["step"] == "guessing"
+
     def infer_commands(self, event):
         """ Keeps tabs on the conversation and updates gamestate if required """
         channel = event["channel"]
