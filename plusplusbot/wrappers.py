@@ -30,7 +30,7 @@ def only_in_progress(f):
 
     return wrapped_command
 
-def only_actively_guessing(f)
+def only_actively_guessing(f):
     def wrapped_command(self):
         channel = self.args["channel"]
 
