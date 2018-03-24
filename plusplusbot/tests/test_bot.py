@@ -9,8 +9,6 @@ import os
 
 logging.basicConfig(level=logging.DEBUG)
 
-
-
 class TestPlusPlusBot(unittest.TestCase):
     slack_token = "xoxb-000000000000-aaaaaaaaaaaaaaaaaaaaaaaa"
 
