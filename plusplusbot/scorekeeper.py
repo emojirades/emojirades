@@ -25,7 +25,7 @@ def get_handler(filename):
         def load(self):
             bytes_content = super().load()
 
-            if bytes_content is None:
+            if bytes_content is None or not bytes_content:
                 return None
 
             score_file = io.StringIO(bytes_content.decode("utf-8"))
