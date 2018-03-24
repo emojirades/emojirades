@@ -42,6 +42,9 @@ class EmojiradeBotTester(unittest.TestCase):
     def save_responses(self, channel, message):
         self.responses.append((channel, message))
 
+    def find_im(self, user_id):
+        return user_id.replace("U", "D")
+
     @patch("plusplusbot.bot.SlackClient")
     def setUp(self, slack_client):
         self.responses = []
@@ -55,6 +58,10 @@ class EmojiradeBotTester(unittest.TestCase):
         self.bot = PlusPlusBot(self.scorefile.name, self.statefile.name)
         self.bot.slack.bot_id = self.config.bot_id
         self.bot.slack.sc.rtm_send_message = self.save_responses
+        self.bot.slack.find_im = self.find_im
+
+        self.state = self.bot.gamestate.state[self.config.channel]
+        self.scoreboard = self.bot.scorekeeper.scoreboard
 
     def tearDown(self):
         self.scorefile.close()
@@ -65,10 +72,13 @@ class EmojiradeBotTester(unittest.TestCase):
         team = "T00000001"
         channel = "C00000001"
         bot_id = "U00000000"
-        bot_channel = "D00000001"
+        bot_channel = "D00000000"
         player_1 = "U00000001"
+        player_1_channel = "D00000001"
         player_2 = "U00000002"
+        player_2_channel = "D00000002"
         player_3 = "U00000003"
+        player_3_channel = "D00000003"
         emojirade = "testing"
 
         event_config = {
@@ -77,8 +87,11 @@ class EmojiradeBotTester(unittest.TestCase):
             "bot_id": bot_id,
             "bot_channel": bot_channel,
             "player_1": player_1,
+            "player_1_channel": player_1_channel,
             "player_2": player_2,
+            "player_2_channel": player_2_channel,
             "player_3": player_3,
+            "player_3_channel": player_3_channel,
             "emojirade": emojirade,
         }
 
