@@ -194,7 +194,7 @@ class TestBotScenarios(EmojiradeBotTester):
         assert self.state["step"] == "waiting"
         assert self.state["old_winner"] == self.config.player_2
         assert self.state["winner"] == self.config.player_3
-        assert self.state["emojirade"] == None
+        assert self.state["emojirade"] is None
         assert (self.config.channel, "Congrats <@{0}>, you're now at 1 point".format(self.config.player_3)) in self.responses
 
         emojirade = "second"
@@ -225,5 +225,5 @@ class TestBotScenarios(EmojiradeBotTester):
         assert self.state["step"] == "waiting"
         assert self.state["old_winner"] == self.config.player_3
         assert self.state["winner"] == self.config.player_1
-        assert self.state["emojirade"] == None
+        assert self.state["emojirade"] is None
         assert (self.config.channel, "Congrats <@{0}>, you're now at 1 point".format(self.config.player_1)) in self.responses
