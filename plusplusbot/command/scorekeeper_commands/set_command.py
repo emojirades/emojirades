@@ -24,14 +24,6 @@ class SetCommand(ScoreKeeperCommand):
         target_user = self.args["target_user"]
         new_score = int(self.args["new_score"])
 
-        if self.args["user"] == target_user:
-            yield ":thinking_face: you can't do that to yourself"
-            raise StopIteration
-
-        if self.slack.is_bot(target_user):
-            yield ":thinking_face: robots aren't allowed to play Emojirades"
-            raise StopIteration
-
         self.logger.debug("Setting {} score to: {}".format(target_user, new_score))
         self.scorekeeper.overwrite(target_user, new_score)
 

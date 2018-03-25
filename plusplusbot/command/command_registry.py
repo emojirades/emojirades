@@ -9,7 +9,6 @@ from plusplusbot.command.gamestate_commands.game_status import GameStatus
 
 from plusplusbot.command.scorekeeper_commands.set_command import SetCommand
 from plusplusbot.command.scorekeeper_commands.history_command import HistoryCommand
-from plusplusbot.command.scorekeeper_commands.plusplus_command import PlusPlusCommand
 from plusplusbot.command.scorekeeper_commands.minusminus_command import MinusMinusCommand
 from plusplusbot.command.scorekeeper_commands.leaderboard_command import LeaderboardCommand
 
@@ -18,7 +17,6 @@ class CommandRegistry:
 
     registered_commands = [
         HelpCommand,
-        PlusPlusCommand,
         MinusMinusCommand,
         LeaderboardCommand,
         SetCommand,

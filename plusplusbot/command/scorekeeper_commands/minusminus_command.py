@@ -20,14 +20,6 @@ class MinusMinusCommand(ScoreKeeperCommand):
     def execute(self):
         target_user = self.args["target_user"]
 
-        if self.args["user"] == target_user:
-            yield ":thinking_face: you're not allowed to deduct points from yourself..."
-            raise StopIteration
-
-        if self.slack.is_bot(target_user):
-            yield ":thinking_face: robots aren't allowed to play Emojirades!"
-            raise StopIteration
-
         self.logger.debug("Decrementing user's score: {}".format(target_user))
         self.scorekeeper.minusminus(target_user)
 

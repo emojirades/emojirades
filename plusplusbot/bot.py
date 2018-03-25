@@ -28,21 +28,20 @@ class PlusPlusBot(object):
 
     def match_event(self, event, commands):
         """
-        If the event is valid and matches a command, perform the action the command details
+        If the event is valid and matches a command, yield the instantiated command
         :param event:
-        :return:
+        :return Command:
         """
 
         self.logger.debug("Handling event: {}".format(event))
 
         if "text" not in event:
-            return None
+            self.logger.debug("Event match ignored due to no 'text' field")
+            raise StopIteration
 
         for pattern, (Command, description) in commands.items():
             if Command.match(event["text"], me=self.slack.bot_id):
-                return Command(self.slack, event, scorekeeper=self.scorekeeper, gamestate=self.gamestate)
-
-        return None
+                yield Command(self.slack, event, scorekeeper=self.scorekeeper, gamestate=self.gamestate)
 
     def decode_channel(self, channel):
         """
@@ -76,6 +75,7 @@ class PlusPlusBot(object):
 
                 for GameCommand in self.gamestate.infer_commands(event):
                     action = GameCommand(self.slack, event, scorekeeper=self.scorekeeper, gamestate=self.gamestate)
+                    self.logger.debug("Matched {0} for event {1}".format(action, event))
 
                     for channel, response in action.execute():
                         if channel is not None:
@@ -85,9 +85,7 @@ class PlusPlusBot(object):
 
                         self.slack.sc.rtm_send_message(channel, response)
 
-                action = self.match_event(event, commands)
-
-                if action:
+                for action in self.match_event(event, commands):
                     self.logger.debug("Matched {0} for event {1}".format(action, event))
                     for channel, response in action.execute():
                         if channel is not None:
@@ -96,7 +94,5 @@ class PlusPlusBot(object):
                             channel = event["channel"]
 
                         self.slack.sc.rtm_send_message(channel, response)
-                else:
-                    self.logger.debug("No match for event {0}".format(event))
 
             time.sleep(1)

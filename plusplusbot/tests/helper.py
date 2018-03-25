@@ -25,19 +25,19 @@ class EmojiradeBotTester(unittest.TestCase):
     def reset_and_transition_to(self, state):
         """ From the beginning state, transition to another state the user wants """
         self.setUp()
-        assert self.bot.gamestate.state[self.channel]["step"] == "new_game"
+        assert self.state["step"] == "new_game"
 
         if state == "waiting":
             events = [self.events.new_game]
         elif state == "provided":
             events = [self.events.new_game, self.events.posted_emojirade]
         elif state == "guessing":
-            events = [self.events.new_game, self.events.posted_emojirade, self.posted_emoji]
+            events = [self.events.new_game, self.events.posted_emojirade, self.events.posted_emoji]
         else:
             raise RuntimeError("Invalid state ({0}) provided to TestPlusPlusBot.transition_to()".format(state))
 
         for event in events:
-            self.feed(event)
+            self.send_event(event)
 
     def save_responses(self, channel, message):
         self.responses.append((channel, message))
@@ -104,6 +104,7 @@ class EmojiradeBotTester(unittest.TestCase):
         }
 
         event_registry = {
+            "base": base_event,
             "new_game": {
                 **base_event,
                 **{

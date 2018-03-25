@@ -113,7 +113,6 @@ class GameState(object):
                     self.logger.debug("emojirade='{0}' guess='{1}' status='correct'".format(emojirade, guess))
 
                     yield InferredCorrectGuess
-                    yield InferredPlusPlusCommand
                 else:
                     self.logger.debug("emojirade='{0}' guess='{1}' status='incorrect'".format(emojirade, guess))
 
