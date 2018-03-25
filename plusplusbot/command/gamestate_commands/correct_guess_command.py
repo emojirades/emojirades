@@ -21,11 +21,18 @@ class CorrectGuess(GameStateCommand):
             yield (None, "You're not allowed to award yourself the win >.>")
             raise StopIteration
 
+        if self.args["user"] == self.slack.bot_id:
+            self.args["user"] = self.gamestate.state[self.args["channel"]]["winner"]
+
         if self.args["user"] != self.gamestate.state[self.args["channel"]]["winner"]:
             yield (None, "You're not the current player, stop awarding other people the win >.>")
             raise StopIteration
 
         self.gamestate.correct_guess(self.args["channel"], self.args["target_user"])
-        yield (None, "<@{target_user}>++".format(**self.args))
+        self.scorekeeper.plusplus(self.args["target_user"])
+
+        score = self.scorekeeper.scoreboard[self.args["target_user"]]
+
+        yield (None, "Congrats <@{0}>, you're now at {1} point{2}".format(self.args["target_user"], score, "s" if score > 1 else ""))
         yield (self.args["user"], "You'll now need to send me the new 'rade for <@{target_user}>".format(**self.args))
         yield (self.args["user"], "Please reply back in the format `emojirade Point Break` if `Point Break` was the new 'rade")

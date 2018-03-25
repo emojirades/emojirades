@@ -23,7 +23,7 @@ def get_handler(filename):
         def load(self):
             bytes_content = super().load()
 
-            if bytes_content is None:
+            if bytes_content is None or not bytes_content:
                 return None
 
             return json.loads(bytes_content.decode("utf-8"))
@@ -53,13 +53,12 @@ class GameState(object):
         waiting   : The old winner has not provided the winner with the new emojirade
         provided  : The winner has not posted anything since having recieved the emojirade
         guessing  : The winner has posted since having recieved the emojirade
-        guessed   : The guesser has correctly guessed the emojirade
 
     Step transitions:
         set_winners   : new_game -> waiting
         set_emojirade : waiting  -> provided
         winner_posted : provided -> guessing
-        correct_guess : guessing -> guessed
+        correct_guess : guessing -> waiting
     """
 
     class InvalidStateException(Exception):
@@ -114,7 +113,6 @@ class GameState(object):
                     self.logger.debug("emojirade='{0}' guess='{1}' status='correct'".format(emojirade, guess))
 
                     yield InferredCorrectGuess
-                    yield InferredPlusPlusCommand
                 else:
                     self.logger.debug("emojirade='{0}' guess='{1}' status='incorrect'".format(emojirade, guess))
 
