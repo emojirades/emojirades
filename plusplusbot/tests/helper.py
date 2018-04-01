@@ -18,7 +18,7 @@ class EmojiradeBotTester(unittest.TestCase):
         self.bot.slack.sc.rtm_read.return_value = [event]
 
         try:
-            self.bot.listen_for_actions()
+            self.bot.listen_for_commands()
         except InterruptedError:
             pass
 
@@ -139,6 +139,13 @@ class EmojiradeBotTester(unittest.TestCase):
                 **{
                     "user": player_3,
                     "text": emojirade,
+                },
+            },
+            "manual_award": {
+                **base_event,
+                **{
+                    "user": player_2,
+                    "text": "<@{0}>++".format(player_3)
                 },
             },
             "plusplus": {

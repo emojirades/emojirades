@@ -5,7 +5,6 @@ import re
 from collections import defaultdict
 
 from plusplusbot.command.gamestate_commands.inferred_correct_guess_command import InferredCorrectGuess
-from plusplusbot.command.scorekeeper_commands.inferred_plusplus_command import InferredPlusPlusCommand
 from plusplusbot.handlers import get_configuration_handler
 from plusplusbot.command.commands import Command
 
