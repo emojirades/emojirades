@@ -20,7 +20,7 @@ class MinusMinusCommand(ScoreKeeperCommand):
     def execute(self):
         target_user = self.args["target_user"]
 
-        self.logger.debug("Decrementing user's score: {}".format(target_user))
+        self.logger.debug("Decrementing user's score: {0}".format(target_user))
         self.scorekeeper.minusminus(target_user)
 
         score = self.scorekeeper.scoreboard[target_user]

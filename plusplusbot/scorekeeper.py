@@ -55,7 +55,7 @@ class ScoreKeeper(object):
         if filename:
             existing_state = self.config.load()
 
-            if existing_state is not None:
+            if existing_state:
                 self.scoreboard.update(existing_state)
                 self.logger.info("Loaded scores from {0}".format(filename))
 
@@ -71,7 +71,7 @@ class ScoreKeeper(object):
 
     def overwrite(self, user, score):
         self.scoreboard[user] = score
-        self.command_history.append((user, score))
+        self.command_history.append((user, "Manually set to {0}".format(score)))
         self.save()
 
     def leaderboard(self, limit=leaderboard_limit):

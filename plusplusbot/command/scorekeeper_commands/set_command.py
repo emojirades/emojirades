@@ -24,7 +24,7 @@ class SetCommand(ScoreKeeperCommand):
         target_user = self.args["target_user"]
         new_score = int(self.args["new_score"])
 
-        self.logger.debug("Setting {} score to: {}".format(target_user, new_score))
+        self.logger.debug("Setting {0} score to: {1}".format(target_user, new_score))
         self.scorekeeper.overwrite(target_user, new_score)
 
         message = "<@{0}> manually set to {1} point{2}"
