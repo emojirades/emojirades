@@ -20,6 +20,3 @@ class HistoryCommand(ScoreKeeperCommand):
 
         yield (None, "\n".join(["{0}. <@{1}> > '{2}'".format(index + 1, name, action)
                                 for index, (name, action) in enumerate(history)]))
-
-    def __str__(self):
-        return "HistoryCommand"

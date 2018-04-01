@@ -15,6 +15,3 @@ class LeaderboardCommand(ScoreKeeperCommand):
 
         yield (None, "\n".join(["{0}. <@{1}> [{2} point{3}]".format(index + 1, name, score, "s" if score > 1 else "")
                                 for index, (name, score) in enumerate(leaderboard)]))
-
-    def __str__(self):
-        return "LeaderboardCommand"

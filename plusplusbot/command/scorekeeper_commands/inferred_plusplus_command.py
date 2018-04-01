@@ -25,6 +25,3 @@ class InferredPlusPlusCommand(ScoreKeeperCommand):
 
         message = "Congrats <@{0}>, you're now at {1} point{2}"
         yield (None, message.format(target_user, score, "s" if score > 1 else ""))
-
-    def __str__(self):
-        return "InferredPlusPlusCommand"

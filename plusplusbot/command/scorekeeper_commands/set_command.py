@@ -29,6 +29,3 @@ class SetCommand(ScoreKeeperCommand):
 
         message = "<@{0}> manually set to {1} point{2}"
         yield (None, message.format(target_user, new_score, "s" if new_score > 1 else ""))
-
-    def __str__(self):
-        return "SetCommand"

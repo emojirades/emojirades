@@ -49,3 +49,6 @@ class Command(ABC):
     @abstractmethod
     def execute(self):
         pass
+
+    def __str__(self):
+        return type(self).__name__
