@@ -7,17 +7,20 @@ class SlackClient(object):
         self.logger = logger
         self.sc = SC(config)
 
-        epp_bot = self.sc.api_call("auth.test")
-        self.bot_id = epp_bot["user_id"]
+        self.bot_id = self.sc.api_call("auth.test")["user_id"]
+        self.bot_name = self.user_info(self.bot_id)["real_name"]
 
         self.ready = True
         self.last_ts = float(0)
 
-    def is_bot(self, userid):
-        return self.sc.api_call("users.info", user=userid)['user']['is_bot'] or userid == "USLACKBOT"
+    def user_info(self, user_id):
+        return self.sc.api_call("users.info", user=user_id)["user"]
 
-    def is_admin(self, userid):
-        return self.sc.api_call("users.info", user=userid)['user']['is_admin']
+    def is_bot(self, user_id):
+        return self.user_info(user_id)["is_bot"] or userid == "USLACKBOT"
+
+    def is_admin(self, user_id):
+        return self.user_info(user_id)["is_admin"]
 
     def find_im(self, userid):
         for im in self.sc.api_call("im.list")["ims"]:
