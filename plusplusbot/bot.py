@@ -3,8 +3,8 @@ import os
 import time
 
 from plusplusbot.command.command_registry import CommandRegistry
-from plusplusbot.gamestate import GameState
 from plusplusbot.scorekeeper import ScoreKeeper
+from plusplusbot.gamestate import GameState
 from plusplusbot.slack import SlackClient
 
 module_logger = logging.getLogger("PlusPlusBot.bot")
@@ -19,11 +19,10 @@ class PlusPlusBot(object):
 
         slack_bot_token = os.environ.get("SLACK_BOT_TOKEN", None)
 
-        if slack_bot_token is not None:
-            self.slack = SlackClient(os.environ.get('SLACK_BOT_TOKEN'), self.logger)
-        else:
+        if not slack_bot_token:
             raise RuntimeError("Missing SLACK_BOT_TOKEN from environment vars")
 
+        self.slack = SlackClient(slack_bot_token, self.logger)
         self.logger.debug("Initialised application instance")
 
     def match_event(self, event, commands):
