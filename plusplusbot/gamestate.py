@@ -1,13 +1,12 @@
-import re
-import json
 import logging
+import json
+import re
 
 from collections import defaultdict
 
-from plusplusbot.command.commands import Command
-from plusplusbot.handlers import get_configuration_handler
 from plusplusbot.command.gamestate_commands.inferred_correct_guess_command import InferredCorrectGuess
-from plusplusbot.command.scorekeeper_commands.inferred_plusplus_command import InferredPlusPlusCommand
+from plusplusbot.handlers import get_configuration_handler
+from plusplusbot.command.commands import Command
 
 module_logger = logging.getLogger("PlusPlusBot.gamestate")
 
@@ -93,28 +92,31 @@ class GameState(object):
         return self.state[channel]["step"] == "guessing"
 
     def infer_commands(self, event):
-        """ Keeps tabs on the conversation and updates gamestate if required """
+        """
+        Keeps tabs on the conversation and updates gamestate if required
+        Not to be called directly, used as another command source from the bot
+        """
         channel = event["channel"]
         user = event["user"]
+        state = self.state[channel]
 
         # Check to see if the winner is posting emoji's
-        if self.state[channel]["step"] == "provided":
-            if user == self.state[channel]["winner"]:
+        if state["step"] == "provided":
+            if user == state["winner"]:
                 if ':' in event["text"]:  # ':' means they've posted an emoji :thinking_face:
                     self.winner_posted(channel)
 
         # Check to see if the users guess is right!
-        elif self.state[channel]["step"] == "guessing":
-            if user not in (self.state[channel]["old_winner"], self.state[channel]["winner"]):
-                emojirade = self.state[channel]["emojirade"].lower()
-                guess = event["text"].lower()
+        elif state["step"] == "guessing" and user not in (state["old_winner"], state["winner"]):
+            emojirade = state["emojirade"].lower()
+            guess = event["text"].lower()
 
-                if emojirade in guess:
-                    self.logger.debug("emojirade='{0}' guess='{1}' status='correct'".format(emojirade, guess))
+            if emojirade in guess:
+                self.logger.debug("emojirade='{0}' guess='{1}' status='correct'".format(emojirade, guess))
 
-                    yield InferredCorrectGuess
-                else:
-                    self.logger.debug("emojirade='{0}' guess='{1}' status='incorrect'".format(emojirade, guess))
+                yield InferredCorrectGuess
+            else:
+                self.logger.debug("emojirade='{0}' guess='{1}' status='incorrect'".format(emojirade, guess))
 
     def set_admin(self, channel, admin):
         """ Sets a new game admin! """
@@ -173,22 +175,8 @@ class GameState(object):
         self.save()
 
     def game_status(self, channel):
-        """ Returns a string-ified version of the game state """
-        status = []
-
-        for k, v in self.state[channel].items():
-            if k == "old_winner" or k == "winner":
-                v = "<@{0}>".format(v)
-            elif k == "admins":
-                v = ", ".join(["<@{0}>".format(i) for i in v])
-            elif k == "emojirade":
-                v = "`{0}`".format(v)
-            else:
-                v = str(v)
-
-            status.append((k, v))
-
-        return "\n".join("{0}: {1}".format(k, v) for k, v in status)
+        """ Returns the game state """
+        return self.state[channel]
 
     def save(self):
         self.config.save(self.state)

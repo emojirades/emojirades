@@ -1,12 +1,12 @@
-import io
-import re
-import csv
 import logging
+import csv
+import re
+import io
 
 from collections import defaultdict
 
-from plusplusbot.command.commands import Command
 from plusplusbot.handlers import get_configuration_handler
+from plusplusbot.command.commands import Command
 
 module_logger = logging.getLogger("PlusPlusBot.scorekeeper")
 
@@ -55,24 +55,31 @@ class ScoreKeeper(object):
         if filename:
             existing_state = self.config.load()
 
-            if existing_state is not None:
+            if existing_state:
                 self.scoreboard.update(existing_state)
                 self.logger.info("Loaded scores from {0}".format(filename))
+
+    def current_score(self, user):
+        leader = sorted(self.scoreboard.items(), key=lambda x: x[1], reverse=True)[0]
+        return self.scoreboard[user], user == leader
 
     def plusplus(self, user):
         self.scoreboard[user] += 1
         self.command_history.append((user, "++"))
         self.save()
+        return self.current_score(user)
 
     def minusminus(self, user):
         self.scoreboard[user] -= 1
         self.command_history.append((user, "--"))
         self.save()
+        return self.current_score(user)
 
     def overwrite(self, user, score):
         self.scoreboard[user] = score
-        self.command_history.append((user, score))
+        self.command_history.append((user, "Manually set to {0}".format(score)))
         self.save()
+        return self.current_score(user)
 
     def leaderboard(self, limit=leaderboard_limit):
         return sorted(self.scoreboard.items(), key=lambda i: (i[1], i[0]), reverse=True)[:limit]

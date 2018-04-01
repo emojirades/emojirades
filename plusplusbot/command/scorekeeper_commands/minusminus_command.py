@@ -20,13 +20,10 @@ class MinusMinusCommand(ScoreKeeperCommand):
     def execute(self):
         target_user = self.args["target_user"]
 
-        self.logger.debug("Decrementing user's score: {}".format(target_user))
+        self.logger.debug("Decrementing user's score: {0}".format(target_user))
         self.scorekeeper.minusminus(target_user)
 
         score = self.scorekeeper.scoreboard[target_user]
 
         message = "Oops <@{0}>, you're now at {1} point{2}"
         yield (None, message.format(target_user, score, "s" if score > 1 else ""))
-
-    def __str__(self):
-        return "MinusMinusCommand"

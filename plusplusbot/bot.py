@@ -3,8 +3,8 @@ import os
 import time
 
 from plusplusbot.command.command_registry import CommandRegistry
-from plusplusbot.gamestate import GameState
 from plusplusbot.scorekeeper import ScoreKeeper
+from plusplusbot.gamestate import GameState
 from plusplusbot.slack import SlackClient
 
 module_logger = logging.getLogger("PlusPlusBot.bot")
@@ -19,11 +19,10 @@ class PlusPlusBot(object):
 
         slack_bot_token = os.environ.get("SLACK_BOT_TOKEN", None)
 
-        if slack_bot_token is not None:
-            self.slack = SlackClient(os.environ.get('SLACK_BOT_TOKEN'), self.logger)
-        else:
+        if not slack_bot_token:
             raise RuntimeError("Missing SLACK_BOT_TOKEN from environment vars")
 
+        self.slack = SlackClient(slack_bot_token, self.logger)
         self.logger.debug("Initialised application instance")
 
     def match_event(self, event, commands):
@@ -38,6 +37,9 @@ class PlusPlusBot(object):
         if "text" not in event:
             self.logger.debug("Event match ignored due to no 'text' field")
             raise StopIteration
+
+        for GameCommand in self.gamestate.infer_commands(event):
+            yield GameCommand(self.slack, event, scorekeeper=self.scorekeeper, gamestate=self.gamestate)
 
         for pattern, (Command, description) in commands.items():
             if Command.match(event["text"], me=self.slack.bot_id):
@@ -56,14 +58,11 @@ class PlusPlusBot(object):
         else:
             raise NotImplementedError("Returned channel '{0}' wasn't decoded".format(channel))
 
-    def listen_for_actions(self):
+    def listen_for_commands(self):
         commands = CommandRegistry.prepare_commands()
 
         if not self.slack.ready:
-            raise RuntimeError("is_ready has not been called/returned false")
-
-        if not self.slack.sc.rtm_connect():
-            raise RuntimeError("Failed to connect to the Slack API")
+            raise RuntimeError("Slack Client failed to ready up!")
 
         self.logger.info("Slack is connected and listening for commands")
 
@@ -73,21 +72,9 @@ class PlusPlusBot(object):
                     self.logger.debug("Skipping event due to being invalid")
                     continue
 
-                for GameCommand in self.gamestate.infer_commands(event):
-                    action = GameCommand(self.slack, event, scorekeeper=self.scorekeeper, gamestate=self.gamestate)
-                    self.logger.debug("Matched {0} for event {1}".format(action, event))
-
-                    for channel, response in action.execute():
-                        if channel is not None:
-                            channel = self.decode_channel(channel)
-                        else:
-                            channel = event["channel"]
-
-                        self.slack.sc.rtm_send_message(channel, response)
-
-                for action in self.match_event(event, commands):
-                    self.logger.debug("Matched {0} for event {1}".format(action, event))
-                    for channel, response in action.execute():
+                for command in self.match_event(event, commands):
+                    self.logger.debug("Matched {0} for event {1}".format(command, event))
+                    for channel, response in command.execute():
                         if channel is not None:
                             channel = self.decode_channel(channel)
                         else:
