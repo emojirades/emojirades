@@ -15,18 +15,23 @@ class SetEmojirade(GameStateCommand):
         self.args["user"] = event["user"]
         self.args["emojirade"] = re.match(self.pattern, event["text"]).group(1)
 
-        self.args["channel"] = "PLACEHOLDER"  # TODO: Temp hack
-
         # Figure out the channel to use
         # TODO: Decide if we should be getting the user to enter the channel or not?
-        for channel in self.gamestate.state.keys():
-            if self.gamestate.state[channel]["step"] == "waiting":
-                self.args["channel"] = channel
+        for channel_name, channel in self.gamestate.state.items():
+            if channel["step"] == "waiting":
+                self.args["channel"] = channel_name
+                break
+        else:
+            self.args["channel"] = None
 
     @only_in_progress
     def execute(self):
         if self.args["user"] != self.gamestate.state[self.args["channel"]]["old_winner"]:
             yield (None, "Err <@{user}> it's not your turn to provide the new 'rade :sweat:")
+            raise StopIteration
+
+        if self.args["channel"] is None:
+            yield (user, "We were unable to figure out the correct channel, please raise this issue!")
             raise StopIteration
 
         self.gamestate.set_emojirade(self.args["channel"], self.args["emojirade"])
@@ -37,4 +42,4 @@ class SetEmojirade(GameStateCommand):
         yield (winner, "Hey, <@{user}> made the 'rade `{emojirade}`, good luck!".format(**self.args))
 
         # Let everyone else know
-        yield (self.args["channel"], ":mailbox: <@{user}> has sent the 'rade to <@{winner}>".format(**self.args, winner=winner))
+        yield (self.args["channel"], ":mailbox: 'rade sent to <@{winner}>".format(winner=winner))

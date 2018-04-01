@@ -13,11 +13,12 @@ class NewGame(GameStateCommand):
 
     def prepare_args(self, event):
         rendered_pattern = self.pattern.format(me=self.slack.bot_id)
+        match = re.match(rendered_pattern, event["text"])
 
         self.args["user"] = event["user"]
         self.args["channel"] = event["channel"]
-        self.args["old_winner"] = re.match(rendered_pattern, event["text"]).group(1)
-        self.args["winner"] = re.match(rendered_pattern, event["text"]).group(2)
+        self.args["old_winner"] = match.group(1)
+        self.args["winner"] = match.group(2)
 
     @admin_check
     def execute(self):

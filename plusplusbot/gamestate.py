@@ -173,22 +173,8 @@ class GameState(object):
         self.save()
 
     def game_status(self, channel):
-        """ Returns a string-ified version of the game state """
-        status = []
-
-        for k, v in self.state[channel].items():
-            if k == "old_winner" or k == "winner":
-                v = "<@{0}>".format(v)
-            elif k == "admins":
-                v = ", ".join(["<@{0}>".format(i) for i in v])
-            elif k == "emojirade":
-                v = "`{0}`".format(v)
-            else:
-                v = str(v)
-
-            status.append((k, v))
-
-        return "\n".join("{0}: {1}".format(k, v) for k, v in status)
+        """ Returns the game state """
+        return self.state[channel]
 
     def save(self):
         self.config.save(self.state)
