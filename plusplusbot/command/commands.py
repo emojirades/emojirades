@@ -26,8 +26,11 @@ class Command(ABC):
         self.logger = logging.getLogger("PlusPlusBot.Command")
 
         self.slack = slack
-        self.args = {}
 
+        self.scorekeeper = kwargs["scorekeeper"]
+        self.gamestate = kwargs["gamestate"]
+
+        self.args = {}
         self.prepare_args(event)
 
     def prepare_args(self, event):
