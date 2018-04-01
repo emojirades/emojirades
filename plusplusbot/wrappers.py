@@ -1,7 +1,8 @@
 
-# Wrappers used for gamestate and scorekeeper
+# Convenience wrappers used to assert game state or permissions checks
+# These are used directly by a commands execute function
 
-def admin_check(f):
+def admin_check(command):
     def wrapped_command(self):
         channel = self.args["channel"]
 
@@ -12,12 +13,12 @@ def admin_check(f):
             yield (None, "Game admins currently are: {0}".format(", ".join(admins)))
             raise StopIteration
 
-        for channel, response in f(self):
+        for channel, response in command(self):
             yield channel, response
 
     return wrapped_command
 
-def only_in_progress(f):
+def only_in_progress(command):
     def wrapped_command(self):
         channel = self.args["channel"]
 
@@ -25,12 +26,12 @@ def only_in_progress(f):
             yield (None, "Sorry but we need the game to be in progress first! Get someone to kick it off!")
             raise StopIteration
 
-        for channel, response in f(self):
+        for channel, response in command(self):
             yield channel, response
 
     return wrapped_command
 
-def only_actively_guessing(f):
+def only_actively_guessing(command):
     def wrapped_command(self):
         channel = self.args["channel"]
 
@@ -38,7 +39,7 @@ def only_actively_guessing(f):
             yield (None, "Sorry but we need to be actively guessing! Get the winner to start posting the next 'rade!")
             raise StopIteration
 
-        for channel, response in f(self):
+        for channel, response in command(self):
             yield channel, response
 
     return wrapped_command
