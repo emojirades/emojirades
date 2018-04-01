@@ -5,23 +5,6 @@ import re
 
 
 class Command(ABC):
-
-    # TODO: replace hardcoded pattern with this map
-    pattern_map = {
-        "me": {
-            "pattern": "<@{me}>",
-            "replace": "@epp"
-        },
-        "player": {
-            "pattern": "<@([0-9A-Z]+)>",
-            "replace": "@player"
-        },
-        "score": {
-            "pattern": "(-?[0-9]+)",
-            "replace": "<numeric score>"
-        }
-    }
-
     def __init__(self, slack, event, **kwargs):
         self.logger = logging.getLogger("PlusPlusBot.Command")
 
@@ -32,6 +15,21 @@ class Command(ABC):
 
         self.args = {}
         self.prepare_args(event)
+
+        pattern_map = {
+            "me": {
+                "pattern": "<@{me}>",
+                "replace": "@{0}".format(self.slack.bot_name)
+            },
+            "player": {
+                "pattern": "<@([0-9A-Z]+)>",
+                "replace": "@player"
+            },
+            "score": {
+                "pattern": "(-?[0-9]+)",
+                "replace": "<numeric score>"
+            }
+        }
 
     def prepare_args(self, event):
         pass

@@ -6,12 +6,14 @@ class SlackClient(object):
         self.config = config
         self.logger = logger
         self.sc = SC(config)
+        self.ready = False
+        self.last_ts = float(0)
 
         self.bot_id = self.sc.api_call("auth.test")["user_id"]
         self.bot_name = self.user_info(self.bot_id)["real_name"]
 
-        self.ready = True
-        self.last_ts = float(0)
+        if self.sc.rtm_connect():
+            self.ready = True
 
     def user_info(self, user_id):
         return self.sc.api_call("users.info", user=user_id)["user"]
