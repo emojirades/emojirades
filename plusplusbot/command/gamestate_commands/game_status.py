@@ -1,5 +1,3 @@
-import re
-
 from plusplusbot.command.gamestate_commands.gamestate_command import GameStateCommand
 from plusplusbot.wrappers import admin_check
 
@@ -12,22 +10,30 @@ class GameStatus(GameStateCommand):
         super().__init__(*args, **kwargs)
 
     def prepare_args(self, event):
-        self.args["user"] = event["user"]
-        self.args["channel"] = event["channel"]
+        super().prepare_args(event)
 
     @admin_check
     def execute(self):
+        for i in super().execute():
+            yield i
+
         status = self.gamestate.game_status(self.args["channel"])
 
         pretty_status = []
 
         for k, v in sorted(status.items()):
             if k == "old_winner" or k == "winner":
-                v = "<@{0}>".format(v)
+                if v is None:
+                    v = "Not Set"
+                else:
+                    v = "<@{0}>".format(v)
             elif k == "admins":
                 v = ", ".join(["<@{0}>".format(i) for i in v])
             elif k == "emojirade":
-                v = "`{0}`".format(v)
+                if v is None:
+                    v = "Not Set"
+                else:
+                    v = "`{0}`".format(v)
             else:
                 v = str(v)
 

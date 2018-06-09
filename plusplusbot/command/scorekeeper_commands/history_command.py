@@ -9,6 +9,9 @@ class HistoryCommand(ScoreKeeperCommand):
         super().__init__(*args, **kwargs)
 
     def execute(self):
+        for i in super().execute():
+            yield i
+
         history = self.scorekeeper.history()
 
         if not history:

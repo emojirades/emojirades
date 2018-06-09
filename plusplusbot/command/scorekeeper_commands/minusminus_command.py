@@ -1,23 +1,22 @@
 from plusplusbot.command.scorekeeper_commands.scorekeeper_command import ScoreKeeperCommand
 from plusplusbot.wrappers import admin_check
 
-import re
-
 
 class MinusMinusCommand(ScoreKeeperCommand):
-    pattern = "<@([0-9A-Z]+)> --"
+    pattern = "<@(?P<target_user>[0-9A-Z]+)>[\\s]*--"
     description = "Decrement the users score"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def prepare_args(self, event):
-        self.args["target_user"] = re.match(self.pattern, event["text"]).group(1)
-        self.args["channel"] = event["channel"]
-        self.args["user"] = event["user"]
+        super().prepare_args(event)
 
     @admin_check
     def execute(self):
+        for i in super().execute():
+            yield i
+
         target_user = self.args["target_user"]
 
         self.logger.debug("Decrementing user's score: {0}".format(target_user))

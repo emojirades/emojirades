@@ -1,27 +1,22 @@
 from plusplusbot.command.gamestate_commands.gamestate_command import GameStateCommand
 from plusplusbot.wrappers import admin_check
 
-import re
-
 
 class NewGame(GameStateCommand):
-    pattern = "<@{me}> new game <@([0-9A-Z]+)> <@([0-9A-Z]+)>"
+    pattern = "<@{me}> new game <@(?P<old_winner>[0-9A-Z]+)> <@(?P<winner>[0-9A-Z]+)>"
     description = "Initiate a new game by setting the Old Winner and the Winner"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def prepare_args(self, event):
-        rendered_pattern = self.pattern.format(me=self.slack.bot_id)
-        match = re.match(rendered_pattern, event["text"])
-
-        self.args["user"] = event["user"]
-        self.args["channel"] = event["channel"]
-        self.args["old_winner"] = match.group(1)
-        self.args["winner"] = match.group(2)
+        super().prepare_args(event)
 
     @admin_check
     def execute(self):
+        for i in super().execute():
+            yield i
+
         if self.args["winner"] == self.args["old_winner"]:
             yield (None, "Sorry, but the old and current winner cannot be the same person (<@{winner}>)...".format(**self.args))
             raise StopIteration

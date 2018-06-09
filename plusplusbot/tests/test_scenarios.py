@@ -6,10 +6,12 @@ class TestBotScenarios(EmojiradeBotTester):
     """
     def test_valid_complete_game(self):
         """ Performs a complete valid round """
-        assert self.state["step"] == "new_game"
-        assert self.state["old_winner"] is None
-        assert self.state["winner"] is None
-        assert self.state["emojirade"] is None
+        assert {
+            "step": "new_game",
+            "old_winner": None,
+            "winner": None,
+            "emojirade": None,
+        }.items() <= self.state.items()
         assert not self.scoreboard
 
         self.send_event(self.events.new_game)

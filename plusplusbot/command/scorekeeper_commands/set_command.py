@@ -1,28 +1,27 @@
 from plusplusbot.command.scorekeeper_commands.scorekeeper_command import ScoreKeeperCommand
 from plusplusbot.wrappers import admin_check
 
-import re
-
 
 class SetCommand(ScoreKeeperCommand):
-    pattern = "<@([0-9A-Z]+)> set (-?[0-9]+)"
+    pattern = "<@(?P<target_user>[0-9A-Z]+)> set (?P<new_score>-?[0-9]+)"
     description = "Manually set the users score"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def prepare_args(self, event):
-        self.args["user"] = event["user"]
-        self.args["channel"] = event["channel"]
+        super().prepare_args(event)
 
-        matches = re.match(self.pattern, event["text"])
-        self.args["target_user"] = matches.group(1)
-        self.args["new_score"] = matches.group(2)
+        self.args["new_score"] = int(self.args["new_score"])
+        print(self.args)
 
     @admin_check
     def execute(self):
+        for i in super().execute():
+            yield i
+
         target_user = self.args["target_user"]
-        new_score = int(self.args["new_score"])
+        new_score = self.args["new_score"]
 
         self.logger.debug("Setting {0} score to: {1}".format(target_user, new_score))
         self.scorekeeper.overwrite(target_user, new_score)

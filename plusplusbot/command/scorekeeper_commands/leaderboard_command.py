@@ -9,6 +9,9 @@ class LeaderboardCommand(ScoreKeeperCommand):
         super().__init__(*args, **kwargs)
 
     def execute(self):
+        for i in super().execute():
+            yield i
+
         leaderboard = self.scorekeeper.leaderboard()
 
         self.logger.debug("Printing leaderboard: {0}".format(leaderboard))

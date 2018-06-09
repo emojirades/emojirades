@@ -10,12 +10,14 @@ class InferredCorrectGuess(GameStateCommand):
         super().__init__(*args, **kwargs)
 
     def prepare_args(self, event):
+        super().prepare_args(event)
         self.args["target_user"] = event["user"]
-        self.args["channel"] = event["channel"]
-        self.args["user"] = event["user"]
 
     @only_actively_guessing
     def execute(self):
+        for i in super().execute():
+            yield i
+
         state = self.gamestate.state[self.args["channel"]]
 
         self.gamestate.correct_guess(self.args["channel"], self.args["target_user"])

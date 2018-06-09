@@ -138,6 +138,18 @@ class GameState(object):
 
         return True
 
+    def is_admin(self, channel, user):
+        admins = self.state[channel].get("admins", [])
+
+        if not admins:
+            # No admins set yet, so everyone is an admin!
+            return True
+
+        if user in admins:
+            return True
+
+        return False
+
     def new_game(self, channel, old_winner, winner):
         """ Winners should be the unique Slack User IDs """
         self.state[channel]["old_winner"] = old_winner
