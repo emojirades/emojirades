@@ -16,7 +16,7 @@ class Command(ABC):
         self.args = {}
         self.prepare_args(event)
 
-        pattern_map = {
+        self.pattern_map = {
             "me": {
                 "pattern": "<@{me}>",
                 "replace": "@{0}".format(self.slack.bot_name)
