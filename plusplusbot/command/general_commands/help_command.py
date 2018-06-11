@@ -16,13 +16,21 @@ class HelpCommand(Command):
         return pattern
 
     def execute(self):
+        for i in super().execute():
+            yield i
+
         commands = plusplusbot.command.command_registry.CommandRegistry.prepare_commands()
 
         message = "Available commands are:\n```"
         message += "{0:<50}{1}\n".format("Command", "Help")
 
         for command in [c[0] for c in commands.values()]:
-            message += "{0:<50}{1}\n".format(self.format_command(command.pattern), command.description)
+            rendered = self.format_command(command.pattern)
+
+            if len(rendered) > 48:
+                rendered = "{0}...".format(rendered[0:45])
+
+            message += "{0:<50}{1}\n".format(rendered, command.description)
 
         message += "```"
         yield (None, message)

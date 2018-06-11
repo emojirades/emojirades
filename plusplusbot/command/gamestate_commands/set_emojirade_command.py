@@ -1,33 +1,33 @@
 from plusplusbot.command.gamestate_commands.gamestate_command import GameStateCommand
 from plusplusbot.wrappers import only_in_progress
 
-import re
-
 
 class SetEmojirade(GameStateCommand):
-    pattern = "^emojirade (.+)$"
+    pattern = "^emojirade (?P<emojirade>.+)"
     description = "Sets the current Emojirade to be guessed"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def prepare_args(self, event):
-        self.args["user"] = event["user"]
-        self.args["emojirade"] = re.match(self.pattern, event["text"]).group(1)
+        super().prepare_args(event)
 
         # Figure out the channel to use
-        # TODO: Decide if we should be getting the user to enter the channel or not?
+        # TODO: Decide if we should be getting the user to explicitly specify the channel?
         for channel_name, channel in self.gamestate.state.items():
             if channel["step"] == "waiting":
                 self.args["channel"] = channel_name
                 break
         else:
-            self.args["channel"] = None
+            raise RuntimeError("Unable to find the correct channel for '{0}'".format(self.args["channel"]))
 
     @only_in_progress
     def execute(self):
+        for i in super().execute():
+            yield i
+
         if self.args["user"] != self.gamestate.state[self.args["channel"]]["old_winner"]:
-            yield (None, "Err <@{user}> it's not your turn to provide the new 'rade :sweat:")
+            yield (None, "Err <@{user}> it's not your turn to provide the new 'rade :sweat:".format(**self.args))
             raise StopIteration
 
         if self.args["channel"] is None:

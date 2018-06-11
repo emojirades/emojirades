@@ -2,11 +2,10 @@ from plusplusbot.command.gamestate_commands.gamestate_command import GameStateCo
 from plusplusbot.wrappers import only_actively_guessing
 
 import random
-import re
 
 
 class CorrectGuess(GameStateCommand):
-    pattern = "<@([0-9A-Z]+)>[\s]*\+\+"
+    pattern = r"<@(?P<target_user>[0-9A-Z]+)>[\s]*\+\+"
     description = "Indicates the player has correctly guessed (manually awarded)!"
     first_emojis = [
         ":tada:",
@@ -21,12 +20,13 @@ class CorrectGuess(GameStateCommand):
         super().__init__(*args, **kwargs)
 
     def prepare_args(self, event):
-        self.args["target_user"] = re.match(self.pattern, event["text"]).group(1)
-        self.args["channel"] = event["channel"]
-        self.args["user"] = event["user"]
+        super().prepare_args(event)
 
     @only_actively_guessing
     def execute(self):
+        for i in super().execute():
+            yield i
+
         state = self.gamestate.state[self.args["channel"]]
 
         if self.args["target_user"] in (state["old_winner"], state["winner"]):

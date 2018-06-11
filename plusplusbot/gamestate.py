@@ -96,20 +96,30 @@ class GameState(object):
         Keeps tabs on the conversation and updates gamestate if required
         Not to be called directly, used as another command source from the bot
         """
-        channel = event["channel"]
-        user = event["user"]
+        channel = str(event["channel"])
+        user = str(event["user"])
+        text = str(event["text"])
         state = self.state[channel]
+
+        # Double check if we're overriding the user
+        user_override_match = Command.user_override_regex.match(event["text"])
+
+        if user_override_match and self.is_admin(channel, user):
+            original_user = user
+            user = user_override_match.groupdict()["user_override"]
+
+            text = text.replace(user_override_match.groupdict()["override_cmd"], "")
 
         # Check to see if the winner is posting emoji's
         if state["step"] == "provided":
             if user == state["winner"]:
-                if ':' in event["text"]:  # ':' means they've posted an emoji :thinking_face:
+                if ':' in text:  # ':' means they've posted an emoji :thinking_face:
                     self.winner_posted(channel)
 
         # Check to see if the users guess is right!
         elif state["step"] == "guessing" and user not in (state["old_winner"], state["winner"]):
             emojirade = state["emojirade"].lower()
-            guess = event["text"].lower()
+            guess = text.lower()
 
             if emojirade in guess:
                 self.logger.debug("emojirade='{0}' guess='{1}' status='correct'".format(emojirade, guess))
@@ -137,6 +147,18 @@ class GameState(object):
         self.save()
 
         return True
+
+    def is_admin(self, channel, user):
+        admins = self.state[channel].get("admins", [])
+
+        if not admins:
+            # No admins set yet, so everyone is an admin!
+            return True
+
+        if user in admins:
+            return True
+
+        return False
 
     def new_game(self, channel, old_winner, winner):
         """ Winners should be the unique Slack User IDs """
