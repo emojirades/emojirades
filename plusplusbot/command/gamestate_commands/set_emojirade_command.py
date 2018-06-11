@@ -19,9 +19,7 @@ class SetEmojirade(GameStateCommand):
                 self.args["channel"] = channel_name
                 break
         else:
-            self.args["channel"] = None
-
-        print(self.args)
+            raise RuntimeError("Unable to find the correct channel for '{0}'".format(self.args["channel"]))
 
     @only_in_progress
     def execute(self):

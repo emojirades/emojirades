@@ -107,3 +107,7 @@ ENV/
 
 # vim
 *.swp
+
+# emojirades testing config
+scores.csv
+state.json

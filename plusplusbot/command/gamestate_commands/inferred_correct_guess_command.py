@@ -11,7 +11,7 @@ class InferredCorrectGuess(GameStateCommand):
 
     def prepare_args(self, event):
         super().prepare_args(event)
-        self.args["target_user"] = event["user"]
+        self.args["target_user"] = self.args["user"]
 
     @only_actively_guessing
     def execute(self):
