@@ -52,6 +52,9 @@ class PlusPlusBot(object):
         if channel.startswith("C"):
             # Plain old channel, just return it
             return channel
+        elif channel.startswith("D"):
+            # Direct message channel, just return it
+            return channel
         elif channel.startswith("U"):
             # Channel is a User ID, which means the real channel is the DM with that user
             dm_id = self.slack.find_im(channel)
