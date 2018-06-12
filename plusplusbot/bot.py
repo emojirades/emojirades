@@ -52,9 +52,17 @@ class PlusPlusBot(object):
         if channel.startswith("C"):
             # Plain old channel, just return it
             return channel
+        elif channel.startswith("D"):
+            # Direct message channel, just return it
+            return channel
         elif channel.startswith("U"):
-            # Channel is a User ID, which means the real channel is the IM with that user
-            return self.slack.find_im(channel)
+            # Channel is a User ID, which means the real channel is the DM with that user
+            dm_id = self.slack.find_im(channel)
+
+            if dm_id is None:
+                raise RuntimeError("Unable to find direct message channel for '{0}'".format(channel))
+
+            return dm_id
         else:
             raise NotImplementedError("Returned channel '{0}' wasn't decoded".format(channel))
 
@@ -79,7 +87,7 @@ class PlusPlusBot(object):
                         if channel is not None:
                             channel = self.decode_channel(channel)
                         else:
-                            channel = event["channel"]
+                            channel = self.decode_channel(event["channel"])
 
                         self.slack.sc.rtm_send_message(channel, response)
 

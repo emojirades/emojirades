@@ -24,7 +24,14 @@ class SlackClient(object):
     def is_admin(self, user_id):
         return self.user_info(user_id)["is_admin"]
 
-    def find_im(self, userid):
+    def find_im(self, user_id):
+        # Find an existing IM (direct message) ID
+        response = self.sc.api_call("im.open", user=user_id)
+
+        if response["ok"]:
+            return response["channel"]["id"]
+
+        # Attemp to locate an existing IM
         for im in self.sc.api_call("im.list")["ims"]:
             if im["user"] == userid:
                 return im["id"]
