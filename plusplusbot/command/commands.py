@@ -33,6 +33,8 @@ class Command(ABC):
             }
         }
 
+        self.print_performed_by = False
+
     def prepare_args(self, event):
         self.args["channel"] = event["channel"]
         self.args["user"] = event["user"]
@@ -63,8 +65,9 @@ class Command(ABC):
         else:
             shadow_user = ""
 
-        # We leave channel none here to return on the channel the original message came in on
-        yield (None, "This action was performed by <@{0}>{1}".format(self.args["user"], shadow_user))
+        if self.print_performed_by:
+            # We leave channel none here to return on the channel the original message came in on
+            yield (None, "This action was performed by <@{0}>{1}".format(self.args["user"], shadow_user))
 
     @classmethod
     def match(cls, text, **kwargs):

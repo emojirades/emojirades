@@ -9,6 +9,8 @@ class GameStatus(GameStateCommand):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        self.masked_emojirade = True
+
     def prepare_args(self, event):
         super().prepare_args(event)
 
@@ -33,7 +35,10 @@ class GameStatus(GameStateCommand):
                 if v is None:
                     v = "Not Set"
                 else:
-                    v = "`{0}`".format(v)
+                    if self.masked_emojirade:
+                        v = "*****"
+                    else:
+                        v = "`{0}`".format(v)
             else:
                 v = str(v)
 
