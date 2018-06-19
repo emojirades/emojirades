@@ -95,10 +95,9 @@ class TestBotScenarios(EmojiradeBotTester):
         assert len(self.responses) == 0
 
         self.send_event(self.events.new_game)
-        assert len(self.responses) == 5
+        assert len(self.responses) == 4
 
         responses = [
-            (self.config.channel, "This action was performed by <@{0}>".format(self.config.player_1)),
             (self.config.channel, "<@{0}> has set the old winner to <@{0}> and the winner to <@{1}>".format(self.config.player_1, self.config.player_2)),
             (self.config.channel, "It's now <@{0}>'s turn to provide <@{1}> with the next 'rade!".format(self.config.player_1, self.config.player_2)),
             (self.config.player_1_channel, "You'll now need to send me the new 'rade for <@{0}>".format(self.config.player_2)),
@@ -109,25 +108,23 @@ class TestBotScenarios(EmojiradeBotTester):
             assert response == self.responses[i]
 
         self.send_event(self.events.posted_emojirade)
-        assert len(self.responses) == 8
+        assert len(self.responses) == 6
 
         responses = [
-            (self.config.bot_channel, "This action was performed by <@{0}>".format(self.config.player_1)),
             (self.config.player_2_channel, "Hey, <@{0}> made the 'rade `{1}`, good luck!".format(self.config.player_1, self.config.emojirade)),
             (self.config.channel, ":mailbox: 'rade sent to <@{1}>".format(self.config.player_1, self.config.player_2)),
         ]
 
         for i, response in enumerate(responses):
-            assert response == self.responses[5 + i]
+            assert response == self.responses[4 + i]
 
         self.send_event(self.events.posted_emoji)
-        assert len(self.responses) == 8
+        assert len(self.responses) == 6
 
         self.send_event(self.events.correct_guess)
-        assert len(self.responses) == 13
+        assert len(self.responses) == 10
 
         responses = [
-            (self.config.channel, "This action was performed by <@{0}>".format(self.config.player_3)),
             (self.config.channel, "<@{0}>++".format(self.config.player_3)),
             (self.config.channel, "Congrats <@{0}>, you're now at 1 point".format(self.config.player_3)),
             (self.config.player_2_channel, "You'll now need to send me the new 'rade for <@{0}>".format(self.config.player_3)),
@@ -135,7 +132,7 @@ class TestBotScenarios(EmojiradeBotTester):
         ]
 
         for i, response in enumerate(responses):
-            assert response == self.responses[8 + i]
+            assert response == self.responses[6 + i]
 
     def test_only_guess_when_guessing(self):
         """ Ensures we can only 'guess' correctly when state is guessing """
