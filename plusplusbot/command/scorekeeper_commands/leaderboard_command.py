@@ -16,8 +16,6 @@ class LeaderboardCommand(ScoreKeeperCommand):
 
         self.logger.debug("Printing leaderboard: {0}".format(leaderboard))
 
-        self.slack.get_names(name)[""]
-
         lines = []
 
         for index, (name, score) in enumerate(leaderboard):
@@ -26,6 +24,6 @@ class LeaderboardCommand(ScoreKeeperCommand):
                 self.slack.pretty_name(name),
                 score,
                 "s" if score > 1 else ""
-            )
+            ))
 
         yield (None, "\n".join(lines))
