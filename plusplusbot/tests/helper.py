@@ -45,6 +45,9 @@ class EmojiradeBotTester(unittest.TestCase):
     def find_im(self, user_id):
         return user_id.replace("U", "D")
 
+    def pretty_name(self, user_id):
+        return user_id
+
     @patch("plusplusbot.bot.SlackClient")
     def setUp(self, slack_client):
         self.responses = []
@@ -57,8 +60,11 @@ class EmojiradeBotTester(unittest.TestCase):
 
         self.bot = PlusPlusBot(self.scorefile.name, self.statefile.name)
         self.bot.slack.bot_id = self.config.bot_id
+
+        # Override bot functions
         self.bot.slack.sc.rtm_send_message = self.save_responses
         self.bot.slack.find_im = self.find_im
+        self.bot.slack.pretty_name = self.pretty_name
 
         self.state = self.bot.gamestate.state[self.config.channel]
         self.scoreboard = self.bot.scorekeeper.scoreboard
@@ -145,7 +151,7 @@ class EmojiradeBotTester(unittest.TestCase):
                 **base_event,
                 **{
                     "user": player_2,
-                    "text": "<@{0}>++".format(player_3)
+                    "text": "<@{0}>++".format(player_3),
                 },
             },
             "plusplus": {
@@ -153,6 +159,13 @@ class EmojiradeBotTester(unittest.TestCase):
                 **{
                     "user": player_1,
                     "text": "<@{0}>++".format(player_2),
+                },
+            },
+            "leaderboard": {
+                **base_event,
+                **{
+                    "user": player_1,
+                    "text": "<@{0}> leaderboard".format(bot_id),
                 },
             },
         }
