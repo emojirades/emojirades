@@ -24,6 +24,22 @@ class SlackClient(object):
     def is_admin(self, user_id):
         return self.user_info(user_id)["is_admin"]
 
+    def get_names(self, user_id):
+        user = self.user_info(user_id)
+
+        return {
+            "name": user["name"],
+            "real_name": user["real_name"],
+        }
+
+    def pretty_name(self, user_id):
+        user = self.user_info(user_id)
+
+        if user["name"]:
+            return "{0} ({1})".format(user["real_name"], user["name"])
+        else:
+            return user["real_name"]
+
     def find_im(self, user_id):
         # Find an existing IM (direct message) ID
         response = self.sc.api_call("im.open", user=user_id)
