@@ -200,5 +200,13 @@ class GameState(object):
         """ Returns the game state """
         return self.state[channel]
 
+    def fixwinner(self, channel, winner):
+        """ Updates the current winner with the newly provided winner and handles score updates """
+        loser = self.state[channel]["winner"]
+        self.state[channel]["winner"] = winner
+        self.save()
+
+        return loser, winner
+
     def save(self):
         self.config.save(self.state)
