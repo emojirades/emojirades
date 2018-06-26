@@ -20,12 +20,13 @@ class FixWinner(GameStateCommand):
         loser, winner = self.gamestate.fixwinner(self.args["channel"], self.args["winner"])
 
         if loser is None or winner is None:
-            yield (None, "Failed to fix the winner, please manually fix, sorry :(")
+            yield (None, "Failed to fix the winner, no scores have been updated, please fix manually :(")
             raise StopIteration
 
-        # Mainly for compat with plusplus bot purposes
         yield (None, "<@{0}>--".format(loser))
+        self.scorekeeper.minusminus(loser)
+
         yield (None, "<@{0}>++".format(winner))
-        # TODO: Need to update the actual player scores as well
+        self.scorekeeper.plusplus(winner)
 
         yield (None, "Sorry <@{0}>! <@{1}> has decided to award <@{2}> the win :smiling_imp:".format(loser, self.args["user"], winner))
