@@ -60,7 +60,7 @@ class ScoreKeeper(object):
                 self.logger.info("Loaded scores from {0}".format(filename))
 
     def current_score(self, user):
-        leader = sorted(self.scoreboard.items(), key=lambda x: x[1], reverse=True)[0]
+        leader, score = sorted(self.scoreboard.items(), key=lambda x: x[1], reverse=True)[0]
         return self.scoreboard[user], user == leader
 
     def plusplus(self, user):
