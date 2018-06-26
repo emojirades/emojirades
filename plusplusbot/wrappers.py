@@ -1,6 +1,6 @@
-
 # Convenience wrappers used to assert game state or permissions checks
 # These are used directly by a commands execute function
+
 
 def admin_check(command):
     def wrapped_command(self):
@@ -17,6 +17,7 @@ def admin_check(command):
             yield channel, response
 
     return wrapped_command
+
 
 def admin_or_old_winner_check(command):
     def wrapped_command(self):
@@ -43,6 +44,7 @@ def admin_or_old_winner_check(command):
 
     return wrapped_command
 
+
 def only_in_progress(command):
     def wrapped_command(self):
         channel = self.args["channel"]
@@ -55,6 +57,7 @@ def only_in_progress(command):
             yield channel, response
 
     return wrapped_command
+
 
 def only_actively_guessing(command):
     def wrapped_command(self):

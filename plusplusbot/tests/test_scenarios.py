@@ -1,5 +1,6 @@
 from plusplusbot.tests.helper import EmojiradeBotTester
 
+
 class TestBotScenarios(EmojiradeBotTester):
     """
     Tests various game scenarios against the bot
@@ -181,8 +182,8 @@ class TestBotScenarios(EmojiradeBotTester):
         assert self.state["emojirade"] is None
         assert (self.config.channel, "<@{0}>++".format(self.config.player_3)) in self.responses
         assert any(
-            self.config.channel == channel and
-            "Congrats <@{0}>, you're now at 1 point".format(self.config.player_3) in msg
+            self.config.channel == channel
+            and "Congrats <@{0}>, you're now at 1 point".format(self.config.player_3) in msg
             for channel, msg in self.responses
         )
 
@@ -209,7 +210,7 @@ class TestBotScenarios(EmojiradeBotTester):
         assert self.state["emojirade"] is None
         assert (self.config.channel, "<@{0}>++".format(self.config.player_1)) in self.responses
         assert any(
-            self.config.channel == channel and
-            "Congrats <@{0}>, you're now at 1 point".format(self.config.player_1) in msg
+            self.config.channel == channel
+            and "Congrats <@{0}>, you're now at 1 point".format(self.config.player_1) in msg
             for channel, msg in self.responses
         )

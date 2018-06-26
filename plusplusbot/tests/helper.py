@@ -8,6 +8,7 @@ import os
 
 logging.basicConfig(level=logging.DEBUG)
 
+
 class EmojiradeBotTester(unittest.TestCase):
     """
     Base testing class that creates a bot that will accept events to test against

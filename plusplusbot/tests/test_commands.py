@@ -1,5 +1,6 @@
 from plusplusbot.tests.helper import EmojiradeBotTester
 
+
 class TestBotCommands(EmojiradeBotTester):
     """
     Tests various game commands against the bot
