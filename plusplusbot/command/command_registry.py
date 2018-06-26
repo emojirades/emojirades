@@ -6,6 +6,7 @@ from plusplusbot.command.gamestate_commands.set_admin_command import SetAdmin
 from plusplusbot.command.gamestate_commands.remove_admin_command import RemoveAdmin
 from plusplusbot.command.gamestate_commands.correct_guess_command import CorrectGuess
 from plusplusbot.command.gamestate_commands.set_emojirade_command import SetEmojirade
+from plusplusbot.command.gamestate_commands.fixwinner_command import FixWinner
 
 from plusplusbot.command.scorekeeper_commands.set_command import SetCommand
 from plusplusbot.command.scorekeeper_commands.history_command import HistoryCommand
@@ -26,6 +27,7 @@ class CommandRegistry:
         SetAdmin,
         SetEmojirade,
         GameStatus,
+        FixWinner,
     ]
 
     @classmethod

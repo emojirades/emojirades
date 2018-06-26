@@ -1,10 +1,20 @@
 from plusplusbot.command.gamestate_commands.gamestate_command import GameStateCommand
 from plusplusbot.wrappers import only_actively_guessing
 
+import random
+
 
 class InferredCorrectGuess(GameStateCommand):
     pattern = None
     description = "Takes the user that send the event as the winner, this is only ever fired internally"
+    first_emojis = [
+        ":tada:",
+        ":first_place_medal:",
+        ":sunglasses:",
+        ":nerd_face:",
+        ":birthday:",
+        ":beers:",
+    ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

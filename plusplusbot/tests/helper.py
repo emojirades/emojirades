@@ -8,6 +8,7 @@ import os
 
 logging.basicConfig(level=logging.DEBUG)
 
+
 class EmojiradeBotTester(unittest.TestCase):
     """
     Base testing class that creates a bot that will accept events to test against
@@ -85,6 +86,8 @@ class EmojiradeBotTester(unittest.TestCase):
         player_2_channel = "D00000002"
         player_3 = "U00000003"
         player_3_channel = "D00000003"
+        player_4 = "U00000004"
+        player_4_channel = "D00000004"
         emojirade = "testing"
 
         event_config = {
@@ -98,6 +101,8 @@ class EmojiradeBotTester(unittest.TestCase):
             "player_2_channel": player_2_channel,
             "player_3": player_3,
             "player_3_channel": player_3_channel,
+            "player_4": player_4,
+            "player_4_channel": player_4_channel,
             "emojirade": emojirade,
         }
 
@@ -166,6 +171,13 @@ class EmojiradeBotTester(unittest.TestCase):
                 **{
                     "user": player_1,
                     "text": "<@{0}> leaderboard".format(bot_id),
+                },
+            },
+            "fixwinner": {
+                **base_event,
+                **{
+                    "user": player_2,
+                    "text": "<@{0}> fixwinner <@{1}>".format(bot_id, player_4),
                 },
             },
         }

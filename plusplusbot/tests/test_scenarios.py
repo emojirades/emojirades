@@ -1,5 +1,6 @@
 from plusplusbot.tests.helper import EmojiradeBotTester
 
+
 class TestBotScenarios(EmojiradeBotTester):
     """
     Tests various game scenarios against the bot
@@ -104,8 +105,9 @@ class TestBotScenarios(EmojiradeBotTester):
             (self.config.player_1_channel, "Please reply back in the format `emojirade Point Break` if `Point Break` was the new 'rade"),
         ]
 
-        for i, response in enumerate(responses):
-            assert response == self.responses[i]
+        for i, (channel, msg) in enumerate(responses):
+            assert channel == self.responses[i][0]
+            assert msg in self.responses[i][1]
 
         self.send_event(self.events.posted_emojirade)
         assert len(self.responses) == 6
@@ -115,8 +117,9 @@ class TestBotScenarios(EmojiradeBotTester):
             (self.config.channel, ":mailbox: 'rade sent to <@{1}>".format(self.config.player_1, self.config.player_2)),
         ]
 
-        for i, response in enumerate(responses):
-            assert response == self.responses[4 + i]
+        for i, (channel, msg) in enumerate(responses):
+            assert channel == self.responses[4 + i][0]
+            assert msg in self.responses[4 + i][1]
 
         self.send_event(self.events.posted_emoji)
         assert len(self.responses) == 6
@@ -131,8 +134,9 @@ class TestBotScenarios(EmojiradeBotTester):
             (self.config.player_2_channel, "Please reply back in the format `emojirade Point Break` if `Point Break` was the new 'rade"),
         ]
 
-        for i, response in enumerate(responses):
-            assert response == self.responses[6 + i]
+        for i, (channel, msg) in enumerate(responses):
+            assert channel == self.responses[6 + i][0]
+            assert msg in self.responses[6 + i][1]
 
     def test_only_guess_when_guessing(self):
         """ Ensures we can only 'guess' correctly when state is guessing """
@@ -177,7 +181,11 @@ class TestBotScenarios(EmojiradeBotTester):
         assert self.state["winner"] == self.config.player_3
         assert self.state["emojirade"] is None
         assert (self.config.channel, "<@{0}>++".format(self.config.player_3)) in self.responses
-        assert (self.config.channel, "Congrats <@{0}>, you're now at 1 point".format(self.config.player_3)) in self.responses
+        assert any(
+            self.config.channel == channel
+            and "Congrats <@{0}>, you're now at 1 point".format(self.config.player_3) in msg
+            for channel, msg in self.responses
+        )
 
         emojirade = "second"
         override = {"user": self.config.player_2, "text": "emojirade {0}".format(emojirade)}
@@ -201,4 +209,8 @@ class TestBotScenarios(EmojiradeBotTester):
         assert self.state["winner"] == self.config.player_1
         assert self.state["emojirade"] is None
         assert (self.config.channel, "<@{0}>++".format(self.config.player_1)) in self.responses
-        assert (self.config.channel, "Congrats <@{0}>, you're now at 1 point".format(self.config.player_1)) in self.responses
+        assert any(
+            self.config.channel == channel
+            and "Congrats <@{0}>, you're now at 1 point".format(self.config.player_1) in msg
+            for channel, msg in self.responses
+        )

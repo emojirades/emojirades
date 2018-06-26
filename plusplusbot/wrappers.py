@@ -1,6 +1,6 @@
-
 # Convenience wrappers used to assert game state or permissions checks
 # These are used directly by a commands execute function
+
 
 def admin_check(command):
     def wrapped_command(self):
@@ -18,6 +18,33 @@ def admin_check(command):
 
     return wrapped_command
 
+
+def admin_or_old_winner_check(command):
+    def wrapped_command(self):
+        channel = self.args["channel"]
+
+        is_old_winner = False
+        is_admin = False
+
+        if self.args["user"] == self.gamestate.state[channel]["old_winner"]:
+            is_old_winner = True
+
+        if self.gamestate.state[channel]["admins"] and self.args["user"] in self.gamestate.state[channel]["admins"]:
+            is_admin = True
+
+        if not is_old_winner and not is_admin:
+            yield (None, "Sorry <@{user}> but you need to be the old winner (or a game admin) to do that :upside_down_face:".format(**self.args))
+
+            admins = ["<@{0}>".format(admin) for admin in self.gamestate.state[channel]["admins"]]
+            yield (None, "Game admins currently are: {0}".format(", ".join(admins)))
+            raise StopIteration
+
+        for channel, response in command(self):
+            yield channel, response
+
+    return wrapped_command
+
+
 def only_in_progress(command):
     def wrapped_command(self):
         channel = self.args["channel"]
@@ -30,6 +57,7 @@ def only_in_progress(command):
             yield channel, response
 
     return wrapped_command
+
 
 def only_actively_guessing(command):
     def wrapped_command(self):
