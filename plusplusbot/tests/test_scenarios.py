@@ -180,7 +180,11 @@ class TestBotScenarios(EmojiradeBotTester):
         assert self.state["winner"] == self.config.player_3
         assert self.state["emojirade"] is None
         assert (self.config.channel, "<@{0}>++".format(self.config.player_3)) in self.responses
-        assert any(self.config.channel == channel and "Congrats <@{0}>, you're now at 1 point".format(self.config.player_3) in msg for channel, msg in self.responses)
+        assert any(
+            self.config.channel == channel and
+            "Congrats <@{0}>, you're now at 1 point".format(self.config.player_3) in msg
+            for channel, msg in self.responses
+        )
 
         emojirade = "second"
         override = {"user": self.config.player_2, "text": "emojirade {0}".format(emojirade)}
@@ -204,4 +208,8 @@ class TestBotScenarios(EmojiradeBotTester):
         assert self.state["winner"] == self.config.player_1
         assert self.state["emojirade"] is None
         assert (self.config.channel, "<@{0}>++".format(self.config.player_1)) in self.responses
-        assert (self.config.channel, "Congrats <@{0}>, you're now at 1 point".format(self.config.player_1)) in self.responses
+        assert any(
+            self.config.channel == channel and
+            "Congrats <@{0}>, you're now at 1 point".format(self.config.player_1) in msg
+            for channel, msg in self.responses
+        )
