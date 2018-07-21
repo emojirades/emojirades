@@ -1,5 +1,6 @@
 from plusplusbot.command.gamestate_commands.gamestate_command import GameStateCommand
 from plusplusbot.wrappers import only_in_progress
+from plusplusbot.checks import emojirade_is_banned
 
 
 class SetEmojirade(GameStateCommand):
@@ -31,7 +32,11 @@ class SetEmojirade(GameStateCommand):
             raise StopIteration
 
         if self.args["channel"] is None:
-            yield (user, "We were unable to figure out the correct channel, please raise this issue!")
+            yield (None, "We were unable to figure out the correct channel, please raise this issue!")
+            raise StopIteration
+
+        if emojirade_is_banned(self.args["emojirade"]):
+            yield (None, "Sorry, but that emojirade contained a banned word/phrase :no_good:, try again?")
             raise StopIteration
 
         self.gamestate.set_emojirade(self.args["channel"], self.args["emojirade"])
