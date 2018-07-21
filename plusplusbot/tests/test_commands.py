@@ -32,7 +32,6 @@ class TestBotCommands(EmojiradeBotTester):
         self.send_event(self.events.correct_guess)
         assert state["old_winner"] == self.config.player_2
         assert state["winner"] == self.config.player_3
-        print(self.bot.scorekeeper.leaderboard())
         assert self.bot.scorekeeper.current_score(self.config.player_3) == (1, True)
         assert self.bot.scorekeeper.current_score(self.config.player_4) == (0, False)
 
@@ -41,3 +40,19 @@ class TestBotCommands(EmojiradeBotTester):
         assert state["winner"] == self.config.player_4
         assert self.bot.scorekeeper.current_score(self.config.player_3) == (0, False)
         assert self.bot.scorekeeper.current_score(self.config.player_4) == (1, True)
+
+    def test_set_emojirade_banned_words(self):
+        """ Ensure that the emojirade can't contain banned words """
+        self.reset_and_transition_to("waiting")
+
+        state = self.bot.gamestate.state[self.config.channel]
+
+        banned_emojirade = dict(self.events.posted_emojirade)
+        banned_emojirade["text"] = "emojirade foo :pie: bar"
+
+        self.send_event(banned_emojirade)
+        assert (self.config.bot_channel, "Sorry, but that emojirade contained a banned word/phrase :no_good:, try again?") in self.responses
+        assert state["step"] == "waiting"
+
+        self.send_event(self.events.posted_emojirade)
+        assert state["step"] == "provided"
