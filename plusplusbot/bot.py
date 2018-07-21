@@ -31,12 +31,7 @@ class PlusPlusBot(object):
         :param event:
         :return Command:
         """
-
         self.logger.debug("Handling event: {}".format(event))
-
-        if "text" not in event:
-            self.logger.debug("Event match ignored due to no 'text' field")
-            raise StopIteration
 
         for GameCommand in self.gamestate.infer_commands(event):
             yield GameCommand(self.slack, event, scorekeeper=self.scorekeeper, gamestate=self.gamestate)
@@ -44,6 +39,25 @@ class PlusPlusBot(object):
         for pattern, (Command, description) in commands.items():
             if Command.match(event["text"], me=self.slack.bot_id):
                 yield Command(self.slack, event, scorekeeper=self.scorekeeper, gamestate=self.gamestate)
+
+    def valid_event(self, event):
+        """
+        Assert the lowest level of things we need to see in an event to be parseable
+        :param event:
+        :return bool:
+        """
+        expected_keys = {
+            "text",
+            "channel",
+            "user",
+        }
+
+        if not event:
+            return False
+        elif not expected_keys.issubset(event.keys()):
+            return False
+
+        return True
 
     def decode_channel(self, channel):
         """
@@ -76,7 +90,7 @@ class PlusPlusBot(object):
 
         while True:
             for event in self.slack.sc.rtm_read():
-                if not event or "text" not in event or "channel" not in event:
+                if not self.valid_event(event):
                     self.logger.debug("Skipping event due to being invalid")
                     continue
 
