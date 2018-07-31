@@ -26,14 +26,14 @@ class TestBotScenarios(EmojiradeBotTester):
         assert self.state["step"] == "provided"
         assert self.state["old_winner"] == self.config.player_1
         assert self.state["winner"] == self.config.player_2
-        assert self.state["emojirade"] == self.config.emojirade
+        assert self.state["emojirade"] == [self.config.emojirade]
         assert not self.scoreboard
 
         self.send_event(self.events.posted_emoji)
         assert self.state["step"] == "guessing"
         assert self.state["old_winner"] == self.config.player_1
         assert self.state["winner"] == self.config.player_2
-        assert self.state["emojirade"] == self.config.emojirade
+        assert self.state["emojirade"] == [self.config.emojirade]
         assert not self.scoreboard
 
         self.send_event(self.events.correct_guess)
@@ -64,21 +64,21 @@ class TestBotScenarios(EmojiradeBotTester):
         assert self.state["step"] == "provided"
         assert self.state["old_winner"] == self.config.player_1
         assert self.state["winner"] == self.config.player_2
-        assert self.state["emojirade"] == self.config.emojirade
+        assert self.state["emojirade"] == [self.config.emojirade]
         assert not self.scoreboard
 
         self.send_event(self.events.posted_emoji)
         assert self.state["step"] == "guessing"
         assert self.state["old_winner"] == self.config.player_1
         assert self.state["winner"] == self.config.player_2
-        assert self.state["emojirade"] == self.config.emojirade
+        assert self.state["emojirade"] == [self.config.emojirade]
         assert not self.scoreboard
 
         self.send_event(self.events.incorrect_guess)
         assert self.state["step"] == "guessing"
         assert self.state["old_winner"] == self.config.player_1
         assert self.state["winner"] == self.config.player_2
-        assert self.state["emojirade"] == self.config.emojirade
+        assert self.state["emojirade"] == [self.config.emojirade]
         assert not self.scoreboard
 
         self.send_event(self.events.manual_award)
@@ -208,7 +208,7 @@ class TestBotScenarios(EmojiradeBotTester):
         assert self.state["step"] == "guessing"
         assert self.state["old_winner"] == self.config.player_1
         assert self.state["winner"] == self.config.player_2
-        assert self.state["emojirade"] == self.config.emojirade
+        assert self.state["emojirade"] == [self.config.emojirade]
 
         self.send_event(self.events.correct_guess)
         assert self.state["step"] == "waiting"
@@ -228,14 +228,14 @@ class TestBotScenarios(EmojiradeBotTester):
         assert self.state["step"] == "provided"
         assert self.state["old_winner"] == self.config.player_2
         assert self.state["winner"] == self.config.player_3
-        assert self.state["emojirade"] == emojirade
+        assert self.state["emojirade"] == [emojirade]
 
         override = {"user": self.config.player_3}
         self.send_event({**self.events.posted_emoji, **override})
         assert self.state["step"] == "guessing"
         assert self.state["old_winner"] == self.config.player_2
         assert self.state["winner"] == self.config.player_3
-        assert self.state["emojirade"] == emojirade
+        assert self.state["emojirade"] == [emojirade]
 
         override = {"user": self.config.player_1, "text": emojirade}
         self.send_event({**self.events.correct_guess, **override})
@@ -249,3 +249,43 @@ class TestBotScenarios(EmojiradeBotTester):
             and "Congrats <@{0}>, you're now at 1 point".format(self.config.player_1) in msg
             for channel, msg in self.responses
         )
+
+    def test_emojirade_alternatives(self):
+        """ Performs alternative emojirades checks """
+        # Check alternative A ('foo')
+        self.reset_and_transition_to("waiting")
+
+        override = {"text": "emojirade foo | bar"}
+        self.send_event({**self.events.posted_emojirade, **override})
+        assert self.state["step"] == "provided"
+        assert self.state["emojirade"] == ["foo", "bar"]
+        assert not self.scoreboard
+
+        self.send_event(self.events.posted_emoji)
+        assert self.state["step"] == "guessing"
+        assert self.state["emojirade"] == ["foo", "bar"]
+        assert not self.scoreboard
+
+        override = {"text": "foo"}
+        self.send_event({**self.events.correct_guess, **override})
+        assert self.state["step"] == "waiting"
+        assert self.state["emojirade"] is None
+
+        # Check alternative B ('bar')
+        self.reset_and_transition_to("waiting")
+
+        override = {"text": "emojirade foo | bar"}
+        self.send_event({**self.events.posted_emojirade, **override})
+        assert self.state["step"] == "provided"
+        assert self.state["emojirade"] == ["foo", "bar"]
+        assert not self.scoreboard
+
+        self.send_event(self.events.posted_emoji)
+        assert self.state["step"] == "guessing"
+        assert self.state["emojirade"] == ["foo", "bar"]
+        assert not self.scoreboard
+
+        override = {"text": "bar"}
+        self.send_event({**self.events.correct_guess, **override})
+        assert self.state["step"] == "waiting"
+        assert self.state["emojirade"] is None

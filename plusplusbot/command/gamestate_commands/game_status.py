@@ -38,7 +38,7 @@ class GameStatus(GameStateCommand):
                     if self.masked_emojirade:
                         v = "*****"
                     else:
-                        v = "`{0}`".format(v)
+                        v = " | ".join(["`{0}`".format(i) for i in v])
             else:
                 v = str(v)
 
