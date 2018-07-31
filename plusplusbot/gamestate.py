@@ -118,8 +118,11 @@ class GameState(object):
 
         # Check to see if the users guess is right!
         elif state["step"] == "guessing" and user not in (state["old_winner"], state["winner"]):
-            emojirade = state["emojirade"].lower()
-            guess = text.lower()
+            def sanitize(text):
+                return re.sub("['\"-_+=]", "", text)
+
+            emojirade = sanitize(state["emojirade"].lower())
+            guess = sanitize(text.lower())
 
             if emojirade in guess:
                 self.logger.debug("emojirade='{0}' guess='{1}' status='correct'".format(emojirade, guess))
