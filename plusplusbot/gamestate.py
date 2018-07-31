@@ -121,15 +121,17 @@ class GameState(object):
             def sanitize(text):
                 return re.sub("['\"-_+=]", "", text)
 
-            emojirade = sanitize(state["emojirade"].lower())
+            emojirades = [sanitize(i.lower()) for i in state["emojirade"]]
             guess = sanitize(text.lower())
 
-            if emojirade in guess:
-                self.logger.debug("emojirade='{0}' guess='{1}' status='correct'".format(emojirade, guess))
+            for emojirade in emojirades:
+                if emojirade in guess:
+                    self.logger.debug("emojirade='{0}' guess='{1}' status='correct'".format(emojirade, guess))
 
-                yield InferredCorrectGuess
-            else:
-                self.logger.debug("emojirade='{0}' guess='{1}' status='incorrect'".format(emojirade, guess))
+                    yield InferredCorrectGuess
+                    break
+                else:
+                    self.logger.debug("emojirade='{0}' guess='{1}' status='incorrect'".format(emojirade, guess))
 
     def set_admin(self, channel, admin):
         """ Sets a new game admin! """

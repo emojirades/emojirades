@@ -39,7 +39,10 @@ class SetEmojirade(GameStateCommand):
             yield (None, "Sorry, but that emojirade contained a banned word/phrase :no_good:, try again?")
             raise StopIteration
 
-        self.gamestate.set_emojirade(self.args["channel"], self.args["emojirade"])
+        # Break the alternatives out and strip whitespace (from front/end of each 'rade)
+        emojirades = [i.strip() for i in self.args["emojirade"].split("|")]
+
+        self.gamestate.set_emojirade(self.args["channel"], emojirades)
 
         winner = self.gamestate.state[self.args["channel"]]["winner"]
 
@@ -47,7 +50,12 @@ class SetEmojirade(GameStateCommand):
         yield (self.args["user"], "Thanks for that! I've let {winner} know!".format(winner=winner))
 
         # DM the winner with the new rade
-        yield (winner, "Hey, <@{user}> made the 'rade `{emojirade}`, good luck!".format(**self.args))
+        if len(emojirades) > 1:
+            alternatives = ", with alternatives " + " OR ".join(["`{0}`".format(i) for i in emojirades[1:]])
+        else:
+            alternatives = ""
+
+        yield (winner, "Hey, <@{user}> made the 'rade `{first}`{alternatives}, good luck!".format(**self.args, first=emojirades[0], alternatives=alternatives))
 
         # Let everyone else know
         yield (self.args["channel"], ":mailbox: 'rade sent to <@{winner}>".format(winner=winner))
