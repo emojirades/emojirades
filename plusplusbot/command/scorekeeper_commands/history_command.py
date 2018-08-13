@@ -15,11 +15,11 @@ class HistoryCommand(ScoreKeeperCommand):
         history = self.scorekeeper.history()
 
         if not history:
-            self.logger.debug("No history available")
-            yield (None, "No history available.")
+            self.logger.debug("No history available. History is temporary and doesn't persist across bot restarts.")
+            yield (None, "No history available. History is temporary and doesn't persist across bot restarts.")
             raise StopIteration
 
         self.logger.debug("Printing history: {0}".format(history))
 
         yield (None, "\n".join(["{0}. <@{1}> > '{2}'".format(index + 1, name, action)
-                                for index, (name, action) in enumerate(history)]))
+                                for index, (name, action) in enumerate(history)] + ["This is an in-memory log and only up-to-date from the last bot restart."]))
