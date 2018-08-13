@@ -35,6 +35,24 @@ Optionally if you are saving data into S3, you might need to set the profile to 
 ## Run the daemon
 `emojirades-plusplus --score-file scores.csv --state-file state.json -vv`
 
+## Service configuration
+```
+cp emojirades.service /etc/systemd/system/
+sudo chmod 0664 /etc/systemd/system/emojirades.service
+
+# Edit the /etc/systemd/system/emojirades.service file and update the user and group
+
+cp emojiradesplusplus.config /etc/emojiradesplusplus
+sudo chmod 0400 /etc/emojiradesplusplus
+
+# Edit the /etc/emojiradesplusplus config file with your configuration for the bot
+
+sudo systemctl daemon-reload
+sudo systemctl enable emojirades
+sudo systemctl start emojirades
+```
+
+
 # Release process (for master branch)
 1. Create release branch containing new version in setup.py
 2. Perform a PR into master
