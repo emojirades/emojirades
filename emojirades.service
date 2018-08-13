@@ -1,0 +1,15 @@
+[Unit]
+Description=EmojiradesPlusPlus Bot
+After=network.target
+
+[Service]
+EnvironmentFile=/etc/emojiradesplusplus
+User=<local user>
+Group=<local group>
+Type=simple
+ExecStart=/bin/bash -c "AWS_PROFILE=\"${AWS_PROFILE}\" SLACK_BOT_TOKEN=\"${SLACK_BOT_TOKEN}\" emojirades-plusplus --score-file \"${SCORE_FILE}\" --state-file \"${STATE_FILE}\" -vv"
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
