@@ -5,7 +5,6 @@ import re
 import io
 
 from collections import defaultdict
-from enum import Enum
 
 from plusplusbot.handlers import get_configuration_handler
 from plusplusbot.command.commands import Command
