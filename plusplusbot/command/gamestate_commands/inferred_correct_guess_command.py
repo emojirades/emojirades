@@ -31,7 +31,7 @@ class InferredCorrectGuess(GameStateCommand):
         state = self.gamestate.state[self.args["channel"]]
 
         self.gamestate.correct_guess(self.args["channel"], self.args["target_user"])
-        score, is_first = self.scorekeeper.plusplus(self.args["target_user"])
+        score, is_first = self.scorekeeper.plusplus(self.args["channel"], self.args["target_user"])
 
         if is_first:
             emoji = " {0}".format(random.choice(self.first_emojis))

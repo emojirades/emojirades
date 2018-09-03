@@ -12,7 +12,7 @@ class LeaderboardCommand(ScoreKeeperCommand):
         for i in super().execute():
             yield i
 
-        leaderboard = self.scorekeeper.leaderboard()
+        leaderboard = self.scorekeeper.leaderboard(self.args["channel"])
 
         self.logger.debug("Printing leaderboard: {0}".format(leaderboard))
 

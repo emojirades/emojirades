@@ -12,7 +12,7 @@ class HistoryCommand(ScoreKeeperCommand):
         for i in super().execute():
             yield i
 
-        history = self.scorekeeper.history()
+        history = self.scorekeeper.history(self.args["channel"])
 
         if not history:
             self.logger.debug("No history available. History is temporary and doesn't persist across bot restarts.")
