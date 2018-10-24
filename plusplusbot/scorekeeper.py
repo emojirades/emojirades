@@ -18,7 +18,7 @@ history_limit = 5
 def get_handler(filename):
     class ScoreKeeperConfigHandler(get_configuration_handler(filename)):
         """
-        Handles CRUD for the ScoreKeeper configuration file V1
+        Handles CRUD for the ScoreKeeper configuration file
         """
         FILE_ENCODING = "utf-8"
 
@@ -31,8 +31,7 @@ def get_handler(filename):
             if bytes_content is None or not bytes_content:
                 return None
 
-            scores = bytes_content.decode(self.FILE_ENCODING)
-            conf = json.loads(scores)
+            conf = json.loads(bytes_content.decode(self.FILE_ENCODING))
 
             for channel, channel_conf in conf.items():
                 channel_conf["scores"] = defaultdict(int, channel_conf["scores"])
@@ -46,6 +45,21 @@ def get_handler(filename):
 
 
 class ScoreKeeper(object):
+    """
+    self.scoreboard = {
+       "channel_a": {
+           "scores": {
+               player1: 100,
+               player2: 50
+           },
+           "history": [
+               (player1, "++"),
+               (player2, "--")
+           ]
+       }
+    }
+    """
+
     def __init__(self, filename=None):
         self.logger = logging.getLogger("PlusPlusBot.scorekeeper.ScoreKeeper")
 
