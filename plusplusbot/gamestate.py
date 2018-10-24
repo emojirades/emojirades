@@ -120,15 +120,26 @@ class GameState(object):
         # Check to see if the users guess is right!
         elif state["step"] == "guessing" and user not in (state["old_winner"], state["winner"]):
             def sanitize(text):
+                # Remove any random misc chars we deem unnessesary
                 stripped = re.sub("['\"-_+=]", "", text)
+
+                # unidecode will normalize to ASCII
                 normalized = unidecode(stripped)
+
                 return normalized
 
             emojirades = [sanitize(i.lower()) for i in state["emojirade"]]
             guess = sanitize(text.lower())
+            guess_len = len(guess)
 
             for emojirade in emojirades:
-                if emojirade in guess:
+                if guess_len > (len(emojirade) * 0.10):
+                    # Skip as it's too big?
+                    continue
+
+                to_search = r"\b{0}\b".format(emojirade)
+
+                if re.search(to_search, guess):
                     self.logger.debug("emojirade='{0}' guess='{1}' status='correct'".format(emojirade, guess))
 
                     yield InferredCorrectGuess
