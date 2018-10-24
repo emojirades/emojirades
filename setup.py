@@ -19,7 +19,8 @@ setup(
     packages=find_packages(),
     install_requires=[
         "slackclient>=1.1,<2",
-        "boto3>=1.5,<2"
+        "boto3>=1.5,<2",
+        "Unidecode>=1,<2"
     ],
     python_requires="~=3.5",
     extras_require={

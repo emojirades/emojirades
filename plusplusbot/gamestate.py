@@ -3,6 +3,7 @@ import json
 import re
 
 from collections import defaultdict
+from unidecode import unidecode
 
 from plusplusbot.command.gamestate_commands.inferred_correct_guess_command import InferredCorrectGuess
 from plusplusbot.handlers import get_configuration_handler
@@ -119,7 +120,9 @@ class GameState(object):
         # Check to see if the users guess is right!
         elif state["step"] == "guessing" and user not in (state["old_winner"], state["winner"]):
             def sanitize(text):
-                return re.sub("['\"-_+=]", "", text)
+                stripped = re.sub("['\"-_+=]", "", text)
+                normalized = unidecode(stripped)
+                return normalized
 
             emojirades = [sanitize(i.lower()) for i in state["emojirade"]]
             guess = sanitize(text.lower())
