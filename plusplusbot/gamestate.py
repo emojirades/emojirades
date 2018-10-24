@@ -12,7 +12,7 @@ module_logger = logging.getLogger("PlusPlusBot.gamestate")
 
 
 def get_handler(filename):
-    class GameStateConfigurationHandler(get_configuration_handler(filename)):
+    class GameStateConfigHandler(get_configuration_handler(filename)):
         """
         Handles CRUD for the Game State configuration file
         """
@@ -32,7 +32,7 @@ def get_handler(filename):
 
             super().save(bytes_content)
 
-    return GameStateConfigurationHandler(filename)
+    return GameStateConfigHandler(filename)
 
 
 class GameState(object):
@@ -63,7 +63,7 @@ class GameState(object):
     class InvalidStateException(Exception):
         pass
 
-    def __init__(self, filename):
+    def __init__(self, filename=None):
         self.logger = logging.getLogger("PlusPlusBot.gamestate.GameState")
         self.config = get_handler(filename)
 
@@ -78,7 +78,7 @@ class GameState(object):
 
         self.state = defaultdict(state_factory)
 
-        if filename:
+        if filename is not None:
             existing_state = self.config.load()
 
             if existing_state is not None:

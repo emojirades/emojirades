@@ -68,7 +68,7 @@ class EmojiradeBotTester(unittest.TestCase):
         self.bot.slack.pretty_name = self.pretty_name
 
         self.state = self.bot.gamestate.state[self.config.channel]
-        self.scoreboard = self.bot.scorekeeper.scoreboard
+        self.scoreboard = self.bot.scorekeeper.scoreboard[self.config.channel]
 
     def tearDown(self):
         self.scorefile.close()

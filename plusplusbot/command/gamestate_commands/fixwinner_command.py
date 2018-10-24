@@ -24,9 +24,9 @@ class FixWinner(GameStateCommand):
             raise StopIteration
 
         yield (None, "<@{0}>--".format(loser))
-        self.scorekeeper.minusminus(loser)
+        self.scorekeeper.minusminus(self.args["channel"], loser)
 
         yield (None, "<@{0}>++".format(winner))
-        self.scorekeeper.plusplus(winner)
+        self.scorekeeper.plusplus(self.args["channel"], winner)
 
         yield (None, "Sorry <@{0}>! <@{1}> has decided to award <@{2}> the win :smiling_imp:".format(loser, self.args["user"], winner))

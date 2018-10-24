@@ -24,7 +24,7 @@ class SetCommand(ScoreKeeperCommand):
         new_score = self.args["new_score"]
 
         self.logger.debug("Setting {0} score to: {1}".format(target_user, new_score))
-        self.scorekeeper.overwrite(target_user, new_score)
+        self.scorekeeper.overwrite(self.args["channel"], target_user, new_score)
 
         message = "<@{0}> manually set to {1} point{2}"
         yield (None, message.format(target_user, new_score, "s" if new_score > 1 else ""))
