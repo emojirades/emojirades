@@ -30,7 +30,7 @@ def match_emojirade(guess, emojirades, scott_factor=2):
         if not (len(emojirade) / scott_factor) < len(guess) < (len(emojirade) * scott_factor):
             raise ScottFactorExceededException("Guess exceeded the Scott Factor")
 
-        if re.search(re.escape(emojirade), guess):
+        if re.search(r"\b{0}\b".format(re.escape(emojirade)), guess):
             return True
 
     return False

@@ -289,3 +289,43 @@ class TestBotScenarios(EmojiradeBotTester):
         self.send_event({**self.events.correct_guess, **override})
         assert self.state["step"] == "waiting"
         assert self.state["emojirade"] is None
+
+    def test_scott_factor_exceeded(self):
+        """ Performs tests for guesses exceeding the scott factor """
+        # Test something 'within' the scott factor
+        self.reset_and_transition_to("guessing")
+
+        assert self.state["step"] == "guessing"
+
+        override = {"text": "0 {0} 1".format(self.config.emojirade)}
+        self.send_event({**self.events.correct_guess, **override})
+        assert self.state["step"] == "waiting"
+
+        # Test something 'outside' the scott factor
+        self.reset_and_transition_to("guessing")
+
+        assert self.state["step"] == "guessing"
+
+        override = {"text": "blah1234567890 {0} blah0987654321".format(self.config.emojirade)}
+        self.send_event({**self.events.correct_guess, **override})
+        assert self.state["step"] == "guessing"
+
+    def test_word_boundary_matching(self):
+        """ Performs tests to ensure emojirade matches only occur on word boundaries """
+        # Test a word, should work
+        self.reset_and_transition_to("guessing")
+
+        assert self.state["step"] == "guessing"
+
+        override = {"text": "0 {0} 1".format(self.events.correct_guess["text"])}
+        self.send_event({**self.events.correct_guess, **override})
+        assert self.state["step"] == "waiting"
+
+        # Test a sub-word, shouldn't work
+        self.reset_and_transition_to("guessing")
+
+        assert self.state["step"] == "guessing"
+
+        override = {"text": "0 a{0}b 1".format(self.events.correct_guess["text"])}
+        self.send_event({**self.events.correct_guess, **override})
+        assert self.state["step"] == "guessing"
