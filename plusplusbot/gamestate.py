@@ -6,7 +6,10 @@ from collections import defaultdict
 
 from plusplusbot.command.gamestate_commands.inferred_correct_guess_command import InferredCorrectGuess
 from plusplusbot.handlers import get_configuration_handler
+from plusplusbot.helpers import sanitize_emojirade, match_emojirade
+
 from plusplusbot.command.commands import Command
+from plusplusbot.helpers import ScottFactorExceededException
 
 module_logger = logging.getLogger("PlusPlusBot.gamestate")
 
@@ -118,20 +121,16 @@ class GameState(object):
 
         # Check to see if the users guess is right!
         elif state["step"] == "guessing" and user not in (state["old_winner"], state["winner"]):
-            def sanitize(text):
-                return re.sub("['\"-_+=]", "", text)
+            guess = sanitize_emojirade(text.lower())
 
-            emojirades = [sanitize(i.lower()) for i in state["emojirade"]]
-            guess = sanitize(text.lower())
-
-            for emojirade in emojirades:
-                if emojirade in guess:
-                    self.logger.debug("emojirade='{0}' guess='{1}' status='correct'".format(emojirade, guess))
-
+            try:
+                if match_emojirade(guess, state["emojirade"]):
+                    self.logger.debug("emojirades='{0}' guess='{1}' status='correct'".format('|'.join(state["emojirade"]), guess))
                     yield InferredCorrectGuess
-                    break
                 else:
-                    self.logger.debug("emojirade='{0}' guess='{1}' status='incorrect'".format(emojirade, guess))
+                    self.logger.debug("emojirades='{0}' guess='{1}' status='incorrect'".format('|'.join(state["emojirade"]), guess))
+            except ScottFactorExceededException as e:
+                self.logger.debug("emojirade='{0}' guess='{1}' status='scott factor exceeded'")
 
     def set_admin(self, channel, admin):
         """ Sets a new game admin! """
@@ -174,7 +173,7 @@ class GameState(object):
         self.save()
 
     def set_emojirade(self, channel, emojirade):
-        """ New emojirade word(s) """
+        """ New emojirade word(s), 'emojirade' is a list of accepted answers """
         if self.state[channel]["step"] != "waiting":
             raise self.InvalidStateException("Expecting {0}'s state to be 'waiting', it is actually {1}".format(channel, self.state[channel]["step"]))
 
