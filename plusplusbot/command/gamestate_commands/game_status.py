@@ -20,28 +20,27 @@ class GameStatus(GameStateCommand):
             yield i
 
         status = self.gamestate.game_status(self.args["channel"])
-
         pretty_status = []
 
-        for k, v in sorted(status.items()):
-            if k == "old_winner" or k == "winner":
-                if v is None:
-                    v = "Not Set"
-                else:
-                    v = "<@{0}>".format(v)
-            elif k == "admins":
-                v = ", ".join(["<@{0}>".format(i) for i in v])
-            elif k == "emojirade":
-                if v is None:
-                    v = "Not Set"
-                else:
-                    if self.masked_emojirade:
-                        v = "*****"
-                    else:
-                        v = " | ".join(["`{0}`".format(i) for i in v])
-            else:
-                v = str(v)
+        # self.slack.pretty_name(name)
 
-            pretty_status.append((k, v))
+        args = {
+            "old_winner": self.slack.pretty_name(status["old_winner"]),
+            "winner": self.slack.pretty_name(status["winner"]),
+        }
+
+        # First item is game state (step)
+        step_msg = {
+            "new_game": "Game has not started yet, please wait for an admin to start it!",
+            "waiting": "Waiting for {old_winner} to provide a 'rade to {winner}",
+            "provided": "Waiting for {winner} to post an emoji to kick off the round!",
+            "guessing": "Come on, everyone's guessing! Get to it! :runner:",
+        }
+
+        pretty_status.append(("Status", step_msg[status["step"]].format(**args)))
+
+        # Winner details
+        pretty_status.append(("'rade provider", args["old_winner"]))
+        pretty_status.append(("'rade-r", args["winner"]))
 
         yield (None, "\n".join("{0}: {1}".format(k, v) for k, v in pretty_status))

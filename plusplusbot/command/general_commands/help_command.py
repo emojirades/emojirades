@@ -33,6 +33,8 @@ class HelpCommand(Command):
             message += "{0:<50}{1}\n".format(rendered, command.description)
 
         message += "```"
+        message += "Game Admins: " + ", ".join(self.gamestate.game_status(self.args["channel"])["admins"])
+
         yield (None, message)
 
     def __str__(self):
