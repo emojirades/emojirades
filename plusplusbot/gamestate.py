@@ -104,14 +104,27 @@ class GameState(object):
         text = str(event["text"])
         state = self.state[channel]
 
-        # Double check if we're overriding the user
-        user_override_match = Command.user_override_regex.match(event["text"])
+        if self.is_admin(channel, user):
+            # Double check if we're overriding the channel
+            channel_override_match = Command.channel_override_regex.match(text)
 
-        if user_override_match and self.is_admin(channel, user):
-            original_user = user
-            user = user_override_match.groupdict()["user_override"]
+            if channel_override_match:
+                original_channel = channel
+                channel = channel_override_match.groupdict()["channel_override"]
 
-            text = text.replace(user_override_match.groupdict()["override_cmd"], "")
+                text = text.replace(channel_override_match.groupdict()["override_cmd"], "")
+
+            # Double check if we're overriding the user
+            user_override_match = Command.user_override_regex.match(text)
+
+            if user_override_match:
+                original_user = user
+                user = user_override_match.groupdict()["user_override"]
+
+                text = text.replace(user_override_match.groupdict()["override_cmd"], "")
+
+        # User the overridden channel if applicable
+        state = self.state[channel]
 
         # Check to see if the winner is posting emoji's
         if state["step"] == "provided":

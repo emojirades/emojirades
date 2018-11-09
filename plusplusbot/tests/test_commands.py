@@ -56,3 +56,29 @@ class TestBotCommands(EmojiradeBotTester):
 
         self.send_event(self.events.posted_emojirade)
         assert state["step"] == "provided"
+
+    def test_user_override(self):
+        self.reset_and_transition_to("guessing")
+
+        state = self.bot.gamestate.state[self.config.channel]
+
+        # Player 4 is not involved in this round
+        override = {"user": self.config.player_4, "text": "<@{0}>++ player=<@{1}>".format(self.config.player_3, self.config.player_2)}
+        self.send_event({**self.events.manual_award, **override})
+
+        assert state["step"] == "waiting"
+        assert state["winner"] == self.config.player_3
+
+    def test_channel_override(self):
+        self.reset_and_transition_to("guessing")
+
+        state = self.bot.gamestate.state[self.config.channel]
+
+        override = {
+            "channel": self.config.bot_channel,
+            "text": "{0} channel=<#{1}|emojirades>".format(self.config.emojirade, self.config.channel)
+        }
+        self.send_event({**self.events.correct_guess, **override})
+
+        assert state["step"] == "waiting"
+        assert state["winner"] == self.config.player_3

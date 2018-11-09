@@ -5,7 +5,8 @@ import re
 
 
 class Command(ABC):
-    user_override_regex = re.compile(".*(?P<override_cmd>[\\s]+player=[\\s]*(<@(?P<user_override>[0-9A-Z]+)>)).*")
+    user_override_regex = re.compile(r".*(?P<override_cmd>[\s]+player=[\s]*(<@(?P<user_override>[0-9A-Z]+)>)).*")
+    channel_override_regex = re.compile(r".*(?P<override_cmd>[\s]+channel=[\s]*(<#(?P<channel_override>[0-9A-Z]+)\|(?P<channel_name>[0-9A-Za-z_-]+)>)).*")
 
     def __init__(self, slack, event, **kwargs):
         self.logger = logging.getLogger("PlusPlusBot.Command")
@@ -44,14 +45,25 @@ class Command(ABC):
         if "{me}" in pattern:
             pattern = pattern.format(me=self.slack.bot_id)
 
-        # Perform the user override if it matches
-        user_override_match = Command.user_override_regex.match(event["text"])
+        # Only check for overrides if admin
+        if self.gamestate.is_admin(self.args["channel"], self.args["user"]):
+            # Perform the channel override if it matches
+            channel_override_match = Command.channel_override_regex.match(event["text"])
 
-        if user_override_match and self.gamestate.is_admin(self.args["channel"], self.args["user"]):
-            self.args["original_user"] = self.args["user"]
-            self.args["user"] = user_override_match.groupdict()["user_override"]
+            if channel_override_match:
+                self.args["original_channel"] = self.args["channel"]
+                self.args["channel"] = channel_override_match.groupdict()["channel_override"]
 
-            event["text"] = event["text"].replace(user_override_match.groupdict()["override_cmd"], "")
+                event["text"] = event["text"].replace(channel_override_match.groupdict()["override_cmd"], "")
+
+            # Perform the user override if it matches
+            user_override_match = Command.user_override_regex.match(event["text"])
+
+            if user_override_match:
+                self.args["original_user"] = self.args["user"]
+                self.args["user"] = user_override_match.groupdict()["user_override"]
+
+                event["text"] = event["text"].replace(user_override_match.groupdict()["override_cmd"], "")
 
         # Perform the command's actual match
         match = re.match(pattern, event["text"])
