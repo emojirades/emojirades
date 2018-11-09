@@ -173,6 +173,13 @@ class EmojiradeBotTester(unittest.TestCase):
                     "text": "<@{0}> leaderboard".format(bot_id),
                 },
             },
+            "game_status": {
+                **base_event,
+                **{
+                    "user": player_1,
+                    "text": "<@{0}> game status".format(bot_id),
+                },
+            },
             "fixwinner": {
                 **base_event,
                 **{
