@@ -17,7 +17,8 @@ class LeaderboardCommand(ScoreKeeperCommand):
         self.logger.debug("Printing leaderboard: {0}".format(leaderboard))
 
         if not leaderboard:
-            return (None, "Nothing to see here!")
+            yield (None, "Nothing to see here!")
+            raise StopIteration
 
         lines = ["```"]
 
