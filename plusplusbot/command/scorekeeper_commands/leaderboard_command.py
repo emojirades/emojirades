@@ -16,14 +16,22 @@ class LeaderboardCommand(ScoreKeeperCommand):
 
         self.logger.debug("Printing leaderboard: {0}".format(leaderboard))
 
-        lines = []
+        if not leaderboard:
+            yield (None, "Nothing to see here!")
+            raise StopIteration
+
+        lines = ["```"]
 
         for index, (name, score) in enumerate(leaderboard):
-            lines.append("{0}. {1} [{2} point{3}]".format(
+            name = self.slack.pretty_name(name)
+
+            lines.append("{0:>2}. {1:<20} [{2:>3} point{3}]".format(
                 index + 1,
-                self.slack.pretty_name(name),
+                name if len(name) < 20 else "{0}..".format(name[0:18]),
                 score,
                 "s" if score > 1 else ""
             ))
+
+        lines.append("```")
 
         yield (None, "\n".join(lines))

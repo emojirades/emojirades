@@ -110,4 +110,5 @@ ENV/
 
 # emojirades testing config
 scores.csv
+scores.json
 state.json
