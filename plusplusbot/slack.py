@@ -15,6 +15,8 @@ class SlackClient(object):
         if self.sc.rtm_connect():
             self.ready = True
 
+        self.pretty_names = dict()
+
     def user_info(self, user_id):
         return self.sc.api_call("users.info", user=user_id)["user"]
 
@@ -33,12 +35,12 @@ class SlackClient(object):
         }
 
     def pretty_name(self, user_id):
-        user = self.user_info(user_id)
+        if user_id not in self.pretty_names:
+            self.pretty_names[user_id] = self.user_info(user_id)
 
-        if user["name"]:
-            return "{0} ({1})".format(user["real_name"], user["name"])
-        else:
-            return user["real_name"]
+        user = self.pretty_names[user_id]
+
+        return user.get("real_name", user.get("name", "Unknown User"))
 
     def find_im(self, user_id):
         # Find an existing IM (direct message) ID
