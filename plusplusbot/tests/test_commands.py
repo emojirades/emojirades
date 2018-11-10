@@ -21,7 +21,7 @@ class TestBotCommands(EmojiradeBotTester):
         self.send_event(self.events.correct_guess)
         self.send_event(self.events.leaderboard)
 
-        assert (self.config.channel, "1. U00000003 [1 point]") in self.responses
+        assert (self.config.channel, "```\n 1. U00000003            [  1 point]\n```") in self.responses
 
     def test_fixwinner(self):
         """ Ensure fixwinner does the right thing """
