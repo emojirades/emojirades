@@ -5,7 +5,10 @@ import random
 
 
 class CorrectGuess(GameStateCommand):
-    pattern = r"<@(?P<target_user>[0-9A-Z]+)>[\s]*\+\+"
+    patterns = [
+        r"<@(?P<target_user>[0-9A-Z]+)>[\s]*\+\+",
+    ]
+
     description = "Indicates the player has correctly guessed (manually awarded)!"
     first_emojis = [
         ":tada:",

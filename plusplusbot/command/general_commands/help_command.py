@@ -4,10 +4,14 @@ from plusplusbot.command.commands import Command
 
 
 class HelpCommand(Command):
-    pattern = "<@{me}> help"
+    patterns = [
+      "<@{me}> help",
+    ]
+
     description = "Shows this help"
 
     def format_command(self, pattern):
+        # TODO FIX
         pattern = pattern.replace("\\", "")
 
         for replacer in self.pattern_map.values():

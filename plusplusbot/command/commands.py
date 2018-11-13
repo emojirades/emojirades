@@ -40,10 +40,9 @@ class Command(ABC):
         self.args["channel"] = event["channel"]
         self.args["user"] = event["user"]
 
-        pattern = str(self.pattern)
-
-        if "{me}" in pattern:
-            pattern = pattern.format(me=self.slack.bot_id)
+        for i, pattern in enumerate(list(self.patterns)):
+            if "{me}" in pattern:
+                self.patterns[i] = self.patterns[i].format(me=self.slack.bot_id)
 
         # Only check for overrides if admin
         if self.gamestate.is_admin(self.args["channel"], self.args["user"]):
@@ -66,10 +65,12 @@ class Command(ABC):
                 event["text"] = event["text"].replace(user_override_match.groupdict()["override_cmd"], "")
 
         # Perform the command's actual match
-        match = re.match(pattern, event["text"])
+        for pattern in self.patterns:
+            match = re.match(pattern, event["text"])
 
-        if hasattr(match, "groupdict"):
-            self.args.update(match.groupdict())
+            if hasattr(match, "groupdict"):
+                self.args.update(match.groupdict())
+                break
 
     def execute(self):
         if self.args.get("original_user"):
