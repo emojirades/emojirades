@@ -4,20 +4,24 @@ from plusplusbot.command.commands import Command
 
 
 class HelpCommand(Command):
-    patterns = [
-      "<@{me}> help",
-    ]
+    patterns = (
+        r"<@{me}> help",
+    )
 
     description = "Shows this help"
 
-    def format_command(self, pattern):
-        # TODO FIX
-        pattern = pattern.replace("\\", "")
+    def format_patterns(self, patterns):
+        new_patterns = []
 
-        for replacer in self.pattern_map.values():
-            pattern = pattern.replace(replacer["pattern"], replacer["replace"])
+        for pattern in patterns:
+            pattern = pattern.replace("\\", "")
 
-        return pattern
+            for i in self.pattern_map:
+                pattern = pattern.replace(i["pattern"], i["replace"])
+
+            new_patterns.append(pattern)
+
+        return tuple(new_patterns)
 
     def execute(self):
         for i in super().execute():
@@ -26,18 +30,24 @@ class HelpCommand(Command):
         commands = plusplusbot.command.command_registry.CommandRegistry.prepare_commands()
 
         message = "Available commands are:\n```"
-        message += "{0:<50}{1}\n".format("Command", "Help")
+        message += "{0:<15}{1:<50}{2}\n".format("Name", "Description", "Regex")
 
-        for command in [c[0] for c in commands.values()]:
-            rendered = self.format_command(command.pattern)
+        for patterns, command in commands.items():
+            patterns = self.format_patterns(patterns)
 
-            if len(rendered) > 48:
-                rendered = "{0}...".format(rendered[0:45])
+            for i, pattern in enumerate(patterns):
+                desc = command.description
 
-            message += "{0:<50}{1}\n".format(rendered, command.description)
+                if len(desc) > 48:
+                    desc = "{0}...".format(desc[0:45])
+
+                if i == 0:
+                    message += "{0:<15}{1:<50}{2}\n".format(command.__name__, desc, pattern)
+                else:
+                    message += "{0:<15}{1:>50}{2}\n".format("", "Alternatives: ", pattern)
 
         message += "```"
-        message += "Game Admins: " + ", ".join(self.gamestate.game_status(self.args["channel"])["admins"])
+        message += "Game Admins: " + ", ".join("<@{0}>".format(self.gamestate.game_status(self.args["channel"])["admins"]))
 
         yield (None, message)
 

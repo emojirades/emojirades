@@ -3,9 +3,9 @@ from plusplusbot.wrappers import admin_check
 
 
 class GameStatus(GameStateCommand):
-    patterns = [
-        "<@{me}> game status",
-    ]
+    patterns = (
+        r"<@{me}> game status",
+    )
 
     description = "Prints out the game status"
 

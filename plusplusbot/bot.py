@@ -31,12 +31,12 @@ class PlusPlusBot(object):
         :param event:
         :return Command:
         """
-        self.logger.debug("Handling event: {}".format(event))
+        self.logger.debug("Handling event: {0}".format(event))
 
         for GameCommand in self.gamestate.infer_commands(event):
             yield GameCommand(self.slack, event, scorekeeper=self.scorekeeper, gamestate=self.gamestate)
 
-        for pattern, (Command, description) in commands.items():
+        for Command in commands.values():
             if Command.match(event["text"], me=self.slack.bot_id):
                 yield Command(self.slack, event, scorekeeper=self.scorekeeper, gamestate=self.gamestate)
 
@@ -97,7 +97,7 @@ class PlusPlusBot(object):
                 for command in self.match_event(event, commands):
                     self.logger.debug("Matched {0} for event {1}".format(command, event))
                     for channel, response in command.execute():
-                        self.logger.debug("Command {} executed with response: {}".format(command, (channel, response)))
+                        self.logger.debug("Command {0} executed with response: {1}".format(command, (channel, response)))
                         if channel is not None:
                             channel = self.decode_channel(channel)
                         else:

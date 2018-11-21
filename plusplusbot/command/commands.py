@@ -19,30 +19,17 @@ class Command(ABC):
         self.args = {}
         self.prepare_args(event)
 
-        self.pattern_map = {
-            "me": {
-                "pattern": "<@{me}>",
-                "replace": "@{0}".format(self.slack.bot_name)
-            },
-            "player": {
-                "pattern": "<@([0-9A-Z]+)>",
-                "replace": "@player"
-            },
-            "score": {
-                "pattern": "(-?[0-9]+)",
-                "replace": "<numeric score>"
-            }
-        }
+        self.pattern_map = [
+            {"pattern": "<@{me}>", "replace": "@{0}".format(self.slack.bot_name)},
+            {"pattern": "<@([0-9A-Z]+)>", "replace": "@player"},
+            {"pattern": "(-?[0-9]+)", "replace": "<numeric score>"},
+        ]
 
         self.print_performed_by = False
 
     def prepare_args(self, event):
         self.args["channel"] = event["channel"]
         self.args["user"] = event["user"]
-
-        for i, pattern in enumerate(list(self.patterns)):
-            if "{me}" in pattern:
-                self.patterns[i] = self.patterns[i].format(me=self.slack.bot_id)
 
         # Only check for overrides if admin
         if self.gamestate.is_admin(self.args["channel"], self.args["user"]):
@@ -65,7 +52,11 @@ class Command(ABC):
                 event["text"] = event["text"].replace(user_override_match.groupdict()["override_cmd"], "")
 
         # Perform the command's actual match
-        for pattern in self.patterns:
+        patterns = tuple(i.format(me=self.slack.bot_id) if "{me}" in i else i for i in self.patterns)
+
+        for pattern in patterns:
+            print("Matching '{0}' against '{1}'".format(pattern, event["text"]))
+
             match = re.match(pattern, event["text"])
 
             if hasattr(match, "groupdict"):
@@ -84,10 +75,13 @@ class Command(ABC):
 
     @classmethod
     def match(cls, text, **kwargs):
-        return re.match(cls.pattern.format(**kwargs), text)
+        for pattern in cls.patterns:
+            print("Attempting match on '{0}' -> '{1}'".format(re.escape(text), pattern.format(**kwargs)))
+
+        return any(re.match(pattern.format(**kwargs), re.escape(text)) for pattern in cls.patterns)
 
     @abstractproperty
-    def pattern(self):
+    def patterns(self):
         pass
 
     @abstractproperty

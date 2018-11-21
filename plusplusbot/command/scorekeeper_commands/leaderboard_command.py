@@ -2,10 +2,10 @@ from plusplusbot.command.scorekeeper_commands.scorekeeper_command import ScoreKe
 
 
 class LeaderboardCommand(ScoreKeeperCommand):
-    patterns = [
-        "<@{me}> leaderboard",
-        "<@{me}> scoreboard",
-    ]
+    patterns = (
+        r"<@{me}> leaderboard",
+        r"<@{me}> scoreboard",
+    )
 
     description = "Shows all the users scores"
 

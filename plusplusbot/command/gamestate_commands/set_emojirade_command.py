@@ -5,9 +5,9 @@ from plusplusbot.checks import emojirade_is_banned
 
 
 class SetEmojirade(GameStateCommand):
-    patterns = [
-        "^emojirade (?P<emojirade>.+)"
-    ]
+    patterns = (
+        r"^emojirade (?P<emojirade>.+)",
+    )
 
     description = "Sets the current Emojirade to be guessed"
 

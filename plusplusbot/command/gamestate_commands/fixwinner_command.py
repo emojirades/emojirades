@@ -3,9 +3,9 @@ from plusplusbot.wrappers import admin_or_old_winner_check
 
 
 class FixWinner(GameStateCommand):
-    patterns = [
-        "<@{me}> fixwinner <@(?P<winner>[0-9A-Z]+)>",
-    ]
+    patterns = (
+        r"<@{me}> fixwinner <@(?P<winner>[0-9A-Z]+)>",
+    )
 
     description = "Resets the currently awarded win to another player (in case of a ninja or something)"
 
