@@ -3,7 +3,7 @@ from plusplusbot.command.scorekeeper_commands.scorekeeper_command import ScoreKe
 
 class HistoryCommand(ScoreKeeperCommand):
     patterns = (
-        r"<@{me}> history",
+        r"<@{me}>\\ history",
     )
 
     description = "Shows the latest few actions performed"

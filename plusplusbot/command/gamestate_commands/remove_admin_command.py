@@ -4,7 +4,7 @@ from plusplusbot.wrappers import admin_check
 
 class RemoveAdmin(GameStateCommand):
     patterns = (
-        r"<@{me}> demote <@(?P<admin>[0-9A-Z]+)>",
+        r"<@{me}>\\ demote\\ <@(?P<admin>[0-9A-Z]+)>",
     )
 
     description = "Removes a user from the admins group"

@@ -5,7 +5,7 @@ from plusplusbot.command.commands import Command
 
 class HelpCommand(Command):
     patterns = (
-        r"<@{me}> help",
+        r"<@{me}>\\ help",
     )
 
     description = "Shows this help"

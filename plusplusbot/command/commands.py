@@ -34,7 +34,7 @@ class Command(ABC):
         # Only check for overrides if admin
         if self.gamestate.is_admin(self.args["channel"], self.args["user"]):
             # Perform the channel override if it matches
-            channel_override_match = Command.channel_override_regex.match(event["text"])
+            channel_override_match = Command.channel_override_regex.match(re.escape(event["text"]))
 
             if channel_override_match:
                 self.args["original_channel"] = self.args["channel"]
@@ -43,7 +43,7 @@ class Command(ABC):
                 event["text"] = event["text"].replace(channel_override_match.groupdict()["override_cmd"], "")
 
             # Perform the user override if it matches
-            user_override_match = Command.user_override_regex.match(event["text"])
+            user_override_match = Command.user_override_regex.match(re.escape(event["text"]))
 
             if user_override_match:
                 self.args["original_user"] = self.args["user"]
@@ -55,9 +55,12 @@ class Command(ABC):
         patterns = tuple(i.format(me=self.slack.bot_id) if "{me}" in i else i for i in self.patterns)
 
         for pattern in patterns:
-            print("Matching '{0}' against '{1}'".format(pattern, event["text"]))
+            self.logger.debug("Matching '{0}' against '{1}'".format(pattern, event["text"]))
 
-            match = re.match(pattern, event["text"])
+            match = re.compile(pattern).match(re.escape(event["text"]))
+
+            if not match:
+                self.logger.debug("Failed to match '{0}' against '{1}'".format(pattern, re.escape(event["text"])))
 
             if hasattr(match, "groupdict"):
                 self.args.update(match.groupdict())

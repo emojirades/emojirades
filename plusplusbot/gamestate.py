@@ -106,7 +106,7 @@ class GameState(object):
 
         if self.is_admin(channel, user):
             # Double check if we're overriding the channel
-            channel_override_match = Command.channel_override_regex.match(text)
+            channel_override_match = Command.channel_override_regex.match(re.escape(text))
 
             if channel_override_match:
                 original_channel = channel
@@ -115,7 +115,7 @@ class GameState(object):
                 text = text.replace(channel_override_match.groupdict()["override_cmd"], "")
 
             # Double check if we're overriding the user
-            user_override_match = Command.user_override_regex.match(text)
+            user_override_match = Command.user_override_regex.match(re.escape(text))
 
             if user_override_match:
                 original_user = user
@@ -127,14 +127,13 @@ class GameState(object):
         state = self.state[channel]
 
         # Check to see if the winner is posting emoji's
-        if state["step"] == "provided":
-            if user == state["winner"]:
-                if ':' in text:  # ':' means they've posted an emoji :thinking_face:
-                    self.winner_posted(channel)
+        if state["step"] == "provided" and user == state["winner"] and ':' in text:
+            # ':' means they've posted an emoji :thinking_face:
+            self.winner_posted(channel)
 
         # Check to see if the users guess is right!
         elif state["step"] == "guessing" and user not in (state["old_winner"], state["winner"]):
-            guess = sanitize_emojirade(text.lower())
+            guess = sanitize_emojirade(text)
 
             try:
                 if match_emojirade(guess, state["emojirade"]):

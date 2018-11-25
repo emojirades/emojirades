@@ -4,7 +4,7 @@ from plusplusbot.wrappers import admin_check
 
 class SetCommand(ScoreKeeperCommand):
     patterns = (
-        r"<@(?P<target_user>[0-9A-Z]+)> set (?P<new_score>-?[0-9]+)",
+        r"<@(?P<target_user>[0-9A-Z]+)>\\ set\\ (?P<new_score>-?[0-9]+)",
     )
 
     description = "Manually set the users score"
