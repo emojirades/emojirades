@@ -127,14 +127,13 @@ class GameState(object):
         state = self.state[channel]
 
         # Check to see if the winner is posting emoji's
-        if state["step"] == "provided":
-            if user == state["winner"]:
-                if ':' in text:  # ':' means they've posted an emoji :thinking_face:
-                    self.winner_posted(channel)
+        if state["step"] == "provided" and user == state["winner"] and ':' in text:
+            # ':' means they've posted an emoji :thinking_face:
+            self.winner_posted(channel)
 
         # Check to see if the users guess is right!
         elif state["step"] == "guessing" and user not in (state["old_winner"], state["winner"]):
-            guess = sanitize_emojirade(text.lower())
+            guess = sanitize_emojirade(text)
 
             try:
                 if match_emojirade(guess, state["emojirade"]):

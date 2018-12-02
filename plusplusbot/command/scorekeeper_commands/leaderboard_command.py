@@ -2,15 +2,18 @@ from plusplusbot.command.scorekeeper_commands.scorekeeper_command import ScoreKe
 
 
 class LeaderboardCommand(ScoreKeeperCommand):
-    pattern = "<@{me}> leaderboard"
+    patterns = (
+        r"<@{me}> leaderboard",
+        r"<@{me}> scoreboard",
+    )
+
     description = "Shows all the users scores"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def execute(self):
-        for i in super().execute():
-            yield i
+        yield from super().execute()
 
         leaderboard = self.scorekeeper.leaderboard(self.args["channel"])
 
@@ -18,7 +21,7 @@ class LeaderboardCommand(ScoreKeeperCommand):
 
         if not leaderboard:
             yield (None, "Nothing to see here!")
-            raise StopIteration
+            return
 
         lines = ["```"]
 

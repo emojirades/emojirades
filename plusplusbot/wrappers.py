@@ -11,10 +11,9 @@ def admin_check(command):
 
             admins = ["<@{0}>".format(admin) for admin in self.gamestate.state[channel]["admins"]]
             yield (None, "Game admins currently are: {0}".format(", ".join(admins)))
-            raise StopIteration
+            return
 
-        for channel, response in command(self):
-            yield channel, response
+        yield from command(self)
 
     return wrapped_command
 
@@ -37,10 +36,9 @@ def admin_or_old_winner_check(command):
 
             admins = ["<@{0}>".format(admin) for admin in self.gamestate.state[channel]["admins"]]
             yield (None, "Game admins currently are: {0}".format(", ".join(admins)))
-            raise StopIteration
+            return
 
-        for channel, response in command(self):
-            yield channel, response
+        yield from command(self)
 
     return wrapped_command
 
@@ -51,10 +49,9 @@ def only_in_progress(command):
 
         if not self.gamestate.in_progress(channel):
             yield (None, "Sorry but we need the game to be in progress first! Get someone to kick it off!")
-            raise StopIteration
+            return
 
-        for channel, response in command(self):
-            yield channel, response
+        yield from command(self)
 
     return wrapped_command
 
@@ -65,9 +62,8 @@ def only_actively_guessing(command):
 
         if not self.gamestate.actively_guessing(channel):
             yield (None, "Sorry but we need to be actively guessing! Get the winner to start posting the next 'rade!")
-            raise StopIteration
+            return
 
-        for channel, response in command(self):
-            yield channel, response
+        yield from command(self)
 
     return wrapped_command

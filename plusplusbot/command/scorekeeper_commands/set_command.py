@@ -3,7 +3,10 @@ from plusplusbot.wrappers import admin_check
 
 
 class SetCommand(ScoreKeeperCommand):
-    pattern = "<@(?P<target_user>[0-9A-Z]+)> set (?P<new_score>-?[0-9]+)"
+    patterns = (
+        r"<@(?P<target_user>[0-9A-Z]+)> set (?P<new_score>-?[0-9]+)",
+    )
+
     description = "Manually set the users score"
 
     def __init__(self, *args, **kwargs):
@@ -13,12 +16,10 @@ class SetCommand(ScoreKeeperCommand):
         super().prepare_args(event)
 
         self.args["new_score"] = int(self.args["new_score"])
-        print(self.args)
 
     @admin_check
     def execute(self):
-        for i in super().execute():
-            yield i
+        yield from super().execute()
 
         target_user = self.args["target_user"]
         new_score = self.args["new_score"]

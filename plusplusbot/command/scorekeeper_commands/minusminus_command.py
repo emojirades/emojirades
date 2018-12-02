@@ -3,7 +3,10 @@ from plusplusbot.wrappers import admin_check
 
 
 class MinusMinusCommand(ScoreKeeperCommand):
-    pattern = "<@(?P<target_user>[0-9A-Z]+)>[\\s]*--"
+    patterns = (
+        r"<@(?P<target_user>[0-9A-Z]+)>[\s]*--",
+    )
+
     description = "Decrement the users score"
 
     def __init__(self, *args, **kwargs):
@@ -14,8 +17,7 @@ class MinusMinusCommand(ScoreKeeperCommand):
 
     @admin_check
     def execute(self):
-        for i in super().execute():
-            yield i
+        yield from super().execute()
 
         target_user = self.args["target_user"]
 

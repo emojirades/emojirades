@@ -9,5 +9,4 @@ class GameStateCommand(Command):
         super().prepare_args(event)
 
     def execute(self):
-        for i in super().execute():
-            yield i
+        yield from super().execute()

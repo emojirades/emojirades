@@ -35,4 +35,4 @@ class CommandRegistry:
         if commands is None:
             commands = cls.registered_commands
 
-        return {command.pattern: (command, command.description) for command in commands}
+        return {command.patterns: command for command in commands if command.patterns}

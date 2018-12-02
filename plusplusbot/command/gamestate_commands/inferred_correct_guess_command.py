@@ -5,8 +5,10 @@ import random
 
 
 class InferredCorrectGuess(GameStateCommand):
-    pattern = None
+    patterns = tuple()
+
     description = "Takes the user that send the event as the winner, this is only ever fired internally"
+
     first_emojis = [
         ":tada:",
         ":first_place_medal:",
@@ -25,8 +27,7 @@ class InferredCorrectGuess(GameStateCommand):
 
     @only_actively_guessing
     def execute(self):
-        for i in super().execute():
-            yield i
+        yield from super().execute()
 
         state = self.gamestate.state[self.args["channel"]]
 

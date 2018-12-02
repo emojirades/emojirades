@@ -19,31 +19,17 @@ class Command(ABC):
         self.args = {}
         self.prepare_args(event)
 
-        self.pattern_map = {
-            "me": {
-                "pattern": "<@{me}>",
-                "replace": "@{0}".format(self.slack.bot_name)
-            },
-            "player": {
-                "pattern": "<@([0-9A-Z]+)>",
-                "replace": "@player"
-            },
-            "score": {
-                "pattern": "(-?[0-9]+)",
-                "replace": "<numeric score>"
-            }
-        }
+        self.pattern_map = [
+            {"pattern": "<@{me}>", "replace": "@{0}".format(self.slack.bot_name)},
+            {"pattern": "<@([0-9A-Z]+)>", "replace": "@player"},
+            {"pattern": "(-?[0-9]+)", "replace": "<numeric score>"},
+        ]
 
         self.print_performed_by = False
 
     def prepare_args(self, event):
         self.args["channel"] = event["channel"]
         self.args["user"] = event["user"]
-
-        pattern = str(self.pattern)
-
-        if "{me}" in pattern:
-            pattern = pattern.format(me=self.slack.bot_id)
 
         # Only check for overrides if admin
         if self.gamestate.is_admin(self.args["channel"], self.args["user"]):
@@ -66,10 +52,19 @@ class Command(ABC):
                 event["text"] = event["text"].replace(user_override_match.groupdict()["override_cmd"], "")
 
         # Perform the command's actual match
-        match = re.match(pattern, event["text"])
+        patterns = tuple(i.format(me=self.slack.bot_id) if "{me}" in i else i for i in self.patterns)
 
-        if hasattr(match, "groupdict"):
-            self.args.update(match.groupdict())
+        for pattern in patterns:
+            self.logger.debug("Matching '{0}' against '{1}'".format(pattern, event["text"]))
+
+            match = re.compile(pattern).match(event["text"])
+
+            if not match:
+                self.logger.debug("Failed to match '{0}' against '{1}'".format(pattern, event["text"]))
+
+            if hasattr(match, "groupdict"):
+                self.args.update(match.groupdict())
+                break
 
     def execute(self):
         if self.args.get("original_user"):
@@ -83,10 +78,10 @@ class Command(ABC):
 
     @classmethod
     def match(cls, text, **kwargs):
-        return re.match(cls.pattern.format(**kwargs), text)
+        return any(re.match(pattern.format(**kwargs), text) for pattern in cls.patterns)
 
     @abstractproperty
-    def pattern(self):
+    def patterns(self):
         pass
 
     @abstractproperty
