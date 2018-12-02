@@ -6,7 +6,7 @@ from plusplusbot.checks import emojirade_is_banned
 
 class SetEmojirade(GameStateCommand):
     patterns = (
-        r"^emojirade\\ (?P<emojirade>.+)",
+        r"^emojirade (?P<emojirade>.+)",
     )
 
     description = "Sets the current Emojirade to be guessed"
@@ -28,20 +28,19 @@ class SetEmojirade(GameStateCommand):
 
     @only_in_progress
     def execute(self):
-        for i in super().execute():
-            yield i
+        yield from super().execute()
 
         if self.args["user"] != self.gamestate.state[self.args["channel"]]["old_winner"]:
             yield (None, "Err <@{user}> it's not your turn to provide the new 'rade :sweat:".format(**self.args))
-            raise StopIteration
+            return
 
         if self.args["channel"] is None:
             yield (None, "We were unable to figure out the correct channel, please raise this issue!")
-            raise StopIteration
+            return
 
         if emojirade_is_banned(self.args["emojirade"]):
             yield (None, "Sorry, but that emojirade contained a banned word/phrase :no_good:, try again?")
-            raise StopIteration
+            return
 
         # Break the alternatives out and sanitize the emojirade (apply consistent sanitization)
         emojirades = [sanitize_emojirade(i) for i in self.args["emojirade"].split("|")]

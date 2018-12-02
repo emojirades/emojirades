@@ -34,7 +34,7 @@ class Command(ABC):
         # Only check for overrides if admin
         if self.gamestate.is_admin(self.args["channel"], self.args["user"]):
             # Perform the channel override if it matches
-            channel_override_match = Command.channel_override_regex.match(re.escape(event["text"]))
+            channel_override_match = Command.channel_override_regex.match(event["text"])
 
             if channel_override_match:
                 self.args["original_channel"] = self.args["channel"]
@@ -43,7 +43,7 @@ class Command(ABC):
                 event["text"] = event["text"].replace(channel_override_match.groupdict()["override_cmd"], "")
 
             # Perform the user override if it matches
-            user_override_match = Command.user_override_regex.match(re.escape(event["text"]))
+            user_override_match = Command.user_override_regex.match(event["text"])
 
             if user_override_match:
                 self.args["original_user"] = self.args["user"]
@@ -57,10 +57,10 @@ class Command(ABC):
         for pattern in patterns:
             self.logger.debug("Matching '{0}' against '{1}'".format(pattern, event["text"]))
 
-            match = re.compile(pattern).match(re.escape(event["text"]))
+            match = re.compile(pattern).match(event["text"])
 
             if not match:
-                self.logger.debug("Failed to match '{0}' against '{1}'".format(pattern, re.escape(event["text"])))
+                self.logger.debug("Failed to match '{0}' against '{1}'".format(pattern, event["text"]))
 
             if hasattr(match, "groupdict"):
                 self.args.update(match.groupdict())
@@ -78,10 +78,7 @@ class Command(ABC):
 
     @classmethod
     def match(cls, text, **kwargs):
-        for pattern in cls.patterns:
-            print("Attempting match on '{0}' -> '{1}'".format(re.escape(text), pattern.format(**kwargs)))
-
-        return any(re.match(pattern.format(**kwargs), re.escape(text)) for pattern in cls.patterns)
+        return any(re.match(pattern.format(**kwargs), text) for pattern in cls.patterns)
 
     @abstractproperty
     def patterns(self):

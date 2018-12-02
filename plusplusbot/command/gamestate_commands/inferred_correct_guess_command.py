@@ -27,8 +27,7 @@ class InferredCorrectGuess(GameStateCommand):
 
     @only_actively_guessing
     def execute(self):
-        for i in super().execute():
-            yield i
+        yield from super().execute()
 
         state = self.gamestate.state[self.args["channel"]]
 

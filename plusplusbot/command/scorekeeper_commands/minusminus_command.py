@@ -17,8 +17,7 @@ class MinusMinusCommand(ScoreKeeperCommand):
 
     @admin_check
     def execute(self):
-        for i in super().execute():
-            yield i
+        yield from super().execute()
 
         target_user = self.args["target_user"]
 

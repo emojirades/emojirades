@@ -3,7 +3,7 @@ from plusplusbot.command.scorekeeper_commands.scorekeeper_command import ScoreKe
 
 class HistoryCommand(ScoreKeeperCommand):
     patterns = (
-        r"<@{me}>\\ history",
+        r"<@{me}> history",
     )
 
     description = "Shows the latest few actions performed"
@@ -12,15 +12,14 @@ class HistoryCommand(ScoreKeeperCommand):
         super().__init__(*args, **kwargs)
 
     def execute(self):
-        for i in super().execute():
-            yield i
+        yield from super().execute()
 
         history = self.scorekeeper.history(self.args["channel"])
 
         if not history:
             self.logger.debug("No history available. History is temporary and doesn't persist across bot restarts.")
             yield (None, "No history available. History is temporary and doesn't persist across bot restarts.")
-            raise StopIteration
+            return
 
         self.logger.debug("Printing history: {0}".format(history))
 

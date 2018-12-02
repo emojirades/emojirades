@@ -6,7 +6,7 @@ import random
 
 class CorrectGuess(GameStateCommand):
     patterns = (
-        r"<@(?P<target_user>[0-9A-Z]+)>[\s]*\\\+\\\+",
+        r"<@(?P<target_user>[0-9A-Z]+)>[\s]*\+\+",
     )
 
     description = "Indicates the player has correctly guessed (manually awarded)!"
@@ -28,18 +28,17 @@ class CorrectGuess(GameStateCommand):
 
     @only_actively_guessing
     def execute(self):
-        for i in super().execute():
-            yield i
+        yield from super().execute()
 
         state = self.gamestate.state[self.args["channel"]]
 
         if self.args["target_user"] in (state["old_winner"], state["winner"]):
             yield (None, "You're not allowed to award current players the win >.>")
-            raise StopIteration
+            return
 
         if self.args["user"] != state["winner"]:
             yield (None, "You're not the current winner, stop awarding other people the win >.>")
-            raise StopIteration
+            return
 
         self.gamestate.correct_guess(self.args["channel"], self.args["target_user"])
         score, is_first = self.scorekeeper.plusplus(self.args["channel"], self.args["target_user"])

@@ -24,8 +24,6 @@ def sanitize_emojirade(text):
 
 
 def match_emojirade(guess, emojirades, scott_factor=2):
-    guess = re.escape(guess)
-
     for emojirade in emojirades:
         if len(guess) > (len(emojirade) * scott_factor):
             raise ScottFactorExceededException("Guess exceeded the Scott Factor")

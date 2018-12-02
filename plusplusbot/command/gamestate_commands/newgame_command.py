@@ -4,8 +4,8 @@ from plusplusbot.wrappers import admin_check
 
 class NewGame(GameStateCommand):
     patterns = (
-        r"<@{me}>\\ new\\ game\\ <@(?P<old_winner>[0-9A-Z]+)>\\ <@(?P<winner>[0-9A-Z]+)>",
-        r"<@{me}>\\ newgame\\ <@(?P<old_winner>[0-9A-Z]+)>\\ <@(?P<winner>[0-9A-Z]+)>",
+        r"<@{me}> new game <@(?P<old_winner>[0-9A-Z]+)> <@(?P<winner>[0-9A-Z]+)>",
+        r"<@{me}> newgame <@(?P<old_winner>[0-9A-Z]+)> <@(?P<winner>[0-9A-Z]+)>",
     )
 
     description = "Initiate a new game by setting the Old Winner and the Winner"
@@ -18,12 +18,11 @@ class NewGame(GameStateCommand):
 
     @admin_check
     def execute(self):
-        for i in super().execute():
-            yield i
+        yield from super().execute()
 
         if self.args["winner"] == self.args["old_winner"]:
             yield (None, "Sorry, but the old and current winner cannot be the same person (<@{winner}>)...".format(**self.args))
-            raise StopIteration
+            return
 
         self.gamestate.new_game(self.args["channel"], self.args["old_winner"], self.args["winner"])
         yield (None, "<@{user}> has set the old winner to <@{old_winner}> and the winner to <@{winner}>".format(**self.args))

@@ -4,7 +4,7 @@ from plusplusbot.wrappers import admin_or_old_winner_check
 
 class FixWinner(GameStateCommand):
     patterns = (
-        r"<@{me}>\\ fixwinner\\ <@(?P<winner>[0-9A-Z]+)>",
+        r"<@{me}> fixwinner <@(?P<winner>[0-9A-Z]+)>",
     )
 
     description = "Resets the currently awarded win to another player (in case of a ninja or something)"
@@ -17,14 +17,13 @@ class FixWinner(GameStateCommand):
 
     @admin_or_old_winner_check
     def execute(self):
-        for i in super().execute():
-            yield i
+        yield from super().execute()
 
         loser, winner = self.gamestate.fixwinner(self.args["channel"], self.args["winner"])
 
         if loser is None or winner is None:
             yield (None, "Failed to fix the winner, no scores have been updated, please fix manually :(")
-            raise StopIteration
+            return
 
         yield (None, "<@{0}>--".format(loser))
         self.scorekeeper.minusminus(self.args["channel"], loser)

@@ -5,7 +5,7 @@ from plusplusbot.command.commands import Command
 
 class HelpCommand(Command):
     patterns = (
-        r"<@{me}>\\ help",
+        r"<@{me}> help",
     )
 
     description = "Shows this help"
@@ -24,8 +24,7 @@ class HelpCommand(Command):
         return tuple(new_patterns)
 
     def execute(self):
-        for i in super().execute():
-            yield i
+        yield from super().execute()
 
         commands = plusplusbot.command.command_registry.CommandRegistry.prepare_commands()
 

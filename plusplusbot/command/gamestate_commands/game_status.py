@@ -4,12 +4,12 @@ from plusplusbot.wrappers import admin_check
 
 class GameStatus(GameStateCommand):
     patterns = (
-        r"<@{me}>\\ game\\ status",
-        r"<@{me}>\\ gamestatus",
-        r"<@{me}>\\ status",
-        r"<@{me}>\\ game\\ state",
-        r"<@{me}>\\ gamestate",
-        r"<@{me}>\\ state",
+        r"<@{me}> game status",
+        r"<@{me}> gamestatus",
+        r"<@{me}> status",
+        r"<@{me}> game state",
+        r"<@{me}> gamestate",
+        r"<@{me}> state",
     )
 
     description = "Prints out the game status"
@@ -24,8 +24,7 @@ class GameStatus(GameStateCommand):
 
     @admin_check
     def execute(self):
-        for i in super().execute():
-            yield i
+        yield from super().execute()
 
         status = self.gamestate.game_status(self.args["channel"])
         pretty_status = []

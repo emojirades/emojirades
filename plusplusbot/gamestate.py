@@ -106,7 +106,7 @@ class GameState(object):
 
         if self.is_admin(channel, user):
             # Double check if we're overriding the channel
-            channel_override_match = Command.channel_override_regex.match(re.escape(text))
+            channel_override_match = Command.channel_override_regex.match(text)
 
             if channel_override_match:
                 original_channel = channel
@@ -115,7 +115,7 @@ class GameState(object):
                 text = text.replace(channel_override_match.groupdict()["override_cmd"], "")
 
             # Double check if we're overriding the user
-            user_override_match = Command.user_override_regex.match(re.escape(text))
+            user_override_match = Command.user_override_regex.match(text)
 
             if user_override_match:
                 original_user = user

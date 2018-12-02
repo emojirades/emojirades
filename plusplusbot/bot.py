@@ -96,6 +96,7 @@ class PlusPlusBot(object):
 
                 for command in self.match_event(event, commands):
                     self.logger.debug("Matched {0} for event {1}".format(command, event))
+
                     for channel, response in command.execute():
                         self.logger.debug("Command {0} executed with response: {1}".format(command, (channel, response)))
                         if channel is not None:
