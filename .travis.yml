@@ -1,29 +1,25 @@
 language: python
 dist: xenial
 python:
-  - 3.7
-
+- 3.7
 install:
-  - pip install -r requirements.txt --upgrade
-  - pip install -r test_requirements.txt --upgrade
-  - pip install -e .
-
+- pip install -r requirements.txt --upgrade
+- pip install -r test_requirements.txt --upgrade
+- pip install -e .
 script:
-  - pycodestyle
-  - pytest
-
+- pycodestyle
+- pytest
 deploy:
   provider: pypi
   username:
-    secure: lSgaBotxbD8+zTHyqM+hFiUc1rnzCFPnEX7DqdBB8Abtza8RFI962be8bUzUxFVuoeX5PSbGLTMnEynk+UqFdK1mIfuXOHJHCbTpWsyG7ADN4IOV/0dzJbbgobsj2uau0UW6CHjN7v32W+hNmht2lKXm2nrVOgG2yQgqjWtrMxlyZFZaa8u2LtDA/NqNgLthIEzH9Gsmk0Gmog40AazV41k5orKqNc32kP3UxgZ6v7u5NSoXJDGk7P5M1kquG7wxAu1j56JtoBXpYZvJHb71qMFMRi4kIELpkGz0Z6IdGmINopJm/DmD+WOIdmWj+TKuyXc9i6GQHu+JXbQXaoWDqAAXNcuYCHGoja12/fMFqy5NoTRQsz3kCWT9bMResD36zGSVWrByZe0/8a8gGUW+9AvTZmMK7JgghZy8CtJgWXbQDkAOkByxatht8mUECr8MMonkL7TemQBMn81nNZ3j/zGW7IZXYPeKKItEozU6raU4ylSma4bi3csW76NL2YTpb5bNIGgVANjAkOPbqhws5ZQ61GlAcOntrBsu6eMM+J8pGhGYl+v+/hVlZwP1irXmR0/Ol2frivNRppQvxoGe9WPEGS8UwB8/lecVHqBGJmOa5b09Hk5qRTgPb/ye3OXnv6Sr+xoq2g739g5VXMTcY42UWQmIKQ5OWXnP5k60B3A=
+    secure: wnQjcv6tEod0UXUDO7ZLiFm8qsVu8PEWD07qdFn0xJjI5L5lP0PzhhhINzbdkHrfiLixU0UnuTbxLqrvfSiZjjY0V9MJtWb/JWBWNIcomCRjSSRJpFmRG4Ix+0kcIAxFcXwUm6Of5C3+NfZxbFW9O2JuOU7lSoM1INUFMORPEm/OAPXzMmbzRNDqWk29tEvce4JwzIPqlGiG5FN/i35Sf33v3UBU6mS0APKnACxddN+8wxHriFcGZhwHuTY6+DcP6ddmn8boBLJIGVgOp7Mg4ndGrDjpyuUhbdcmIXbq2eg6LZ/ySwodu509oCDjTTBmjz6v+xzRDfKUx0F2J7hIf1l4ngr/Am1Xbr83fxBwznga8gJrBqGjZCJzyPRFX7XMQEtHoJeMbaPSCuon+y/S/1XumtTJJmfk+k6s+3ka3VAEOe+Nx0ndYJysAjzCPaMeVkFsn1UDyxGm2Zcw/aabboAppnuSDfBiKRff5vyXnueAAs50i38vwS89EZbv5cuUXGnhYdtCqsIocwjul31wYbXQiiw7FsGLsJxJeofO/dRaeLZSzig3nYc7RfwTYG7JtBxTqrbP6SpRFx6Y55cIGLgu/NiCv+NnMErXBuwy5uHIhr061bQO5e8E/Y6rHlp4beJmNFMP8nZ9wAaYwzdteoxQBy3sqSWY5EB4uBlltd0=
   password:
-    secure: tBiUsHS94Zrxg0mCuyWJtKbch6cK3IQA9FH9ex2LvWL0uAXKA76k3pqkTNIpQ4/Oj3AgBQaSC3Si8wOOcih7Wv149selPyvvJyautRYPPyQB2VfIbsiDfo70vnJh+ty7WnLtGEz9ww/yaBls5AubLtc6guXAYvrJOTE5byJ5kPkwt514HeEvGFvIjSDWNZMMoeQI2yvTGcwfBIMsAmDT1WUGaAD4T1gKoYqSm/oA3AXQDv+sL07O0g1OSyRrk9NU7fqVj7zfC81m7yvz/qBgkBFB28wsnbyOC/t108nqlIpBjzacaQLaEVgwP9NxYZwFsa85SNexp2xjqtL1EQkHJaRgrL86jIMRpRl6PnUoEeEMzGoXD+wty9Q/yhDLnfoLlg0OQ3+ITQkExNHEf8E9MzUxataK2BUl2r+x5jf5UPiFJC0z8VX/Es7RzOWs63DSrC0806vqbY8w1SHB3KKcxMHDYL+chweuNY+CDg1F9JxRp+WG8lBvImpGOanSO9b+uRf9lsO7dhbuYn6FckNMTtFPtOlvADSLudoJwpuPpLBc0r1uYdw9ELXCYb6ojg+OCWBCBXJC8X2HLYWTHquNauJtaYIbri2PDtoycwVK4zBGcsPxRWMo2XJteEKVZod2lTPvod5QPBpvsxfvJTrg2MURDDQtCo7BvnJSZ1F5xcw=
+    secure: qSyzBarbyjoA2BidCHQy4/jILBCxnoA6LHiRhN/2ap1uuJIwU/Fb4Zx/k3qPXy6lpEZ88XZF1T3F+Ee1SZAJHPEfA+cfDvo0Q+y3JImwjT5UWCiVVKmUov9BIlD4V4ppe71ILs0iZB5XV5J+bsG6G4oM1xcmIGL5mD+aBwtvhHvdOpTpuyK+KhYJdNsKD9e99n/0l6/z5yLy5pAnEwXOe3fkejRVyC6UXiPLGLDL39/DSm98tuXl8nuiGuFqFzn99vIqy9F6ItcyEqm+cNfv46EH2+HoPo1/4cEAPRRLNgcrYNEgHA39wHnLxxPWIV1+bwNrVwLcWPxBOmkVy3kxS/HonFtHIBs33tItU2iaAfCar29iXsXwJnW5t07Okcda7oQSg14/yGkLK0XMDFEZUW+cQrC6UGsO93FogTSYJOYDtbTU0m5msc8hpZWgcesB984xWqefWglTfvId9W7U+8LdIbVQzIcNrAVh9yQOFT93J63ucODFSvq3bl5b5JUweSTnJSSN7SxvcrljECEXgxSzujz+XCPsW1dMPd1k1EYgMKMkTyvcI9CS0Xdc2DcSvhC5R030xmjTm78PNK+p5L3hWS85ITQH3dUJip12yZbQ3TwIJhYdRYEYXZdXGvQ4v8k6g/58IUoVTR1eDv+OF98bKyajmmF4UAS4o9XM6Dg=
   on:
     tags: true
     branch: master
     python: 3.7
-  distributions: "sdist bdist_wheel"
-
+  distributions: sdist bdist_wheel
 notifications:
   email:
     on_success: never
