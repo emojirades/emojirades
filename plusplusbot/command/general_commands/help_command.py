@@ -28,8 +28,8 @@ class HelpCommand(Command):
 
         commands = plusplusbot.command.command_registry.CommandRegistry.prepare_commands()
 
-        message = "Available commands are:\n```"
-        message += "{0:<15}{1:<50}{2}\n".format("Name", "Description", "Regex")
+        yield (None, "Available commands are:\n")
+        message = "```\n{0:<25}{1:<50}{2}\n".format("Name", "Description", "Regex")
 
         for patterns, command in commands.items():
             patterns = self.format_patterns(patterns)
@@ -41,14 +41,14 @@ class HelpCommand(Command):
                     desc = "{0}...".format(desc[0:45])
 
                 if i == 0:
-                    message += "{0:<15}{1:<50}{2}\n".format(command.__name__, desc, pattern)
+                    message += "{0:<25}{1:<50}{2}\n".format(command.__name__, desc, pattern)
                 else:
-                    message += "{0:<15}{1:>50}{2}\n".format("", "Alternatives: ", pattern)
+                    message += "{0:<25}{1:>50}{2}\n".format("", "Alternatives:  ", pattern)
 
         message += "```"
-        message += "Game Admins: " + ", ".join("<@{0}>".format(self.gamestate.game_status(self.args["channel"])["admins"]))
 
         yield (None, message)
+        yield (None, "Game Admins: " + ", ".join(["<@{0}>".format(i) for i in self.gamestate.game_status(self.args["channel"])["admins"]]))
 
     def __str__(self):
         return "HelpCommand"

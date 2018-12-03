@@ -4,8 +4,7 @@ from plusplusbot.wrappers import admin_check
 
 class NewGame(GameStateCommand):
     patterns = (
-        r"<@{me}> new game <@(?P<old_winner>[0-9A-Z]+)> <@(?P<winner>[0-9A-Z]+)>",
-        r"<@{me}> newgame <@(?P<old_winner>[0-9A-Z]+)> <@(?P<winner>[0-9A-Z]+)>",
+        r"<@{me}> new[\s]*game <@(?P<old_winner>[0-9A-Z]+)> <@(?P<winner>[0-9A-Z]+)>",
     )
 
     description = "Initiate a new game by setting the Old Winner and the Winner"
