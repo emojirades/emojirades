@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="Emojirades PlusPlus",
-    version="0.4.0",
+    version="0.4.1",
     description="A Slack bot that understands the Emojirades game!",
     url="https://github.com/michael-robbins/emojirades-plusplus",
     classifiers=[
