@@ -50,7 +50,7 @@ class SetEmojirade(GameStateCommand):
         winner = self.gamestate.state[self.args["channel"]]["winner"]
 
         # Let the user know their 'rade has been accepted
-        yield (self.args["user"], "Thanks for that! I've let {winner} know!".format(winner=winner))
+        yield (self.args["user"], "Thanks for that! I've let <@{winner}> know!".format(winner=winner))
 
         # DM the winner with the new rade
         if len(emojirades) > 1:
