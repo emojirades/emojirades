@@ -11,7 +11,7 @@ from plusplusbot.command.commands import Command
 
 module_logger = logging.getLogger("PlusPlusBot.scorekeeper")
 
-leaderboard_limit = 10
+leaderboard_limit = 15
 history_limit = 5
 
 

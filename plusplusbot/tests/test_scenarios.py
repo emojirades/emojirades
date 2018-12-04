@@ -133,7 +133,7 @@ class TestBotScenarios(EmojiradeBotTester):
         # Expected *new* responses
         responses = [
             response(self.config.player_1_channel,
-                     "Thanks for that! I've let {0} know!".format(self.config.player_2)),
+                     "Thanks for that! I've let <@{0}> know!".format(self.config.player_2)),
             response(self.config.player_2_channel,
                      "Hey, <@{0}> made the 'rade `{1}`, good luck!".format(self.config.player_1, self.config.emojirade)),
             response(self.config.channel,
