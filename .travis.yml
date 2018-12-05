@@ -1,5 +1,7 @@
 language: python
 dist: xenial
+services:
+  - docker
 python:
 - 3.7
 install:
@@ -10,16 +12,22 @@ script:
 - pycodestyle
 - pytest
 deploy:
-  provider: pypi
-  username:
-    secure: Os6dolXbpJPbTQlZR33yvQXO6H5vAW0IOgx4A3OPW1ib/tTwq6A24vIQTtDMFtVgZAhsmtCNtVSm/keUGcsqTPsNLt/XTT6z6F/mRiADI6Z4N4I0dnC27AkEgJmOabiMZanzNKYfOPm6DjzukVlk9FvgYQwJd2DfK8VpjJuccPEsySS6di/FUqSF3xWyEEJd8QI/1h5a0HEZsbxwsolE9y+dKdMKf3UL04wLTlFGyHZ1cUgC4MAVMqjMd1fmDEMnepi4bZn5DSghlXyQCIyokzkk+Mjo6S42/BHY6+nYjqdsuH6f6A/CKX644iXMGEenioMvSQcPKwF6a/RFewf+5DcYjs9hBYS92W02COxMYS03yvC8h5wxGtpMQGvTfsEaWNb6pk6QOfip+X9RUJWEwzr3LnejDBO586x1s8e34jZuGrtwpzl0p9/Wa+oMTjhrQANDNJeKEdbXlAMSytCoXSFl4IzVF7KFy8WICkDttcPjJzy/IpbXtWzJMUnp0vMY2I1McBzChox7DeY3UvK/aM7qBKcEIG7HIgoygV6B6OdtPvxJfdD7oWdX/5ct5QtJHcre7AjpbMelDtP8XJETDpu2Cx8UaddY/wrow+UQyC4+J8UXVm/zwIAxt9YBUzTItu8LLpVCvl5FtWGmHHoNeQelY27v28pwC4cxI9ReEJ8=
-  password:
-    secure: KALow2g73RjxeZHvCahGgD3tq69/cZSZq2ghh0V5LvtW8jkZ0lxXs1qfoIDZKJMb6m4W1m4VEeWUXY8DICLPJc+O2NghiWa+5SnyC45Yn3KRzxhLfLdaGPEGnmZ7qS2+j5u5R7fjmbXMJnfMtXzqoYjoThpKt7+w99xpbkzAm5pDmsQu7947RHYdZbomBEhKouZj9xEVdQ/OpqY7BY7dj8CWDWT+uLnOJPgjvZInDQIY4O80t6rwOe2sBsdZQ4zpefyWGaeNEIuHMMRcizCykYR43Ucf3IAzFxLOz02osxFAlJGhSrL0cB+WK6NUbU884lwJFIj0gBZZNzyC6azcEhacAYcjz9RcayBI1N2rPHcLH/PMd0u2cr4+Zxy/tapDZaeMm+XvBtgjCIIoYqOTSbzGoHaxWlZrzBLAdHNF/hvEzkKh7CC1Oi0PqLXUR/HV5xJUhWUJdnfghDSL7BgowNFtbM8WPkNwVkON80814MnSsuRAj/bBUUbXyfaJxmXvySll8oEq6t9+N1gOrd5Jn3D2b1lM6i68+NHje76xmBGm9c+mIYe/zxz09WPASZfiP0HKn3Mqae5kmCAGbtl/UeL8jFV3HBVB1OwSzIwhYEXFNhCthInMFwVxlxy8l6czsH33oFdnk+HwUnxwcmn8OxTq7eUpXbBI3c+XGJGxZgE=
-  on:
-    tags: true
-    branch: master
-    python: 3.7
-  distributions: sdist bdist_wheel
+  - provider: pypi
+    username:
+      secure: Os6dolXbpJPbTQlZR33yvQXO6H5vAW0IOgx4A3OPW1ib/tTwq6A24vIQTtDMFtVgZAhsmtCNtVSm/keUGcsqTPsNLt/XTT6z6F/mRiADI6Z4N4I0dnC27AkEgJmOabiMZanzNKYfOPm6DjzukVlk9FvgYQwJd2DfK8VpjJuccPEsySS6di/FUqSF3xWyEEJd8QI/1h5a0HEZsbxwsolE9y+dKdMKf3UL04wLTlFGyHZ1cUgC4MAVMqjMd1fmDEMnepi4bZn5DSghlXyQCIyokzkk+Mjo6S42/BHY6+nYjqdsuH6f6A/CKX644iXMGEenioMvSQcPKwF6a/RFewf+5DcYjs9hBYS92W02COxMYS03yvC8h5wxGtpMQGvTfsEaWNb6pk6QOfip+X9RUJWEwzr3LnejDBO586x1s8e34jZuGrtwpzl0p9/Wa+oMTjhrQANDNJeKEdbXlAMSytCoXSFl4IzVF7KFy8WICkDttcPjJzy/IpbXtWzJMUnp0vMY2I1McBzChox7DeY3UvK/aM7qBKcEIG7HIgoygV6B6OdtPvxJfdD7oWdX/5ct5QtJHcre7AjpbMelDtP8XJETDpu2Cx8UaddY/wrow+UQyC4+J8UXVm/zwIAxt9YBUzTItu8LLpVCvl5FtWGmHHoNeQelY27v28pwC4cxI9ReEJ8=
+    password:
+      secure: KALow2g73RjxeZHvCahGgD3tq69/cZSZq2ghh0V5LvtW8jkZ0lxXs1qfoIDZKJMb6m4W1m4VEeWUXY8DICLPJc+O2NghiWa+5SnyC45Yn3KRzxhLfLdaGPEGnmZ7qS2+j5u5R7fjmbXMJnfMtXzqoYjoThpKt7+w99xpbkzAm5pDmsQu7947RHYdZbomBEhKouZj9xEVdQ/OpqY7BY7dj8CWDWT+uLnOJPgjvZInDQIY4O80t6rwOe2sBsdZQ4zpefyWGaeNEIuHMMRcizCykYR43Ucf3IAzFxLOz02osxFAlJGhSrL0cB+WK6NUbU884lwJFIj0gBZZNzyC6azcEhacAYcjz9RcayBI1N2rPHcLH/PMd0u2cr4+Zxy/tapDZaeMm+XvBtgjCIIoYqOTSbzGoHaxWlZrzBLAdHNF/hvEzkKh7CC1Oi0PqLXUR/HV5xJUhWUJdnfghDSL7BgowNFtbM8WPkNwVkON80814MnSsuRAj/bBUUbXyfaJxmXvySll8oEq6t9+N1gOrd5Jn3D2b1lM6i68+NHje76xmBGm9c+mIYe/zxz09WPASZfiP0HKn3Mqae5kmCAGbtl/UeL8jFV3HBVB1OwSzIwhYEXFNhCthInMFwVxlxy8l6czsH33oFdnk+HwUnxwcmn8OxTq7eUpXbBI3c+XGJGxZgE=
+    on:
+      tags: true
+      branch: master
+      python: 3.7
+    distributions: sdist bdist_wheel
+  - provider: script
+    script: bash docker_push
+    on:
+      tags: true
+      branch: master
+      python: 3.7
 notifications:
   email:
     on_success: never
