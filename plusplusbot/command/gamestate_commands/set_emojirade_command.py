@@ -43,7 +43,7 @@ class SetEmojirade(GameStateCommand):
             return
 
         # Break the alternatives out and sanitize the emojirade (apply consistent sanitization)
-        raw_emojirades = [i for i in self.args["emojirade"].split("|")]
+        raw_emojirades = [i.strip() for i in self.args["emojirade"].split("|")]
         sanitized_emojirades = [sanitize_emojirade(i) for i in raw_emojirades]
 
         self.gamestate.set_emojirade(self.args["channel"], sanitized_emojirades)

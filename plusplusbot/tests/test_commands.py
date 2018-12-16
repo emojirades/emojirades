@@ -88,6 +88,36 @@ class TestBotCommands(EmojiradeBotTester):
         self.send_event(self.events.posted_emojirade)
         assert state["step"] == "provided"
 
+    def test_set_emojirade_raw_output(self):
+        """ Ensure that the emojirade passed to the winner isn't sanitized """
+        self.reset_and_transition_to("waiting")
+
+        emojirade = "test-123-test_123"
+
+        override = {"text": "emojirade {0}".format(emojirade)}
+        self.send_event({**self.events.posted_emojirade, **override})
+
+        assert (self.config.player_2_channel,
+                "Hey, <@{old_winner}> made the 'rade `{emojirade}`, good luck!".format(
+                    old_winner=self.config.player_1,
+                    emojirade=emojirade
+                )) in self.responses
+
+    def test_set_emojirade_alternatives_output(self):
+        """ Ensure that the emojirade alternatives output is expected """
+        self.reset_and_transition_to("waiting")
+
+        emojirade = "foo | bar"
+
+        override = {"text": "emojirade {0}".format(emojirade)}
+        self.send_event({**self.events.posted_emojirade, **override})
+
+        assert (self.config.player_2_channel,
+                "Hey, <@{old_winner}> made the 'rade `foo`, with alternatives `bar`, good luck!".format(
+                    old_winner=self.config.player_1,
+                    emojirade=emojirade
+                )) in self.responses
+
     def test_user_override(self):
         self.reset_and_transition_to("guessing")
 
