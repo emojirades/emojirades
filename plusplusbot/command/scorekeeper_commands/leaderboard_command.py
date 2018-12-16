@@ -24,19 +24,29 @@ class LeaderboardCommand(ScoreKeeperCommand):
 
         lines = ["```"]
 
-        longest_name = max(len(name) for (name, score) in leaderboard)
-        biggest_score = len(str(max(score for (name, score) in leaderboard)))
+        longest_name = 0
+        biggest_score = 0
+
+        for (name, score) in leaderboard:
+            name_length = len(name)
+            score_length = len(str(score))
+
+            if name_length > longest_name:
+                longest_name = name_length
+
+            if score_length > biggest_score:
+                biggest_score = score_length
 
         for index, (name, score) in enumerate(leaderboard):
             name = self.slack.pretty_name(name)
 
-            lines.append("{0:>2}. {1:<{name_width}} [{2:>{point_width}} point{3}]".format(
+            lines.append("{0:>2}. {1:<{name_width}} [ {2:>{point_width}} point{3} ]".format(
                 index + 1,
                 name if len(name) < 20 else "{0}..".format(name[0:18]),
                 score,
                 "s" if score > 1 else " ",
-                name_width=longest_name + 1,
-                point_width=biggest_score + 1,
+                name_width=longest_name,
+                point_width=biggest_score,
             ))
 
         lines.append("```")
