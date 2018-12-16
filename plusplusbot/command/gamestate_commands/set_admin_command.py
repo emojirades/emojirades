@@ -3,11 +3,13 @@ from plusplusbot.wrappers import admin_check
 
 
 class SetAdmin(GameStateCommand):
+    description = "Promotes a user to a game admin!"
+    short_description = "Promote a user"
+
     patterns = (
         r"<@{me}> promote <@(?P<admin>[0-9A-Z]+)>",
     )
-
-    description = "Promotes a user to a game admin!"
+    example = "<@{me}> promote @pleb"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

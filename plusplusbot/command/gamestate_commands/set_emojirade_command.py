@@ -5,11 +5,13 @@ from plusplusbot.checks import emojirade_is_banned
 
 
 class SetEmojirade(GameStateCommand):
+    description = "Sets the new emojirade to be guessed"
+    short_description = "Sets the new emojirade"
+
     patterns = (
         r"^emojirade (?P<emojirade>.+)",
     )
-
-    description = "Sets the current Emojirade to be guessed"
+    example = "emojirade foobar"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

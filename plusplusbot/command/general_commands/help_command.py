@@ -4,11 +4,13 @@ from plusplusbot.command.commands import Command
 
 
 class HelpCommand(Command):
+    description = "Shows this help"
+    short_description = "Shows this help"
+
     patterns = (
         r"<@{me}> help",
     )
-
-    description = "Shows this help"
+    example = "<@{me}> help"
 
     def format_patterns(self, patterns):
         new_patterns = []
