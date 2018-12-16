@@ -16,12 +16,46 @@ class TestBotCommands(EmojiradeBotTester):
 
     def test_leaderboard_output(self):
         """ Ensure leaderboard output is consistent """
-        self.reset_and_transition_to("guessing")
+        self.reset_and_transition_to("waiting")
 
-        self.send_event(self.events.correct_guess)
+        self.bot.scorekeeper.scoreboard[self.config.channel] = {
+            "scores": {
+                "David Pham": 168,
+                "fendy Haman": 120,
+                "Michael Mitchell": 118,
+                "Timothy Sinclair": 100,
+                "Stephen Verschuren": 81,
+                "Mark Chaves": 81,
+                "Andres Quillian": 30,
+                "Justin Fendi": 24,
+                "Scott Burke": 23,
+                "Steve Robbins": 16,
+                "Agung Alford": 9,
+                "James Gream": 1
+            },
+        }
+
+        expected = """```
+ 1. David Pham         [ 168 points ]
+ 2. fendy Haman        [ 120 points ]
+ 3. Michael Mitchell   [ 118 points ]
+ 4. Timothy Sinclair   [ 100 points ]
+ 5. Stephen Verschuren [  81 points ]
+ 6. Mark Chaves        [  81 points ]
+ 7. Andres Quillian    [  30 points ]
+ 8. Justin Fendi       [  24 points ]
+ 9. Scott Burke        [  23 points ]
+10. Steve Robbins      [  16 points ]
+11. Agung Alford       [   9 points ]
+12. James Gream        [   1 point  ]
+```"""
+
         self.send_event(self.events.leaderboard)
 
-        assert (self.config.channel, "```\n 1. U00000003  [ 1 point ]\n```") in self.responses
+        for i in self.responses:
+            print(i)
+
+        assert (self.config.channel, expected) in self.responses
 
     def test_fixwinner(self):
         """ Ensure fixwinner does the right thing """
