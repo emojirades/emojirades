@@ -52,9 +52,6 @@ class TestBotCommands(EmojiradeBotTester):
 
         self.send_event(self.events.leaderboard)
 
-        for i in self.responses:
-            print(i)
-
         assert (self.config.channel, expected) in self.responses
 
     def test_fixwinner(self):
