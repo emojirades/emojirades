@@ -43,22 +43,28 @@ class SetEmojirade(GameStateCommand):
             return
 
         # Break the alternatives out and sanitize the emojirade (apply consistent sanitization)
-        emojirades = [sanitize_emojirade(i) for i in self.args["emojirade"].split("|")]
+        raw_emojirades = [i.strip() for i in self.args["emojirade"].split("|")]
+        sanitized_emojirades = [sanitize_emojirade(i) for i in raw_emojirades]
 
-        self.gamestate.set_emojirade(self.args["channel"], emojirades)
+        self.gamestate.set_emojirade(self.args["channel"], sanitized_emojirades)
 
         winner = self.gamestate.state[self.args["channel"]]["winner"]
 
-        # Let the user know their 'rade has been accepted
-        yield (self.args["user"], "Thanks for that! I've let <@{winner}> know!".format(winner=winner))
-
-        # DM the winner with the new rade
-        if len(emojirades) > 1:
-            alternatives = ", with alternatives " + " OR ".join(["`{0}`".format(i) for i in emojirades[1:]])
+        # DM the winner with the new emojirade
+        if len(raw_emojirades) > 1:
+            alternatives = ", with alternatives " + " OR ".join(["`{0}`".format(i) for i in raw_emojirades[1:]])
         else:
             alternatives = ""
 
-        yield (winner, "Hey, <@{user}> made the 'rade `{first}`{alternatives}, good luck!".format(**self.args, first=emojirades[0], alternatives=alternatives))
+        msg = "Hey, <@{user}> made the 'rade `{first}`{alternatives}, good luck!".format(
+            **self.args,
+            first=raw_emojirades[0],
+            alternatives=alternatives
+        )
+        yield (winner, msg)
+
+        # Let the user know their 'rade has been accepted
+        yield (self.args["user"], "Thanks for that! I've let <@{winner}> know!".format(winner=winner))
 
         # Let everyone else know
         yield (self.args["channel"], ":mailbox: 'rade sent to <@{winner}>".format(winner=winner))
