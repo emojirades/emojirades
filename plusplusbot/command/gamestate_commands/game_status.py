@@ -3,11 +3,13 @@ from plusplusbot.wrappers import admin_check
 
 
 class GameStatus(GameStateCommand):
+    description = "Prints out the game status"
+    short_description = "Print game status"
+
     patterns = (
         r"<@{me}> (game[\s]*){{0,1}}(status|state)",
     )
-
-    description = "Prints out the game status"
+    example = "<@{me}> game status"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

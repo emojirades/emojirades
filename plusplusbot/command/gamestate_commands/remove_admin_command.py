@@ -3,11 +3,13 @@ from plusplusbot.wrappers import admin_check
 
 
 class RemoveAdmin(GameStateCommand):
+    description = "Removes a user from the admins group"
+    short_description = "Demote an admin"
+
     patterns = (
         r"<@{me}> demote <@(?P<admin>[0-9A-Z]+)>",
     )
-
-    description = "Removes a user from the admins group"
+    example = "<@{me}> demote @admin"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

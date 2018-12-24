@@ -3,11 +3,13 @@ from plusplusbot.wrappers import admin_check
 
 
 class NewGame(GameStateCommand):
+    description = "Initiate a new game by setting the Old Winner and the Winner"
+    short_description = "Initiates a new game"
+
     patterns = (
         r"<@{me}> new[\s]*game <@(?P<old_winner>[0-9A-Z]+)> <@(?P<winner>[0-9A-Z]+)>",
     )
-
-    description = "Initiate a new game by setting the Old Winner and the Winner"
+    example = "<@{me}> new game @old_winner @winner"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

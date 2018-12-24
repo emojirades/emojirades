@@ -1,5 +1,7 @@
 from plusplusbot.tests.helper import EmojiradeBotTester
 
+import re
+
 
 class TestBotCommands(EmojiradeBotTester):
     """
@@ -143,3 +145,14 @@ class TestBotCommands(EmojiradeBotTester):
 
         assert state["step"] == "waiting"
         assert state["winner"] == self.config.player_3
+
+    def test_help(self):
+        from plusplusbot.command.command_registry import CommandRegistry
+
+        self.send_event(self.events.help)
+
+        commands = CommandRegistry.prepare_commands()
+
+        for command in commands.values():
+            assert re.compile(r"{0}\s+{1}".format(re.escape(command.short_description), re.escape(command.example))) \
+                     .search(self.responses[-2][1])
