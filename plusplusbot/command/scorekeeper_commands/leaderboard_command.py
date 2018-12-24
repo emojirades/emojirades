@@ -30,6 +30,8 @@ class LeaderboardCommand(ScoreKeeperCommand):
         biggest_score = 0
 
         for (name, score) in leaderboard:
+            name = self.slack.pretty_name(name)
+
             name_length = len(name)
             score_length = len(str(score))
 
