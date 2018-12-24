@@ -36,13 +36,9 @@ class GameStatus(GameStateCommand):
             "new_game": "Game has not started yet, please wait for an admin to start it!",
             "waiting": "Waiting for {old_winner} to provide a 'rade to {winner}",
             "provided": "Waiting for {winner} to post an emoji to kick off the round!",
-            "guessing": "Come on, everyone's guessing! Get to it! :runner:",
+            "guessing": "Come on, everyone's guessing what {winner} has posted! Get to it! :runner::dash:",
         }
 
         pretty_status.append(("Status", step_msg[status["step"]].format(**args)))
-
-        # Winner details
-        pretty_status.append(("'rade provider", args["old_winner"]))
-        pretty_status.append(("'rade-r", args["winner"]))
 
         yield (None, "\n".join("{0}: {1}".format(k, v) for k, v in pretty_status))
