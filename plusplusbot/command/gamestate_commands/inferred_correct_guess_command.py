@@ -5,9 +5,11 @@ import random
 
 
 class InferredCorrectGuess(GameStateCommand):
-    patterns = tuple()
-
     description = "Takes the user that send the event as the winner, this is only ever fired internally"
+    short_description = "Internally awards a win"
+
+    patterns = tuple()
+    example = None
 
     first_emojis = [
         ":tada:",
