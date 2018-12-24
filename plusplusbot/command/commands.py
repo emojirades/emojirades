@@ -80,12 +80,20 @@ class Command(ABC):
     def match(cls, text, **kwargs):
         return any(re.match(pattern.format(**kwargs), text) for pattern in cls.patterns)
 
-    @abstractproperty
+    @property
+    def description(self):
+        pass
+
+    @property
+    def short_description(self):
+        pass
+
+    @property
     def patterns(self):
         pass
 
-    @abstractproperty
-    def description(self):
+    @property
+    def example(self):
         pass
 
     def __str__(self):

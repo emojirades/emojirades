@@ -5,11 +5,13 @@ import random
 
 
 class CorrectGuess(GameStateCommand):
+    description = "Manually award a player the win, when automated inferrence didn't work"
+    short_description = "Manually award a player the win"
+
     patterns = (
         r"<@(?P<target_user>[0-9A-Z]+)>[\s]*\+\+",
     )
-
-    description = "Indicates the player has correctly guessed (manually awarded)!"
+    example = "@winner ++"
 
     first_emojis = [
         ":tada:",

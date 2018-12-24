@@ -3,11 +3,13 @@ from plusplusbot.wrappers import admin_check
 
 
 class SetCommand(ScoreKeeperCommand):
+    description = "Manually set the users score"
+    short_description = "Set a users score"
+
     patterns = (
         r"<@(?P<target_user>[0-9A-Z]+)> set (?P<new_score>-?[0-9]+)",
     )
-
-    description = "Manually set the users score"
+    example = "@user set 123"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
