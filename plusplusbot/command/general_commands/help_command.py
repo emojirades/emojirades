@@ -30,22 +30,36 @@ class HelpCommand(Command):
 
         commands = plusplusbot.command.command_registry.CommandRegistry.prepare_commands()
 
+        longest_description = 0
+        longest_example = 0
+
+        for command in commands.values():
+            description_length = len(command.short_description)
+            example_length = len(command.example)
+
+            if description_length > longest_description:
+                longest_description = description_length
+
+            if example_length > longest_example:
+                longest_example = example_length
+
         yield (None, "Available commands are:\n")
-        message = "```\n{0:<25}{1:<50}{2}\n".format("Name", "Description", "Regex")
+        message = "```\n{0:<{description}} {1:<{example}}\n".format("Description",
+                                                                    "Example",
+                                                                    description=longest_description,
+                                                                    example=example_length)
 
-        for patterns, command in commands.items():
-            patterns = self.format_patterns(patterns)
+        for command in commands.values():
+            desc = command.short_description
+            example = command.example
 
-            for i, pattern in enumerate(patterns):
-                desc = command.description
+            if len(desc) > longest_description:
+                desc = "{0}...".format(desc[0:longest_description])
 
-                if len(desc) > 48:
-                    desc = "{0}...".format(desc[0:45])
+            if len(example) > longest_example:
+                example = "{0}...".format(example[0:longest_example])
 
-                if i == 0:
-                    message += "{0:<25}{1:<50}{2}\n".format(command.__name__, desc, pattern)
-                else:
-                    message += "{0:<25}{1:>50}{2}\n".format("", "Alternatives:  ", pattern)
+            message += "{0:<{description}} {1:<{example}}\n".format(desc, example, description=longest_description, example=example_length)
 
         message += "```"
 
