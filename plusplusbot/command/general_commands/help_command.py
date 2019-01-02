@@ -44,10 +44,10 @@ class HelpCommand(Command):
                 longest_example = example_length
 
         yield (None, "Available commands are:\n")
-        message = "```\n{0:<{description}} {1:<{example}}\n".format("Description",
-                                                                    "Example",
-                                                                    description=longest_description,
-                                                                    example=example_length)
+        message = "```\n{0:<{example}} {1:<{description}}\n".format("Example",
+                                                                    "Description",
+                                                                    example=example_length,
+                                                                    description=longest_description)
 
         for command in commands.values():
             desc = command.short_description
@@ -59,7 +59,7 @@ class HelpCommand(Command):
             if len(example) > longest_example:
                 example = "{0}...".format(example[0:longest_example])
 
-            message += "{0:<{description}} {1:<{example}}\n".format(desc, example, description=longest_description, example=example_length)
+            message += "{0:<{example}} {1:<{description}}\n".format(example, desc, description=longest_description, example=example_length)
 
         message += "```"
 

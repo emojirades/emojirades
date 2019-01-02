@@ -180,5 +180,5 @@ class TestBotCommands(EmojiradeBotTester):
         commands = CommandRegistry.prepare_commands()
 
         for command in commands.values():
-            assert re.compile(r"{0}\s+{1}".format(re.escape(command.short_description), re.escape(command.example))) \
+            assert re.compile(r"{0}\s+{1}".format(re.escape(command.example), re.escape(command.short_description))) \
                      .search(self.responses[-2][1])
