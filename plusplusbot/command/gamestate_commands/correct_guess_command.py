@@ -1,5 +1,5 @@
 from plusplusbot.command.gamestate_commands.gamestate_command import GameStateCommand
-from plusplusbot.wrappers import only_actively_guessing
+from plusplusbot.wrappers import only_guessing
 
 import random
 
@@ -28,7 +28,7 @@ class CorrectGuess(GameStateCommand):
     def prepare_args(self, event):
         super().prepare_args(event)
 
-    @only_actively_guessing
+    @only_guessing
     def execute(self):
         yield from super().execute()
 

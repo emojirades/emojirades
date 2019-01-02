@@ -61,6 +61,10 @@ class GameState(object):
         set_emojirade : waiting  -> provided
         winner_posted : provided -> guessing
         correct_guess : guessing -> waiting
+
+    Step Overview
+        new_game -(set_winners)-> waiting -(set_emojirade)-> provided -(winner_posted)-> guessing -|
+                                     ^-----------------------(correct_guess)-----------------------|
     """
 
     class InvalidStateException(Exception):
@@ -89,10 +93,13 @@ class GameState(object):
                 self.logger.info("Loaded game state from {0}".format(filename))
 
     def in_progress(self, channel):
-        return self.state[channel]["step"] not in ["new_game"]
+        return self.state[channel]["step"] not in ("new_game",)
 
-    def actively_guessing(self, channel):
-        return self.state[channel]["step"] == "guessing"
+    def not_in_progress(self, channel):
+        return self.state[channel]["step"] in ("new_game", "waiting")
+
+    def guessing(self, channel):
+        return self.state[channel]["step"] in ("guessing",)
 
     def infer_commands(self, event):
         """

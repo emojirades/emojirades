@@ -1,5 +1,5 @@
 from plusplusbot.command.gamestate_commands.gamestate_command import GameStateCommand
-from plusplusbot.wrappers import admin_or_old_winner_check
+from plusplusbot.wrappers import admin_or_old_winner_check, only_not_in_progress
 
 
 class FixWinner(GameStateCommand):
@@ -18,8 +18,17 @@ class FixWinner(GameStateCommand):
         super().prepare_args(event)
 
     @admin_or_old_winner_check
+    @only_not_in_progress
     def execute(self):
         yield from super().execute()
+
+        if self.args["winner"] == self.gamestate.state[self.args["channel"]]["old_winner"]:
+            yield (None, ":face_palm: You can't award yourself the win")
+            return
+
+        if self.args["winner"] == self.gamestate.state[self.args["channel"]]["winner"]:
+            yield (None, "This won't actually do anything? :shrug::face_with_monocle:")
+            return
 
         loser, winner = self.gamestate.fixwinner(self.args["channel"], self.args["winner"])
 

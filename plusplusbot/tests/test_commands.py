@@ -14,7 +14,7 @@ class TestBotCommands(EmojiradeBotTester):
         assert state["step"] == "new_game"
 
         self.send_event(self.events.plusplus)
-        assert (self.config.channel, "Sorry but we need to be actively guessing! Get the winner to start posting the next 'rade!") in self.responses
+        assert (self.config.channel, "Sorry, but we need to be guessing! Get the winner to start posting the next 'rade!") in self.responses
 
     def test_leaderboard_output(self):
         """ Ensure leaderboard output is consistent """
@@ -58,21 +58,47 @@ class TestBotCommands(EmojiradeBotTester):
 
     def test_fixwinner(self):
         """ Ensure fixwinner does the right thing """
-        self.reset_and_transition_to("guessing")
+        self.reset_and_transition_to("guessed")
 
         state = self.bot.gamestate.state[self.config.channel]
-
-        self.send_event(self.events.correct_guess)
-        assert state["old_winner"] == self.config.player_2
-        assert state["winner"] == self.config.player_3
-        assert self.bot.scorekeeper.current_score(self.config.channel, self.config.player_3) == (1, True)
-        assert self.bot.scorekeeper.current_score(self.config.channel, self.config.player_4) == (0, False)
 
         self.send_event(self.events.fixwinner)
         assert state["old_winner"] == self.config.player_2
         assert state["winner"] == self.config.player_4
         assert self.bot.scorekeeper.current_score(self.config.channel, self.config.player_3) == (0, False)
         assert self.bot.scorekeeper.current_score(self.config.channel, self.config.player_4) == (1, True)
+
+        # Check the user cannot award to themselves
+        self.reset_and_transition_to("guessed")
+
+        state = self.bot.gamestate.state[self.config.channel]
+
+        override = {"text": "<@{0}> fixwinner <@{1}>".format(self.config.bot_id, self.config.player_2)}
+        self.send_event({**self.events.fixwinner, **override})
+
+        expected = ":face_palm: You can't award yourself the win"
+        assert (self.config.channel, expected) in self.responses
+
+        assert state["old_winner"] == self.config.player_2
+        assert state["winner"] == self.config.player_3
+        assert self.bot.scorekeeper.current_score(self.config.channel, self.config.player_3) == (1, True)
+        assert self.bot.scorekeeper.current_score(self.config.channel, self.config.player_4) == (0, False)
+
+        # Check the user cannot award to the winner (no-op)
+        self.reset_and_transition_to("guessed")
+
+        state = self.bot.gamestate.state[self.config.channel]
+
+        override = {"text": "<@{0}> fixwinner <@{1}>".format(self.config.bot_id, self.config.player_3)}
+        self.send_event({**self.events.fixwinner, **override})
+
+        expected = "This won't actually do anything? :shrug::face_with_monocle:"
+        assert (self.config.channel, expected) in self.responses
+
+        assert state["old_winner"] == self.config.player_2
+        assert state["winner"] == self.config.player_3
+        assert self.bot.scorekeeper.current_score(self.config.channel, self.config.player_3) == (1, True)
+        assert self.bot.scorekeeper.current_score(self.config.channel, self.config.player_4) == (0, False)
 
     def test_set_emojirade_banned_words(self):
         """ Ensure that the emojirade can't contain banned words """

@@ -34,6 +34,8 @@ class EmojiradeBotTester(unittest.TestCase):
             events = [self.events.new_game, self.events.posted_emojirade]
         elif state == "guessing":
             events = [self.events.new_game, self.events.posted_emojirade, self.events.posted_emoji]
+        elif state == "guessed":
+            events = [self.events.new_game, self.events.posted_emojirade, self.events.posted_emoji, self.events.correct_guess]
         else:
             raise RuntimeError("Invalid state ({0}) provided to TestPlusPlusBot.transition_to()".format(state))
 

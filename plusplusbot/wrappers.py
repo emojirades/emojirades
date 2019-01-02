@@ -48,7 +48,7 @@ def only_in_progress(command):
         channel = self.args["channel"]
 
         if not self.gamestate.in_progress(channel):
-            yield (None, "Sorry but we need the game to be in progress first! Get someone to kick it off!")
+            yield (None, "Sorry, but we need the game to be in progress first! Get someone to kick it off!")
             return
 
         yield from command(self)
@@ -56,12 +56,25 @@ def only_in_progress(command):
     return wrapped_command
 
 
-def only_actively_guessing(command):
+def only_not_in_progress(command):
     def wrapped_command(self):
         channel = self.args["channel"]
 
-        if not self.gamestate.actively_guessing(channel):
-            yield (None, "Sorry but we need to be actively guessing! Get the winner to start posting the next 'rade!")
+        if not self.gamestate.not_in_progress(channel):
+            yield (None, "Sorry, but the game cannot be in progress! Wait for the round to finish or manually fix it!")
+            return
+
+        yield from command(self)
+
+    return wrapped_command
+
+
+def only_guessing(command):
+    def wrapped_command(self):
+        channel = self.args["channel"]
+
+        if not self.gamestate.guessing(channel):
+            yield (None, "Sorry, but we need to be guessing! Get the winner to start posting the next 'rade!")
             return
 
         yield from command(self)
