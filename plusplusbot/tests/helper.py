@@ -1,5 +1,5 @@
 from plusplusbot.bot import PlusPlusBot
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 
 import unittest
 import tempfile
@@ -14,14 +14,16 @@ class EmojiradeBotTester(unittest.TestCase):
     Base testing class that creates a bot that will accept events to test against
     """
 
-    @patch("time.sleep", side_effect=InterruptedError)
-    def send_event(self, event, sleep):
-        self.bot.slack.sc.rtm_read.return_value = [event]
+    def send_event(self, event):
+        web_client = Mock()
+        web_client.chat_postMessage = self.save_responses
 
-        try:
-            self.bot.listen_for_commands()
-        except InterruptedError:
-            pass
+        payload = {
+          "data": event,
+          "web_client": web_client,
+        }
+
+        self.bot.handle_event(payload)
 
     def reset_and_transition_to(self, state):
         """ From the beginning state, transition to another state the user wants """
@@ -42,8 +44,8 @@ class EmojiradeBotTester(unittest.TestCase):
         for event in events:
             self.send_event(event)
 
-    def save_responses(self, channel, message):
-        self.responses.append((channel, message))
+    def save_responses(self, channel, text):
+        self.responses.append((channel, text))
 
     def find_im(self, user_id):
         return user_id.replace("U", "D")
@@ -51,8 +53,9 @@ class EmojiradeBotTester(unittest.TestCase):
     def pretty_name(self, user_id):
         return user_id
 
-    @patch("plusplusbot.bot.SlackClient")
-    def setUp(self, slack_client):
+    @patch("slack.RTMClient", autospec=True)
+    @patch("slack.WebClient", autospec=True)
+    def setUp(self, web_client, rtm_client):
         self.responses = []
         self.config, self.events = self.prepare_event_data()
 
@@ -63,9 +66,6 @@ class EmojiradeBotTester(unittest.TestCase):
 
         self.bot = PlusPlusBot(self.scorefile.name, self.statefile.name)
         self.bot.slack.bot_id = self.config.bot_id
-
-        # Override bot functions
-        self.bot.slack.sc.rtm_send_message = self.save_responses
         self.bot.slack.find_im = self.find_im
         self.bot.slack.pretty_name = self.pretty_name
 
