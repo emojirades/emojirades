@@ -58,7 +58,7 @@ class SetEmojirade(GameStateCommand):
         else:
             alternatives = ""
 
-        msg = "Hey, <@{user}> made the 'rade `{first}`{alternatives}, good luck!".format(
+        msg = "Hey, <@{user}> made the emojirade `{first}`{alternatives}, good luck!".format(
             **self.args,
             first=raw_emojirades[0],
             alternatives=alternatives

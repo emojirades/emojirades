@@ -126,7 +126,7 @@ class TestBotCommands(EmojiradeBotTester):
         self.send_event({**self.events.posted_emojirade, **override})
 
         assert (self.config.player_2_channel,
-                "Hey, <@{old_winner}> made the 'rade `{emojirade}`, good luck!".format(
+                "Hey, <@{old_winner}> made the emojirade `{emojirade}`, good luck!".format(
                     old_winner=self.config.player_1,
                     emojirade=emojirade
                 )) in self.responses
@@ -141,7 +141,7 @@ class TestBotCommands(EmojiradeBotTester):
         self.send_event({**self.events.posted_emojirade, **override})
 
         assert (self.config.player_2_channel,
-                "Hey, <@{old_winner}> made the 'rade `foo`, with alternatives `bar`, good luck!".format(
+                "Hey, <@{old_winner}> made the emojirade `foo`, with alternatives `bar`, good luck!".format(
                     old_winner=self.config.player_1,
                     emojirade=emojirade
                 )) in self.responses
