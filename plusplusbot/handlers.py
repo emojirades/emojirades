@@ -23,7 +23,7 @@ class ConfigurationHandler(object):
                 else:
                     raise TypeError(miss_positional.format(self, arg, pos))
             elif arg in kwargs:
-                    setattr(self, arg, kwargs["filename"])
+                setattr(self, arg, kwargs["filename"])
             else:
                 raise TypeError(miss_keyword.format(self, arg))
 
