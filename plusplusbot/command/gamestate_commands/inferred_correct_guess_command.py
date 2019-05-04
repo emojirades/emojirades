@@ -1,4 +1,5 @@
 from plusplusbot.command.gamestate_commands.gamestate_command import GameStateCommand
+from plusplusbot.helpers import sanitize_emojirade
 from plusplusbot.wrappers import only_guessing
 
 import random
@@ -33,6 +34,9 @@ class InferredCorrectGuess(GameStateCommand):
 
         state = self.gamestate.state[self.args["channel"]]
 
+        # Save a copy of the emojirade, as below clears it
+        raw_emojirades = list(state["emojirade"])
+
         self.gamestate.correct_guess(self.args["channel"], self.args["target_user"])
         score, is_first = self.scorekeeper.plusplus(self.args["channel"], self.args["target_user"])
 
@@ -41,7 +45,16 @@ class InferredCorrectGuess(GameStateCommand):
         else:
             emoji = ""
 
+        first_emojirade = raw_emojirades[0]
+
+        if len(raw_emojirades) > 1:
+            alternatives = ", with alternatives " + " OR ".join(["`{0}`".format(i) for i in raw_emojirades[1:]])
+        else:
+            alternatives = ""
+
         yield (None, "<@{0}>++".format(state["winner"]))
         yield (None, "Congrats <@{0}>, you're now at {1} point{2}{3}".format(state["winner"], score, "s" if score > 1 else "", emoji))
+        yield (None, "The correct emojirade was `{0}`{1}".format(first_emojirade, alternatives))
+
         yield (state["old_winner"], "You'll now need to send me the new 'rade for <@{0}>".format(state["winner"]))
         yield (state["old_winner"], "Please reply back in the format `emojirade Point Break` if `Point Break` was the new 'rade")

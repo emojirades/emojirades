@@ -1,24 +1,30 @@
-from slackclient import SlackClient as SC
+import slack
 
 
 class SlackClient(object):
-    def __init__(self, config, logger):
-        self.config = config
+    def __init__(self, token, logger):
+        self.token = token
         self.logger = logger
-        self.sc = SC(config)
+
+        self.rtmclient = slack.RTMClient(token=token)
+        self.webclient = slack.WebClient(token=token, timeout=30)
+
         self.ready = False
         self.last_ts = float(0)
 
-        self.bot_id = self.sc.api_call("auth.test")["user_id"]
+        self.bot_id = self.webclient.auth_test()["user_id"]
         self.bot_name = self.user_info(self.bot_id)["real_name"]
 
-        if self.sc.rtm_connect():
+        if self.rtmclient.start():
             self.ready = True
 
         self.pretty_names = dict()
 
+    def start(self):
+        self.rtmclient.start()
+
     def user_info(self, user_id):
-        return self.sc.api_call("users.info", user=user_id)["user"]
+        return self.webclient.users_info(user=user_id)["user"]
 
     def is_bot(self, user_id):
         return self.user_info(user_id)["is_bot"] or userid == "USLACKBOT"
@@ -44,13 +50,13 @@ class SlackClient(object):
 
     def find_im(self, user_id):
         # Find an existing IM (direct message) ID
-        response = self.sc.api_call("im.open", user=user_id)
+        response = self.webclient.im_open(user=user_id)
 
         if response["ok"]:
             return response["channel"]["id"]
 
         # Attemp to locate an existing IM
-        for im in self.sc.api_call("im.list")["ims"]:
+        for im in self.webclient.im_list()["ims"]:
             if im["user"] == userid:
                 return im["id"]
 

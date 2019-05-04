@@ -133,7 +133,7 @@ class TestBotScenarios(EmojiradeBotTester):
         # Expected *new* responses
         responses = [
             response(self.config.player_2_channel,
-                     "Hey, <@{0}> made the 'rade `{1}`, good luck!".format(self.config.player_1, self.config.emojirade)),
+                     "Hey, <@{0}> made the emojirade `{1}`, good luck!".format(self.config.player_1, self.config.emojirade)),
             response(self.config.player_1_channel,
                      "Thanks for that! I've let <@{0}> know!".format(self.config.player_2)),
             response(self.config.channel,
@@ -160,6 +160,7 @@ class TestBotScenarios(EmojiradeBotTester):
         responses = [
             response(self.config.channel, "<@{0}>\\+\\+".format(self.config.player_3)),
             response(self.config.channel, "Congrats <@{0}>, you're now at 1 point :[a-z_]+:".format(self.config.player_3)),
+            response(self.config.channel, "The correct emojirade was `{0}`".format(self.config.emojirade)),
             response(self.config.player_2_channel, "You'll now need to send me the new 'rade for <@{0}>".format(self.config.player_3)),
             response(self.config.player_2_channel, "Please reply back in the format `emojirade Point Break` if `Point Break` was the new 'rade"),
         ]
