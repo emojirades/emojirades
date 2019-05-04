@@ -5,7 +5,7 @@ import time
 from plusplusbot.command.command_registry import CommandRegistry
 from plusplusbot.scorekeeper import ScoreKeeper
 from plusplusbot.gamestate import GameState
-from plusplusbot.slack import SlackClient
+from plusplusbot.slack import SlackClient, slack
 
 module_logger = logging.getLogger("PlusPlusBot.bot")
 
@@ -80,30 +80,33 @@ class PlusPlusBot(object):
         else:
             raise NotImplementedError("Returned channel '{0}' wasn't decoded".format(channel))
 
-    def listen_for_commands(self):
+    @slack.RTMClient.run_on(event="message")
+    def handle_event_with_slack(self, **payload):
+        self.handle_event(payload)
+
+    def handle_event(self, payload):
         commands = CommandRegistry.prepare_commands()
 
-        if not self.slack.ready:
-            raise RuntimeError("Slack Client failed to ready up!")
+        event = payload["data"]
+        webclient = payload["web_client"]
 
-        self.logger.info("Slack is connected and listening for commands")
+        if not self.valid_event(event):
+            self.logger.debug("Skipping event due to being invalid")
+            return
 
-        while True:
-            for event in self.slack.sc.rtm_read():
-                if not self.valid_event(event):
-                    self.logger.debug("Skipping event due to being invalid")
-                    continue
+        for command in self.match_event(event, commands):
+            self.logger.debug("Matched {0} for event {1}".format(command, event))
 
-                for command in self.match_event(event, commands):
-                    self.logger.debug("Matched {0} for event {1}".format(command, event))
+            for channel, response in command.execute():
+                self.logger.debug("Command {0} executed with response: {1}".format(command, (channel, response)))
+                if channel is not None:
+                    channel = self.decode_channel(channel)
+                else:
+                    channel = self.decode_channel(event["channel"])
 
-                    for channel, response in command.execute():
-                        self.logger.debug("Command {0} executed with response: {1}".format(command, (channel, response)))
-                        if channel is not None:
-                            channel = self.decode_channel(channel)
-                        else:
-                            channel = self.decode_channel(event["channel"])
+                webclient.chat_postMessage(channel=channel, text=response)
 
-                        self.slack.sc.rtm_send_message(channel, response)
+    def listen_for_commands(self):
 
-            time.sleep(1)
+        self.logger.info("Starting Slack monitor")
+        self.slack.start()
