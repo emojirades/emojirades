@@ -1,5 +1,4 @@
 from plusplusbot.command.gamestate_commands.gamestate_command import GameStateCommand
-from plusplusbot.helpers import sanitize_emojirade
 from plusplusbot.wrappers import only_guessing
 
 import random

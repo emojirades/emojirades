@@ -1,6 +1,6 @@
 from plusplusbot.command.gamestate_commands.gamestate_command import GameStateCommand
 from plusplusbot.wrappers import only_in_progress
-from plusplusbot.helpers import sanitize_emojirade
+from plusplusbot.helpers import sanitize_text
 from plusplusbot.checks import emojirade_is_banned
 
 
@@ -46,7 +46,7 @@ class SetEmojirade(GameStateCommand):
 
         # Break the alternatives out and sanitize the emojirade (apply consistent sanitization)
         raw_emojirades = [i.strip() for i in self.args["emojirade"].split("|")]
-        sanitized_emojirades = [sanitize_emojirade(i) for i in raw_emojirades]
+        sanitized_emojirades = [sanitize_text(i) for i in raw_emojirades]
 
         self.gamestate.set_emojirade(self.args["channel"], sanitized_emojirades)
 
