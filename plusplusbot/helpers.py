@@ -8,7 +8,7 @@ class ScottFactorExceededException(Exception):
     pass
 
 
-remove_punctuation = string.maketrans('', '', string.punctuation)
+remove_punctuation = str.maketrans('', '', string.punctuation)
 
 
 def sanitize_emojirade(text):
