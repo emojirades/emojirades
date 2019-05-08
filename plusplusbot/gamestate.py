@@ -6,7 +6,7 @@ from collections import defaultdict
 
 from plusplusbot.command.gamestate_commands.inferred_correct_guess_command import InferredCorrectGuess
 from plusplusbot.handlers import get_configuration_handler
-from plusplusbot.helpers import sanitize_emojirade, match_emojirade
+from plusplusbot.helpers import sanitize_text, match_emojirade
 
 from plusplusbot.command.commands import Command
 from plusplusbot.helpers import ScottFactorExceededException
@@ -140,7 +140,7 @@ class GameState(object):
 
         # Check to see if the users guess is right!
         elif state["step"] == "guessing" and user not in (state["old_winner"], state["winner"]):
-            guess = sanitize_emojirade(text)
+            guess = sanitize_text(text)
 
             try:
                 if match_emojirade(guess, state["emojirade"]):

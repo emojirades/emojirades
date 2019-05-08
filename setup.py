@@ -27,7 +27,8 @@ setup(
         "requests",
         "slackclient",
         "boto3",
-        "Unidecode"
+        "Unidecode",
+        "inflect",
     ],
     python_requires="~=3.7",
     extras_require={

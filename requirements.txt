@@ -2,3 +2,4 @@ requests
 slackclient
 boto3
 Unidecode
+inflect
