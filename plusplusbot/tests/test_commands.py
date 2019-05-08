@@ -134,9 +134,9 @@ class TestBotCommands(EmojiradeBotTester):
     def test_set_emojirade_plurals(self):
         """ Ensure depluralization is as expected """
         cases = [
-            ("when the cow's come home", "when the cows come home"), # No action
-            ("australian banks", "australian bank"),                 # Action
-            ("Michael Rogers", "michael roger"),                     # Action
+            ("when the cow's come home", "when the cows come home"),  # No action
+            ("australian banks", "australian bank"),                  # Action
+            ("Michael Rogers", "michael roger"),                      # Action
         ]
 
         for emojirade, expected in cases:
