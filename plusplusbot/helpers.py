@@ -26,7 +26,7 @@ def depluralize(text):
 
     tokens = text.split(' ')
 
-    singular_noun = inflect_engine.singular_noun(token[-1])
+    singular_noun = inflect_engine.singular_noun(tokens[-1])
 
     if singular_noun:
         tokens[-1] = singular_noun

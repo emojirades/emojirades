@@ -131,6 +131,23 @@ class TestBotCommands(EmojiradeBotTester):
                     emojirade=emojirade
                 )) in self.responses
 
+    def test_set_emojirade_plurals(self):
+        """ Ensure depluralization is as expected """
+        cases = [
+            ("when the cow's come home", "when the cows come home"), # No action
+            ("australian banks", "australian bank"),                 # Action
+            ("Michael Rogers", "michael roger"),                     # Action
+        ]
+
+        for emojirade, expected in cases:
+            self.reset_and_transition_to("waiting")
+
+            override = {"text": "emojirade {0}".format(emojirade)}
+            self.send_event({**self.events.posted_emojirade, **override})
+
+            state = self.bot.gamestate.state[self.config.channel]
+            assert state["emojirade"][0] == expected
+
     def test_set_emojirade_alternatives_output(self):
         """ Ensure that the emojirade alternatives output is expected """
         self.reset_and_transition_to("waiting")
