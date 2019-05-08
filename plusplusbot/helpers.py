@@ -1,4 +1,5 @@
 import re
+import string
 
 from unidecode import unidecode
 
@@ -7,20 +8,23 @@ class ScottFactorExceededException(Exception):
     pass
 
 
+remove_punctuation = str.maketrans('', '', string.punctuation)
+
+
 def sanitize_emojirade(text):
+    # unidecode will normalize to ASCII
+    normalized = unidecode(text)
+
     # Lowercase the text
-    lowered = text.lower()
+    lowered = normalized.lower()
 
     # Strip whitespace
     stripped = lowered.strip()
 
     # Remove any random misc chars we deem unnessesary
-    scrubbed = re.sub("['\"-_+=]", "", stripped)
+    scrubbed = stripped.translate(remove_punctuation)
 
-    # unidecode will normalize to ASCII
-    normalized = unidecode(scrubbed)
-
-    return normalized
+    return scrubbed
 
 
 def match_emojirade(guess, emojirades, scott_factor=2):
