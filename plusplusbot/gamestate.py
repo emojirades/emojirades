@@ -6,7 +6,7 @@ from collections import defaultdict
 
 from plusplusbot.command.gamestate_commands.inferred_correct_guess_command import InferredCorrectGuess
 from plusplusbot.handlers import get_configuration_handler
-from plusplusbot.helpers import sanitize_text, match_emojirade
+from plusplusbot.helpers import sanitize_text, match_emojirade, match_emoji
 
 from plusplusbot.command.commands import Command
 from plusplusbot.helpers import ScottFactorExceededException
@@ -134,8 +134,7 @@ class GameState(object):
         state = self.state[channel]
 
         # Check to see if the winner is posting emoji's
-        if state["step"] == "provided" and user == state["winner"] and ':' in text:
-            # ':' means they've posted an emoji :thinking_face:
+        if state["step"] == "provided" and user == state["winner"] and match_emoji(text):
             self.winner_posted(channel)
 
         # Check to see if the users guess is right!

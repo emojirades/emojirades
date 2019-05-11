@@ -12,6 +12,8 @@ class ScottFactorExceededException(Exception):
 remove_punctuation = str.maketrans('', '', string.punctuation)
 inflect_engine = inflect.engine()
 
+emoji_regex = re.compile(r":[a-zA-Z0-9-_']+:")
+
 
 def depluralize(text):
     """
@@ -62,3 +64,7 @@ def match_emojirade(guess, emojirades, scott_factor=2):
             return True
 
     return False
+
+
+def match_emoji(text):
+    return bool(emoji_regex.match(text))
