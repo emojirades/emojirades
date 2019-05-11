@@ -26,7 +26,7 @@ class SetEmojirade(GameStateCommand):
                 self.args["channel"] = channel_name
                 break
         else:
-            raise RuntimeError("Unable to find the correct channel for '{0}'".format(self.args["channel"]))
+            self.args["channel"] = None
 
     @only_in_progress
     def execute(self):
@@ -37,7 +37,7 @@ class SetEmojirade(GameStateCommand):
             return
 
         if self.args["channel"] is None:
-            yield (None, "We were unable to figure out the correct channel, please raise this issue!")
+            yield (None, "There is no current game waiting for a new emojirade!")
             return
 
         if emojirade_is_banned(self.args["emojirade"]):
