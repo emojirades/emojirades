@@ -36,5 +36,5 @@ setup(
     },
     scripts=["bin/emojirades-plusplus"],
     author="Michael Robbins",
-    author_email="dont-spam-me@dont-spam-me.com"
+    author_email="support@emojirades.io",
 )

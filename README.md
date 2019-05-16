@@ -51,10 +51,19 @@ sudo systemctl daemon-reload
 sudo systemctl enable emojirades
 sudo systemctl start emojirades
 ```
-
-
 # Release process (for master branch)
 1. Create release branch containing new version in setup.py
 2. Perform a PR into master
 3. Perform release in GitHub
 4. TravisCI will automatically build and deploy on a tagged commit into master (the release does this)
+
+# Dealing with Containers
+## Building the Container Image
+```
+docker build --no-cache -t michaelrobbins/emojirades:latest .
+```
+
+## Running the Container
+```
+docker run -d --name emojirades --restart=always -v /path/to/your/.aws/:/root/.aws/:ro -e "AWS_PROFILE=emojirades" michaelrobbins/emojirades:latest
+```
