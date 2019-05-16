@@ -163,6 +163,18 @@ class TestBotCommands(EmojiradeBotTester):
                     emojirade=emojirade
                 )) in self.responses
 
+    def test_set_emojirade_public_channel(self):
+        """ Ensure that the emojirade can only be set in a DM channel """
+        self.reset_and_transition_to("waiting")
+
+        override = {"channel": self.config.channel}
+        self.send_event({**self.events.posted_emojirade, **override})
+
+        print(self.responses)
+        assert (self.config.player_1_channel,
+                "Sorry, but this command can only be sent as a direct message!"
+                ) in self.responses
+
     def test_user_override(self):
         self.reset_and_transition_to("guessing")
 
