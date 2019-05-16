@@ -60,10 +60,19 @@ sudo systemctl start emojirades
 # Dealing with Containers
 ## Building the Container Image
 ```
-docker build --no-cache -t michaelrobbins/emojirades:latest .
+docker build --pull --no-cache -t michaelrobbins/emojirades:X.Y.Z -t michaelrobbins/emojirades:latest .
 ```
 
 ## Running the Container
 ```
-docker run -d --name emojirades --restart=always -v /path/to/your/.aws/:/root/.aws/:ro -e "AWS_PROFILE=emojirades" michaelrobbins/emojirades:latest
+docker run -d \
+  --name emojirades \
+  --restart=always \
+  -v "/path/to/your/.aws/:/root/.aws/:ro" \
+  -e "AWS_PROFILE=emojirades" \
+  -e "SLACK_BOT_TOKEN=xoxb-111111111111-222222222222222222222222" \
+  michaelrobbins/emojirades:X.Y.Z \
+    --score-file /path/to/scores.json \
+    --state-file /path/to/state.json \
+    -vv
 ```
