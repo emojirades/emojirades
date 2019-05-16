@@ -80,3 +80,16 @@ def only_guessing(command):
         yield from command(self)
 
     return wrapped_command
+
+
+def only_as_direct_message(command):
+    def wrapped_command(self):
+        channel = self.args["channel"]
+
+        if not channel.startswith("D"):
+            yield (None, "Sorry, but this command can only be sent as a direct message!")
+            return
+
+        yield from command(self)
+
+    return wrapped_command
