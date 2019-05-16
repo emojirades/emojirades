@@ -1,5 +1,5 @@
 from plusplusbot.command.gamestate_commands.gamestate_command import GameStateCommand
-from plusplusbot.wrappers import only_in_progress
+from plusplusbot.wrappers import only_in_progress, only_as_direct_message
 from plusplusbot.helpers import sanitize_text
 from plusplusbot.checks import emojirade_is_banned
 
@@ -19,8 +19,12 @@ class SetEmojirade(GameStateCommand):
     def prepare_args(self, event):
         super().prepare_args(event)
 
+        # No matter what the final channel is, save the original one
+        # This will override the 'original_channel' from an admin override
+        # /shrug
+        self.args["original_channel"] = self.args["channel"]
+
         # Figure out the channel to use
-        # TODO: Decide if we should be getting the user to explicitly specify the channel?
         for channel_name, channel in self.gamestate.state.items():
             if channel["step"] == "waiting":
                 self.args["channel"] = channel_name
@@ -28,6 +32,7 @@ class SetEmojirade(GameStateCommand):
         else:
             self.args["channel"] = None
 
+    @only_as_direct_message
     @only_in_progress
     def execute(self):
         yield from super().execute()
