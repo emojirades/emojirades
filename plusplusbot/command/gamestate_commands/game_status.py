@@ -37,8 +37,8 @@ class GameStatus(GameStateCommand):
         # First item is game state (step)
         step_msg = {
             "new_game": "Game has not started yet, please wait for an admin to start it!",
-            "waiting": "Waiting for {old_winner} to provide a 'rade to {winner_name}",
-            "provided": "Waiting for {winner} to post an emoji to kick off the round!",
+            "waiting": "Waiting for {old_winner_name} to provide a 'rade to {winner_name}",
+            "provided": "Waiting for {winner_name} to post an emoji to kick off the round!",
             "guessing": "Come on, everyone's guessing what {winner_name} has posted! Get to it! :runner::dash:",
         }
 
