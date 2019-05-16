@@ -9,14 +9,10 @@ class SlackClient(object):
         self.rtmclient = slack.RTMClient(token=token)
         self.webclient = slack.WebClient(token=token, timeout=30)
 
-        self.ready = False
         self.last_ts = float(0)
 
         self.bot_id = self.webclient.auth_test()["user_id"]
         self.bot_name = self.user_info(self.bot_id)["real_name"]
-
-        if self.rtmclient.start():
-            self.ready = True
 
         self.pretty_names = dict()
 

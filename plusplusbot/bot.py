@@ -80,11 +80,7 @@ class PlusPlusBot(object):
         else:
             raise NotImplementedError("Returned channel '{0}' wasn't decoded".format(channel))
 
-    @slack.RTMClient.run_on(event="message")
-    def handle_event_with_slack(self, **payload):
-        self.handle_event(payload)
-
-    def handle_event(self, payload):
+    def handle_event(self, **payload):
         commands = CommandRegistry.prepare_commands()
 
         event = payload["data"]
@@ -107,6 +103,5 @@ class PlusPlusBot(object):
                 webclient.chat_postMessage(channel=channel, text=response)
 
     def listen_for_commands(self):
-
         self.logger.info("Starting Slack monitor")
         self.slack.start()

@@ -23,7 +23,7 @@ class EmojiradeBotTester(unittest.TestCase):
           "web_client": web_client,
         }
 
-        self.bot.handle_event(payload)
+        self.bot.handle_event(**payload)
 
     def reset_and_transition_to(self, state):
         """ From the beginning state, transition to another state the user wants """

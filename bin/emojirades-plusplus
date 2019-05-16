@@ -4,6 +4,7 @@ from plusplusbot.bot import PlusPlusBot
 
 import argparse
 import logging
+import slack
 import sys
 
 
@@ -25,8 +26,12 @@ if __name__ == "__main__":
 
     logging.basicConfig(level=log_level)
     logger = logging.getLogger("PlusPlusBot")
-    logger.debug("Initialised application")
 
     bot = PlusPlusBot(args.score_file, args.state_file)
+    logger.debug("Initialised application")
+
+    # Register the event callback
+    slack.RTMClient.on(event="message", callback=bot.handle_event)
+
     logger.info("Listening for commands")
     bot.listen_for_commands()
