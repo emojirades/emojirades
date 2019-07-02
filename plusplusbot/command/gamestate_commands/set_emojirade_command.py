@@ -9,7 +9,7 @@ class SetEmojirade(GameStateCommand):
     short_description = "Sets the new emojirade"
 
     patterns = (
-        r"^emojirade (?P<emojirade>.+)",
+        r"^emojirade[s]{0,1} (?P<emojirade>.+)",
     )
     example = "emojirade foobar"
 
