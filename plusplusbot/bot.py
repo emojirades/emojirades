@@ -85,6 +85,7 @@ class PlusPlusBot(object):
 
         event = payload["data"]
         webclient = payload["web_client"]
+        self.slack.set_webclient(webclient)
 
         if not self.valid_event(event):
             self.logger.debug("Skipping event due to being invalid")
