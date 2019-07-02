@@ -7,7 +7,7 @@ with open(path.join(this_directory, "README.md"), encoding="utf-8") as f:
 
 setup(
     name="Emojirades PlusPlus",
-    version="0.6.2",
+    version="0.7.0",
     description="A Slack bot that understands the Emojirades game!",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -32,7 +32,7 @@ setup(
     ],
     python_requires="~=3.7",
     extras_require={
-        "test": ["pytest"],
+        "test": ["pytest", "pycodestyle"],
     },
     scripts=["bin/emojirades-plusplus"],
     author="Michael Robbins",

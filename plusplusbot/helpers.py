@@ -67,4 +67,4 @@ def match_emojirade(guess, emojirades, scott_factor=2):
 
 
 def match_emoji(text):
-    return bool(emoji_regex.match(text))
+    return bool(emoji_regex.search(text))

@@ -330,3 +330,26 @@ class TestBotScenarios(EmojiradeBotTester):
         override = {"text": "0 a{0}b 1".format(self.events.correct_guess["text"])}
         self.send_event({**self.events.correct_guess, **override})
         assert self.state["step"] == "guessing"
+
+    def test_emoji_detection(self):
+        """ Performs tests to ensure when an emoji is posted the game progresses in state """
+        self.reset_and_transition_to("provided")
+
+        # Valid emoji
+        override = {"text": ":gun:"}
+        self.send_event({**self.events.posted_emoji, **override})
+        assert self.state["step"] == "guessing"
+
+        # Invalid emoji
+        self.reset_and_transition_to("provided")
+
+        override = {"text": ":gun"}
+        self.send_event({**self.events.posted_emoji, **override})
+        assert self.state["step"] == "provided"
+
+        # Emoji in middle of text
+        self.reset_and_transition_to("provided")
+
+        override = {"text": "gun :gun: gun"}
+        self.send_event({**self.events.posted_emoji, **override})
+        assert self.state["step"] == "guessing"
