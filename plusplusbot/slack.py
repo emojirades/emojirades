@@ -19,6 +19,9 @@ class SlackClient(object):
     def start(self):
         self.rtmclient.start()
 
+    def set_webclient(self, webclient):
+        self.webclient = webclient
+
     def user_info(self, user_id):
         return self.webclient.users_info(user=user_id)["user"]
 
