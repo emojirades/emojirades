@@ -194,3 +194,21 @@ class TestBotCommands(EmojiradeBotTester):
         for command in commands.values():
             assert re.compile(r"{0}\s+{1}".format(re.escape(command.example), re.escape(command.short_description))) \
                      .search(self.responses[-2][1])
+
+    def test_game_status(self):
+        self.reset_and_transition_to("waiting")
+        self.send_event(self.events.game_status)
+
+        assert (self.config.channel,
+                "Status: Waiting for <@{0}> to provide a 'rade to {1}".format(
+                    self.config.player_1,
+                    self.config.player_2,
+                )) in self.responses
+
+        self.reset_and_transition_to("provided")
+        self.send_event(self.events.game_status)
+
+        assert (self.config.channel,
+                "Status: Waiting for <@{0}> to post an emoji to kick off the round!".format(
+                    self.config.player_2,
+                )) in self.responses
