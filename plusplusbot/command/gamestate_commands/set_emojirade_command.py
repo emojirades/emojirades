@@ -11,7 +11,7 @@ class SetEmojirade(GameStateCommand):
     patterns = (
         r"^emojirade[s]* (?P<emojirade>.+)",
     )
-    example = "emojirade foobar"
+    example = "emojirade foo | bar | foobar"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
