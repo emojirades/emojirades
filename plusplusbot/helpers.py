@@ -20,8 +20,8 @@ def sanitize_text(text):
     # Lowercase the text
     lowered = normalized.lower()
 
-    # Strip whitespace
-    stripped = lowered.strip()
+    # Strip excess whitespace
+    stripped = ' '.join(lowered.split())
 
     # Remove any random misc chars we deem unnessesary
     scrubbed = stripped.translate(remove_punctuation)
