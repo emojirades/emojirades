@@ -20,13 +20,13 @@ def sanitize_text(text):
     # Lowercase the text
     lowered = normalized.lower()
 
-    # Strip whitespace
-    stripped = lowered.strip()
-
     # Remove any random misc chars we deem unnessesary
-    scrubbed = stripped.translate(remove_punctuation)
+    scrubbed = lowered.translate(remove_punctuation)
 
-    return scrubbed
+    # Strip excess whitespace
+    stripped = ' '.join(scrubbed.split())
+
+    return stripped
 
 
 def match_emojirade(guess, emojirades, scott_factor=2):

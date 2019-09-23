@@ -331,6 +331,15 @@ class TestBotScenarios(EmojiradeBotTester):
         self.send_event({**self.events.correct_guess, **override})
         assert self.state["step"] == "guessing"
 
+    def test_sanitization(self):
+        """ Test that the sanitize_text helper works as expected """
+        self.reset_and_transition_to("waiting")
+
+        override = {"text": u'emojirade   Späce : THE\t\t\tfinal\v- f_r_ö_n+t/ier'}
+        self.send_event({**self.events.posted_emojirade, **override})
+        assert self.state["step"] == "provided"
+        assert self.state["emojirade"] == ["space the final frontier"]
+
     def test_emoji_detection(self):
         """ Performs tests to ensure when an emoji is posted the game progresses in state """
         self.reset_and_transition_to("provided")
