@@ -112,3 +112,6 @@ ENV/
 scores.csv
 scores.json
 state.json
+
+# macos meta data
+*.DS_STORE
