@@ -150,6 +150,9 @@ class GameState(object):
             except ScottFactorExceededException as e:
                 self.logger.debug("emojirade='{0}' guess='{1}' status='scott factor exceeded'")
 
+            if state.get("first_guess", False):
+                state["first_guess"] = False
+
     def set_admin(self, channel, admin):
         """ Sets a new game admin! """
         if admin in self.state[channel]["admins"]:
@@ -205,6 +208,7 @@ class GameState(object):
             raise self.InvalidStateException("Expecting {0}'s state to be 'provided', it is actually {1}".format(channel, self.state["step"]))
 
         self.state[channel]["step"] = "guessing"
+        self.state[channel]["first_guess"] = True
         self.save()
 
     def correct_guess(self, channel, winner):

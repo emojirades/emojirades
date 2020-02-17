@@ -158,6 +158,7 @@ class TestBotScenarios(EmojiradeBotTester):
 
         # Expected *new* responses
         responses = [
+            response(self.config.channel, "Holy bejesus Batman :bat::man:, they guessed it in one go! :clap:"),
             response(self.config.channel, "<@{0}>\\+\\+".format(self.config.player_3)),
             response(self.config.channel, "Congrats <@{0}>, you're now at 1 point :[a-z_]+:".format(self.config.player_3)),
             response(self.config.channel, "The correct emojirade was `{0}`".format(self.config.emojirade)),

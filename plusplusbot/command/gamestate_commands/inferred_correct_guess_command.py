@@ -51,6 +51,9 @@ class InferredCorrectGuess(GameStateCommand):
         else:
             alternatives = ""
 
+        if state.get("first_guess", False):
+            yield(None, "Holy bejesus Batman :bat::man:, they guessed it in one go! :clap:")
+
         yield (None, "<@{0}>++".format(state["winner"]))
         yield (None, "Congrats <@{0}>, you're now at {1} point{2}{3}".format(state["winner"], score, "s" if score > 1 else "", emoji))
         yield (None, "The correct emojirade was `{0}`{1}".format(first_emojirade, alternatives))
