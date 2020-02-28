@@ -45,7 +45,7 @@ class LeaderboardCommand(ScoreKeeperCommand):
             name = self.slack.pretty_name(name)
             name = name if len(name) < 20 else "{name[0:18]}.."
 
-            lines.append(f"{index:>2}. {name:<{longest_name}} [ {score:>{biggest_score}} point{'s' if score > 1 else ' '} ]"
+            lines.append(f"{index:>2}. {name:<{longest_name}} [ {score:>{biggest_score}} point{'s' if score > 1 else ' '} ]")
 
         lines.append("```")
 
