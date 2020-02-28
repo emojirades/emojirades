@@ -65,8 +65,8 @@ class TestBotCommands(EmojiradeBotTester):
         self.send_event(self.events.fixwinner)
         assert state["old_winner"] == self.config.player_2
         assert state["winner"] == self.config.player_4
-        assert self.bot.scorekeeper.current_score(self.config.channel, self.config.player_3) == (0, False)
-        assert self.bot.scorekeeper.current_score(self.config.channel, self.config.player_4) == (1, True)
+        assert self.bot.scorekeeper.current_score(self.config.channel, self.config.player_3) == (0, 2)
+        assert self.bot.scorekeeper.current_score(self.config.channel, self.config.player_4) == (1, 1)
 
         # Check the user cannot award to themselves
         self.reset_and_transition_to("guessed")
@@ -81,8 +81,8 @@ class TestBotCommands(EmojiradeBotTester):
 
         assert state["old_winner"] == self.config.player_2
         assert state["winner"] == self.config.player_3
-        assert self.bot.scorekeeper.current_score(self.config.channel, self.config.player_3) == (1, True)
-        assert self.bot.scorekeeper.current_score(self.config.channel, self.config.player_4) == (0, False)
+        assert self.bot.scorekeeper.current_score(self.config.channel, self.config.player_3) == (1, 1)
+        assert self.bot.scorekeeper.current_score(self.config.channel, self.config.player_4) == (0, -1)
 
         # Check the user cannot award to the winner (no-op)
         self.reset_and_transition_to("guessed")
@@ -97,8 +97,8 @@ class TestBotCommands(EmojiradeBotTester):
 
         assert state["old_winner"] == self.config.player_2
         assert state["winner"] == self.config.player_3
-        assert self.bot.scorekeeper.current_score(self.config.channel, self.config.player_3) == (1, True)
-        assert self.bot.scorekeeper.current_score(self.config.channel, self.config.player_4) == (0, False)
+        assert self.bot.scorekeeper.current_score(self.config.channel, self.config.player_3) == (1, 1)
+        assert self.bot.scorekeeper.current_score(self.config.channel, self.config.player_4) == (0, -1)
 
     def test_set_emojirade_banned_words(self):
         """ Ensure that the emojirade can't contain banned words """

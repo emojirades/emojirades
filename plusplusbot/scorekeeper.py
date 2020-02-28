@@ -82,8 +82,15 @@ class ScoreKeeper(object):
                 self.logger.info("Loaded scores from {0}".format(filename))
 
     def current_score(self, channel, user):
-        leader, _ = sorted(self.scoreboard[channel]["scores"].items(), key=lambda x: x[1], reverse=True)[0]
-        return self.scoreboard[channel]["scores"][user], user == leader
+        leaderboard = list(map(lambda x: x[0], sorted(self.scoreboard[channel]["scores"].items(), key=lambda x: x[1], reverse=True)))
+
+        try:
+            position = leaderboard.index(user) + 1
+        except ValueError:
+            # User is not in the leaderboard
+            position = -1
+
+        return self.scoreboard[channel]["scores"][user], position
 
     def plusplus(self, channel, user):
         self.scoreboard[channel]["scores"][user] += 1
