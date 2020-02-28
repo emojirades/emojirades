@@ -39,7 +39,7 @@ class EmojiradeBotTester(unittest.TestCase):
         elif state == "guessed":
             events = [self.events.new_game, self.events.posted_emojirade, self.events.posted_emoji, self.events.correct_guess]
         else:
-            raise RuntimeError("Invalid state ({0}) provided to TestPlusPlusBot.transition_to()".format(state))
+            raise RuntimeError(f"Invalid state ({state}) provided to TestPlusPlusBot.transition_to()")
 
         for event in events:
             self.send_event(event)
@@ -122,7 +122,7 @@ class EmojiradeBotTester(unittest.TestCase):
                 **base_event,
                 **{
                     "user": player_1,
-                    "text": "<@{0}> new game <@{1}> <@{2}>".format(bot_id, player_1, player_2),
+                    "text": f"<@{bot_id}> new game <@{player_1}> <@{player_2}>",
                 },
             },
             "posted_emojirade": {
@@ -130,7 +130,7 @@ class EmojiradeBotTester(unittest.TestCase):
                 **{
                     "channel": bot_channel,
                     "user": player_1,
-                    "text": "emojirade {0}".format(emojirade),
+                    "text": f"emojirade {emojirade}",
                 },
             },
             "posted_emoji": {
@@ -158,42 +158,42 @@ class EmojiradeBotTester(unittest.TestCase):
                 **base_event,
                 **{
                     "user": player_2,
-                    "text": "<@{0}>++".format(player_3),
+                    "text": f"<@{player_3}>++",
                 },
             },
             "plusplus": {
                 **base_event,
                 **{
                     "user": player_1,
-                    "text": "<@{0}>++".format(player_2),
+                    "text": f"<@{player_2}>++",
                 },
             },
             "leaderboard": {
                 **base_event,
                 **{
                     "user": player_1,
-                    "text": "<@{0}> leaderboard".format(bot_id),
+                    "text": f"<@{bot_id}> leaderboard",
                 },
             },
             "game_status": {
                 **base_event,
                 **{
                     "user": player_1,
-                    "text": "<@{0}> game status".format(bot_id),
+                    "text": f"<@{bot_id}> game status",
                 },
             },
             "help": {
                 **base_event,
                 **{
                     "user": player_1,
-                    "text": "<@{0}> help".format(bot_id),
+                    "text": f"<@{bot_id}> help",
                 },
             },
             "fixwinner": {
                 **base_event,
                 **{
                     "user": player_2,
-                    "text": "<@{0}> fixwinner <@{1}>".format(bot_id, player_4),
+                    "text": f"<@{bot_id}> fixwinner <@{player_4}>",
                 },
             },
         }

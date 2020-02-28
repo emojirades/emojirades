@@ -22,6 +22,6 @@ class RemoveAdmin(GameStateCommand):
         yield from super().execute()
 
         if self.gamestate.remove_admin(self.args["channel"], self.args["admin"]):
-            yield (None, "<@{admin}> has been demoted to a pleb :cold_sweat:".format(**self.args))
+            yield (None, f"<@{self.args['admin']}> has been demoted to a pleb :cold_sweat:")
         else:
-            yield (None, "<@{admin}> isn't an admin :face_with_rolling_eyes:".format(**self.args))
+            yield (None, f"<@{self.args['admin']}> isn't an admin :face_with_rolling_eyes:")

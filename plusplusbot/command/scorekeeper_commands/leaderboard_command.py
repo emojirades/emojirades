@@ -18,7 +18,7 @@ class LeaderboardCommand(ScoreKeeperCommand):
 
         leaderboard = self.scorekeeper.leaderboard(self.args["channel"])
 
-        self.logger.debug("Printing leaderboard: {0}".format(leaderboard))
+        self.logger.debug(f"Printing leaderboard: {leaderboard}")
 
         if not leaderboard:
             yield (None, "Nothing to see here!")
@@ -41,17 +41,11 @@ class LeaderboardCommand(ScoreKeeperCommand):
             if score_length > biggest_score:
                 biggest_score = score_length
 
-        for index, (name, score) in enumerate(leaderboard):
+        for index, (name, score) in enumerate(leaderboard, start=1):
             name = self.slack.pretty_name(name)
+            name = name if len(name) < 20 else "{name[0:18]}.."
 
-            lines.append("{0:>2}. {1:<{name_width}} [ {2:>{point_width}} point{3} ]".format(
-                index + 1,
-                name if len(name) < 20 else "{0}..".format(name[0:18]),
-                score,
-                "s" if score > 1 else " ",
-                name_width=longest_name,
-                point_width=biggest_score,
-            ))
+            lines.append(f"{index:>2}. {name:<{longest_name}} [ {score:>{biggest_score}} point{'s' if score > 1 else ' '} ]")
 
         lines.append("```")
 

@@ -5,11 +5,11 @@ import re
 from collections import defaultdict
 
 from plusplusbot.command.gamestate_commands.inferred_correct_guess_command import InferredCorrectGuess
-from plusplusbot.handlers import get_configuration_handler
 from plusplusbot.helpers import sanitize_text, match_emojirade, match_emoji
+from plusplusbot.handlers import get_configuration_handler
 
-from plusplusbot.command.commands import Command
 from plusplusbot.helpers import ScottFactorExceededException
+from plusplusbot.command.commands import Command
 
 module_logger = logging.getLogger("PlusPlusBot.gamestate")
 
@@ -90,7 +90,7 @@ class GameState(object):
 
             if existing_state is not None:
                 self.state.update(existing_state)
-                self.logger.info("Loaded game state from {0}".format(filename))
+                self.logger.info(f"Loaded game state from {filename}")
 
     def in_progress(self, channel):
         return self.state[channel]["step"] not in ("new_game",)
@@ -143,12 +143,12 @@ class GameState(object):
 
             try:
                 if match_emojirade(guess, state["emojirade"]):
-                    self.logger.debug("emojirades='{0}' guess='{1}' status='correct'".format('|'.join(state["emojirade"]), guess))
+                    self.logger.debug(f"emojirades='{'|'.join(state['emojirade'])}' guess='{guess}' status='correct'")
                     yield InferredCorrectGuess
                 else:
-                    self.logger.debug("emojirades='{0}' guess='{1}' status='incorrect'".format('|'.join(state["emojirade"]), guess))
+                    self.logger.debug(f"emojirades='{'|'.join(state['emojirade'])}' guess='{guess}' status='incorrect'")
             except ScottFactorExceededException as e:
-                self.logger.debug("emojirade='{0}' guess='{1}' status='scott factor exceeded'")
+                self.logger.debug(f"emojirade='{'|'.join(state['emojirade'])}' guess='{guess}' status='scott factor exceeded'")
 
             if state.get("first_guess", False):
                 state["first_guess"] = False
@@ -196,7 +196,7 @@ class GameState(object):
     def set_emojirade(self, channel, emojirade):
         """ New emojirade word(s), 'emojirade' is a list of accepted answers """
         if self.state[channel]["step"] != "waiting":
-            raise self.InvalidStateException("Expecting {0}'s state to be 'waiting', it is actually {1}".format(channel, self.state[channel]["step"]))
+            raise self.InvalidStateException("Expecting {channel}'s state to be 'waiting', it is actually {self.state[channel]['step'])}")
 
         self.state[channel]["emojirade"] = emojirade
         self.state[channel]["step"] = "provided"
@@ -205,7 +205,7 @@ class GameState(object):
     def winner_posted(self, channel):
         """ Winner has posted something after receiving the emojirade """
         if self.state[channel]["step"] != "provided":
-            raise self.InvalidStateException("Expecting {0}'s state to be 'provided', it is actually {1}".format(channel, self.state["step"]))
+            raise self.InvalidStateException(f"Expecting {channel}'s state to be 'provided', it is actually {self.state['step']}")
 
         self.state[channel]["step"] = "guessing"
         self.state[channel]["first_guess"] = True
@@ -214,7 +214,7 @@ class GameState(object):
     def correct_guess(self, channel, winner):
         """ Guesser has guessed the correct emojirade """
         if self.state[channel]["step"] != "guessing":
-            raise self.InvalidStateException("Expecting {0}'s state to be 'guessing', it is actually {1}".format(channel, self.state[channel]["step"]))
+            raise self.InvalidStateException(f"Expecting {channel}'s state to be 'guessing', it is actually {self.state[channel]['step']}")
 
         self.state[channel]["old_winner"] = self.state[channel]["winner"]
         self.state[channel]["winner"] = winner

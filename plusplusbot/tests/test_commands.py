@@ -73,7 +73,7 @@ class TestBotCommands(EmojiradeBotTester):
 
         state = self.bot.gamestate.state[self.config.channel]
 
-        override = {"text": "<@{0}> fixwinner <@{1}>".format(self.config.bot_id, self.config.player_2)}
+        override = {"text": f"<@{self.config.bot_id}> fixwinner <@{self.config.player_2}>"}
         self.send_event({**self.events.fixwinner, **override})
 
         expected = ":face_palm: You can't award yourself the win"
@@ -89,7 +89,7 @@ class TestBotCommands(EmojiradeBotTester):
 
         state = self.bot.gamestate.state[self.config.channel]
 
-        override = {"text": "<@{0}> fixwinner <@{1}>".format(self.config.bot_id, self.config.player_3)}
+        override = {"text": f"<@{self.config.bot_id}> fixwinner <@{self.config.player_3}>"}
         self.send_event({**self.events.fixwinner, **override})
 
         expected = "This won't actually do anything? :shrug::face_with_monocle:"
@@ -122,14 +122,11 @@ class TestBotCommands(EmojiradeBotTester):
 
         emojirade = "test-123-test_123"
 
-        override = {"text": "emojirade {0}".format(emojirade)}
+        override = {"text": f"emojirade {emojirade}"}
         self.send_event({**self.events.posted_emojirade, **override})
 
         assert (self.config.player_2_channel,
-                "Hey, <@{old_winner}> made the emojirade `{emojirade}`, good luck!".format(
-                    old_winner=self.config.player_1,
-                    emojirade=emojirade
-                )) in self.responses
+                f"Hey, <@{self.config.player_1}> made the emojirade `{emojirade}`, good luck!") in self.responses
 
     def test_set_emojirade_alternatives_output(self):
         """ Ensure that the emojirade alternatives output is expected """
@@ -137,14 +134,11 @@ class TestBotCommands(EmojiradeBotTester):
 
         emojirade = "foo | bar"
 
-        override = {"text": "emojirade {0}".format(emojirade)}
+        override = {"text": f"emojirade {emojirade}"}
         self.send_event({**self.events.posted_emojirade, **override})
 
         assert (self.config.player_2_channel,
-                "Hey, <@{old_winner}> made the emojirade `foo`, with alternatives `bar`, good luck!".format(
-                    old_winner=self.config.player_1,
-                    emojirade=emojirade
-                )) in self.responses
+                f"Hey, <@{self.config.player_1}> made the emojirade `foo`, with alternatives `bar`, good luck!") in self.responses
 
     def test_set_emojirade_public_channel(self):
         """ Ensure that the emojirade can only be set in a DM channel """
@@ -164,7 +158,7 @@ class TestBotCommands(EmojiradeBotTester):
         state = self.bot.gamestate.state[self.config.channel]
 
         # Player 4 is not involved in this round
-        override = {"user": self.config.player_4, "text": "<@{0}>++ player=<@{1}>".format(self.config.player_3, self.config.player_2)}
+        override = {"user": self.config.player_4, "text": f"<@{self.config.player_3}>++ player=<@{self.config.player_2}>"}
         self.send_event({**self.events.manual_award, **override})
 
         assert state["step"] == "waiting"
@@ -177,7 +171,7 @@ class TestBotCommands(EmojiradeBotTester):
 
         override = {
             "channel": self.config.bot_channel,
-            "text": "{0} channel=<#{1}|emojirades>".format(self.config.emojirade, self.config.channel)
+            "text": f"{self.config.emojirade} channel=<#{self.config.channel}|emojirades>"
         }
         self.send_event({**self.events.correct_guess, **override})
 
@@ -192,7 +186,7 @@ class TestBotCommands(EmojiradeBotTester):
         commands = CommandRegistry.prepare_commands()
 
         for command in commands.values():
-            assert re.compile(r"{0}\s+{1}".format(re.escape(command.example), re.escape(command.short_description))) \
+            assert re.compile(fr"{re.escape(command.example)}\s+{re.escape(command.short_description)}") \
                      .search(self.responses[-2][1])
 
     def test_game_status(self):
@@ -200,15 +194,10 @@ class TestBotCommands(EmojiradeBotTester):
         self.send_event(self.events.game_status)
 
         assert (self.config.channel,
-                "Status: Waiting for <@{0}> to provide a 'rade to {1}".format(
-                    self.config.player_1,
-                    self.config.player_2,
-                )) in self.responses
+                f"Status: Waiting for <@{self.config.player_1}> to provide a 'rade to {self.config.player_2}") in self.responses
 
         self.reset_and_transition_to("provided")
         self.send_event(self.events.game_status)
 
         assert (self.config.channel,
-                "Status: Waiting for <@{0}> to post an emoji to kick off the round!".format(
-                    self.config.player_2,
-                )) in self.responses
+                f"Status: Waiting for <@{self.config.player_2}> to post an emoji to kick off the round!") in self.responses

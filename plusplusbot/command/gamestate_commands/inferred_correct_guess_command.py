@@ -52,19 +52,19 @@ class InferredCorrectGuess(GameStateCommand):
         else:
             emoji = random.choice(self.other_emojis)
 
-        emoji = " {0}".format(emoji)
+        emoji = f" {emoji}"
 
         if len(raw_emojirades) > 1:
-            alternatives = ", with alternatives " + " OR ".join(["`{0}`".format(i) for i in raw_emojirades[1:]])
+            alternatives = ", with alternatives " + " OR ".join([f"`{i}`" for i in raw_emojirades[1:]])
         else:
             alternatives = ""
 
         if state.get("first_guess", False):
             yield(None, "Holy bejesus Batman :bat::man:, they guessed it in one go! :clap:")
 
-        yield (None, "<@{0}>++".format(state["winner"]))
-        yield (None, "Congrats <@{0}>, you're now at {1} point{2}{3}".format(state["winner"], score, "s" if score > 1 else "", emoji))
-        yield (None, "The correct emojirade was `{0}`{1}".format(first_emojirade, alternatives))
+        yield (None, f"<@{state['winner']}>++")
+        yield (None, f"Congrats <@{state['winner']}>, you're now at {score} point{'s' if score > 1 else ''}{emoji}")
+        yield (None, f"The correct emojirade was `{first_emojirade}`{alternatives}")
 
-        yield (state["old_winner"], "You'll now need to send me the new 'rade for <@{0}>".format(state["winner"]))
+        yield (state["old_winner"], f"You'll now need to send me the new 'rade for <@{state['winner']}>")
         yield (state["old_winner"], "Please reply back in the format `emojirade Point Break` if `Point Break` was the new 'rade")
