@@ -26,5 +26,7 @@ class HistoryCommand(ScoreKeeperCommand):
 
         self.logger.debug("Printing history: {history}")
 
-        yield (None, "\n".join(["{index}. <@{name}> > '{action}'"
-                                for index, (name, action) in enumerate(history, start=1)] + ["This is an in-memory log and only up-to-date from the last bot restart."]))
+        history_log = [f"{index}. <@{name}> > '{action}'" for index, (name, action) in enumerate(history, start=1)]
+        last_message = ["This is an in-memory log and only up-to-date from the last bot restart."]
+
+        yield (None, "\n".join(history_log + last_message))
