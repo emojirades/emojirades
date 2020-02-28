@@ -13,9 +13,12 @@ class CorrectGuess(GameStateCommand):
     )
     example = "@winner ++"
 
-    first_emojis = [
+    first_emojis = [":first_place_medal:"]
+    second_emojis = [":second_place_medal:"]
+    third_emojis = [":third_place_medal:"]
+
+    other_emojis = [
         ":tada:",
-        ":first_place_medal:",
         ":sunglasses:",
         ":nerd_face:",
         ":birthday:",
@@ -44,16 +47,21 @@ class CorrectGuess(GameStateCommand):
 
         # Save a copy of the emojirade, as below clears it
         raw_emojirades = list(state["emojirade"])
+        first_emojirade = raw_emojirades[0]
 
         self.gamestate.correct_guess(self.args["channel"], self.args["target_user"])
-        score, is_first = self.scorekeeper.plusplus(self.args["channel"], self.args["target_user"])
+        score, position = self.scorekeeper.plusplus(self.args["channel"], self.args["target_user"])
 
-        if is_first:
-            emoji = " {0}".format(random.choice(self.first_emojis))
+        if position == 1:
+            emoji = random.choice(self.first_emojis + self.other_emojis)
+        elif position == 2:
+            emoji = random.choice(self.second_emojis + self.other_emojis)
+        elif position == 3:
+            emoji = random.choice(self.third_emojis + self.other_emojis)
         else:
-            emoji = ""
+            emoji = random.choice(self.other_emojis)
 
-        first_emojirade = raw_emojirades[0]
+        emoji = " {0}".format(emoji)
 
         if len(raw_emojirades) > 1:
             alternatives = ", with alternatives " + " OR ".join(["`{0}`".format(i) for i in raw_emojirades[1:]])

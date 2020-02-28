@@ -11,17 +11,9 @@ class InferredCorrectGuess(GameStateCommand):
     patterns = tuple()
     example = None
 
-    first_emojis = [
-        ":first_place_medal:",
-    ]
-
-    second_emojis = [
-        ":second_place_medal:",
-    ]
-
-    third_emojis = [
-        ":third_place_medal:",
-    ]
+    first_emojis = [":first_place_medal:"]
+    second_emojis = [":second_place_medal:"]
+    third_emojis = [":third_place_medal:"]
 
     other_emojis = [
         ":tada:",
