@@ -44,27 +44,24 @@ class HelpCommand(Command):
                 longest_example = example_length
 
         yield (None, "Available commands are:\n")
-        message = "```\n{0:<{example}} {1:<{description}}\n".format("Example",
-                                                                    "Description",
-                                                                    example=longest_example,
-                                                                    description=longest_description)
+        message = f"```\n{'Example':<{longest_example}} {'Description':<{longest_description}}\n"
 
         for command in commands.values():
             desc = command.short_description
             example = command.example
 
             if len(desc) > longest_description:
-                desc = "{0}...".format(desc[0:longest_description])
+                desc = f"{desc[0:longest_description]}..."
 
             if len(example) > longest_example:
-                example = "{0}...".format(example[0:longest_example])
+                example = f"{example[0:longest_example]}..."
 
-            message += "{0:<{example}} {1:<{description}}\n".format(example, desc, example=longest_example, description=longest_description)
+            message += f"{example:<{longest_example}} {desc:<{longest_description}}\n"
 
         message += "```"
 
         yield (None, message)
-        yield (None, "Game Admins: " + ", ".join(["<@{0}>".format(i) for i in self.gamestate.game_status(self.args["channel"])["admins"]]))
+        yield (None, "Game Admins: " + ", ".join([f"<@{i}>" for i in self.gamestate.game_status(self.args["channel"])["admins"]]))
 
     def __str__(self):
         return "HelpCommand"
