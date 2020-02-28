@@ -143,12 +143,12 @@ class GameState(object):
 
             try:
                 if match_emojirade(guess, state["emojirade"]):
-                    self.logger.debug(f"emojirades='{'|'.join(state['emojirades'])}' guess='{guess}' status='correct'")
+                    self.logger.debug(f"emojirades='{'|'.join(state['emojirade'])}' guess='{guess}' status='correct'")
                     yield InferredCorrectGuess
                 else:
-                    self.logger.debug(f"emojirades='{'|'.join(state['emojirade']}' guess='{guess}' status='incorrect'")
+                    self.logger.debug(f"emojirades='{'|'.join(state['emojirade'])}' guess='{guess}' status='incorrect'")
             except ScottFactorExceededException as e:
-                self.logger.debug(f"emojirade='{'|'.join(state['emojirade']}' guess='{guess}' status='scott factor exceeded'")
+                self.logger.debug(f"emojirade='{'|'.join(state['emojirade'])}' guess='{guess}' status='scott factor exceeded'")
 
             if state.get("first_guess", False):
                 state["first_guess"] = False
