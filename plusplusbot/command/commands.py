@@ -20,7 +20,7 @@ class Command(ABC):
         self.prepare_args(event)
 
         self.pattern_map = [
-            {"pattern": "<@{me}>", "replace": "@{0}".format(self.slack.bot_name)},
+            {"pattern": "<@{me}>", "replace": f"@{self.slack.bot_name}"},
             {"pattern": "<@([0-9A-Z]+)>", "replace": "@player"},
             {"pattern": "(-?[0-9]+)", "replace": "<numeric score>"},
         ]
@@ -55,12 +55,12 @@ class Command(ABC):
         patterns = tuple(i.format(me=self.slack.bot_id) if "{me}" in i else i for i in self.patterns)
 
         for pattern in patterns:
-            self.logger.debug("Matching '{0}' against '{1}'".format(pattern, event["text"]))
+            self.logger.debug(f"Matching '{pattern}' against '{event['text']}'")
 
             match = re.compile(pattern).match(event["text"])
 
             if not match:
-                self.logger.debug("Failed to match '{0}' against '{1}'".format(pattern, event["text"]))
+                self.logger.debug("Failed to match '{pattern}' against '{event['text']}'")
 
             if hasattr(match, "groupdict"):
                 self.args.update(match.groupdict())
@@ -68,13 +68,13 @@ class Command(ABC):
 
     def execute(self):
         if self.args.get("original_user"):
-            shadow_user = " (aka <@{0}>)".format(self.args["original_user"])
+            shadow_user = f" (aka <@{self.args['original_user']}>)"
         else:
             shadow_user = ""
 
         if self.print_performed_by:
             # We leave channel none here to return on the channel the original message came in on
-            yield (None, "This action was performed by <@{0}>{1}".format(self.args["user"], shadow_user))
+            yield (None, f"This action was performed by <@{self.args['user']}>{shadow_user}")
 
     @classmethod
     def match(cls, text, **kwargs):
