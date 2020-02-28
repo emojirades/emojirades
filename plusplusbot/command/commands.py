@@ -93,7 +93,7 @@ class Command(ABC):
         pass
 
     @property
-    def example(self):
+    def examples(self):
         pass
 
     def __str__(self):

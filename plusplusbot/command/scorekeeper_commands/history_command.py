@@ -3,12 +3,14 @@ from plusplusbot.command.scorekeeper_commands.scorekeeper_command import ScoreKe
 
 class HistoryCommand(ScoreKeeperCommand):
     description = "Shows the latest few actions performed"
-    short_description = "Shows history"
 
     patterns = (
         r"<@{me}> history",
     )
-    example = "<@{me}> history"
+
+    examples = [
+        ("<@{me}> history", "Shows history"),
+    ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

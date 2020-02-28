@@ -3,12 +3,14 @@ from plusplusbot.command.scorekeeper_commands.scorekeeper_command import ScoreKe
 
 class LeaderboardCommand(ScoreKeeperCommand):
     description = "Shows all the users scores"
-    short_description = "Show user scores"
 
     patterns = (
         r"<@{me}> (score|leader)[\s]*board",
     )
-    example = "<@{me}> scoreboard"
+
+    examples = [
+        ("<@{me}> scoreboard", "Show user scores"),
+    ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

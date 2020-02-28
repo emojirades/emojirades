@@ -4,12 +4,14 @@ from plusplusbot.wrappers import admin_or_old_winner_check, only_not_in_progress
 
 class FixWinner(GameStateCommand):
     description = "Resets the currently awarded win to another player (in case of a ninja or something)"
-    short_description = "Award the win to someone else"
 
     patterns = (
         r"<@{me}> fixwinner <@(?P<winner>[0-9A-Z]+)>",
     )
-    example = "<@{me}> fixwinner @foo"
+
+    examples = [
+        ("<@{me}> fixwinner @foo", "Award the win to someone else"),
+    ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

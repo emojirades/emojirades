@@ -5,12 +5,14 @@ from plusplusbot.command.commands import Command
 
 class HelpCommand(Command):
     description = "Shows this help"
-    short_description = "Shows this help"
 
     patterns = (
         r"<@{me}> help",
     )
-    example = "<@{me}> help"
+
+    examples = [
+        ("<@{me}> help", "Shows this help"),
+    ]
 
     def format_patterns(self, patterns):
         new_patterns = []
@@ -34,8 +36,9 @@ class HelpCommand(Command):
         longest_example = 0
 
         for command in commands.values():
+            for description,  in command.examples:
             description_length = len(command.short_description)
-            example_length = len(command.example)
+            example_length = len(example[0]command.examples)
 
             if description_length > longest_description:
                 longest_description = description_length
