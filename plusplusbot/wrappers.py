@@ -7,10 +7,10 @@ def admin_check(command):
         channel = self.args["channel"]
 
         if self.gamestate.state[channel]["admins"] and self.args["user"] not in self.gamestate.state[channel]["admins"]:
-            yield (None, "Sorry <@{user}> but you need to be a game admin to do that :upside_down_face:".format(**self.args))
+            yield (None, f"Sorry <@{self.args['user']}> but you need to be a game admin to do that :upside_down_face:")
 
-            admins = ["<@{0}>".format(admin) for admin in self.gamestate.state[channel]["admins"]]
-            yield (None, "Game admins currently are: {0}".format(", ".join(admins)))
+            admins = [f"<@{admin}>" for admin in self.gamestate.state[channel]["admins"]]
+            yield (None, f"Game admins currently are: {', '.join(admins)}")
             return
 
         yield from command(self)
@@ -32,10 +32,10 @@ def admin_or_old_winner_check(command):
             is_admin = True
 
         if not is_old_winner and not is_admin:
-            yield (None, "Sorry <@{user}> but you need to be the old winner (or a game admin) to do that :upside_down_face:".format(**self.args))
+            yield (None, f"Sorry <@{self.args['user']}> but you need to be the old winner (or a game admin) to do that :upside_down_face:")
 
-            admins = ["<@{0}>".format(admin) for admin in self.gamestate.state[channel]["admins"]]
-            yield (None, "Game admins currently are: {0}".format(", ".join(admins)))
+            admins = [f"<@{admin}>" for admin in self.gamestate.state[channel]["admins"]]
+            yield (None, f"Game admins currently are: {', '.join(admins)}")
             return
 
         yield from command(self)
