@@ -12,20 +12,16 @@ class ConfigurationHandler(object):
     They can have .save() and .load() called on them, which take/return bytes
     """
     def __init__(self, *args, **kwargs):
-
-        miss_positional = "{0} is missing a required positional argument '{1}' in position {2}"
-        miss_keyword = "{0} is missing a required keyword argument '{1}'"
-
         for arg, pos in [("filename", 0)]:
             if pos is not None:
                 if len(args) > pos:
                     setattr(self, arg, args[pos])
                 else:
-                    raise TypeError(miss_positional.format(self, arg, pos))
+                    raise TypeError(f"{self} is missing a required positional argument '{arg}' in position {pos}")
             elif arg in kwargs:
                 setattr(self, arg, kwargs["filename"])
             else:
-                raise TypeError(miss_keyword.format(self, arg))
+                raise TypeError(f"{self} is missing a required keyword argument '{arg}'")
 
 
 class S3ConfiguationHandler(ConfigurationHandler):

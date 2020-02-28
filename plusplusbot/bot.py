@@ -31,7 +31,7 @@ class PlusPlusBot(object):
         :param event:
         :return Command:
         """
-        self.logger.debug("Handling event: {0}".format(event))
+        self.logger.debug(f"Handling event: {event}")
 
         for GameCommand in self.gamestate.infer_commands(event):
             yield GameCommand(self.slack, event, scorekeeper=self.scorekeeper, gamestate=self.gamestate)
@@ -74,11 +74,11 @@ class PlusPlusBot(object):
             dm_id = self.slack.find_im(channel)
 
             if dm_id is None:
-                raise RuntimeError("Unable to find direct message channel for '{0}'".format(channel))
+                raise RuntimeError(f"Unable to find direct message channel for '{channel}'")
 
             return dm_id
         else:
-            raise NotImplementedError("Returned channel '{0}' wasn't decoded".format(channel))
+            raise NotImplementedError(f"Returned channel '{channel}' wasn't decoded")
 
     def handle_event(self, **payload):
         commands = CommandRegistry.prepare_commands()
@@ -92,10 +92,10 @@ class PlusPlusBot(object):
             return
 
         for command in self.match_event(event, commands):
-            self.logger.debug("Matched {0} for event {1}".format(command, event))
+            self.logger.debug(f"Matched {command} for event {event}")
 
             for channel, response in command.execute():
-                self.logger.debug("Command {0} executed with response: {1}".format(command, (channel, response)))
+                self.logger.debug(f"Command {command} executed with response: {(channel, response)}")
                 if channel is not None:
                     channel = self.decode_channel(channel)
                 else:

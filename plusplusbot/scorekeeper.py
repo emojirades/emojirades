@@ -79,7 +79,7 @@ class ScoreKeeper(object):
 
             if existing_state is not None:
                 self.scoreboard = defaultdict(scoreboard_factory, existing_state)
-                self.logger.info("Loaded scores from {0}".format(filename))
+                self.logger.info(f"Loaded scores from {filename}")
 
     def current_score(self, channel, user):
         leaderboard = list(map(lambda x: x[0], sorted(self.scoreboard[channel]["scores"].items(), key=lambda x: x[1], reverse=True)))
@@ -106,7 +106,7 @@ class ScoreKeeper(object):
 
     def overwrite(self, channel, user, score):
         self.scoreboard[channel]["scores"][user] = score
-        self.scoreboard[channel]["history"].append((user, "Manually set to {0}".format(score)))
+        self.scoreboard[channel]["history"].append((user, f"Manually set to {score}"))
         self.save()
         return self.current_score(channel, user)
 
