@@ -19,11 +19,12 @@ class HistoryCommand(ScoreKeeperCommand):
         history = self.scorekeeper.history(self.args["channel"])
 
         if not history:
-            self.logger.debug("No history available. History is temporary and doesn't persist across bot restarts.")
-            yield (None, "No history available. History is temporary and doesn't persist across bot restarts.")
+            message = "No history available. History is temporary and doesn't persist across bot restarts."
+            self.logger.debug(message)
+            yield (None, message)
             return
 
-        self.logger.debug("Printing history: {0}".format(history))
+        self.logger.debug("Printing history: {history}")
 
-        yield (None, "\n".join(["{0}. <@{1}> > '{2}'".format(index + 1, name, action)
-                                for index, (name, action) in enumerate(history)] + ["This is an in-memory log and only up-to-date from the last bot restart."]))
+        yield (None, "\n".join(["{index}. <@{name}> > '{action}'"
+                                for index, (name, action) in enumerate(history, start=1)] + ["This is an in-memory log and only up-to-date from the last bot restart."]))
