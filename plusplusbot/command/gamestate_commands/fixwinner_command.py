@@ -36,10 +36,10 @@ class FixWinner(GameStateCommand):
             yield (None, "Failed to fix the winner, no scores have been updated, please fix manually :(")
             return
 
-        yield (None, "<@{0}>--".format(loser))
+        yield (None, f"<@{loser}>--")
         self.scorekeeper.minusminus(self.args["channel"], loser)
 
-        yield (None, "<@{0}>++".format(winner))
+        yield (None, f"<@{winner}>++")
         self.scorekeeper.plusplus(self.args["channel"], winner)
 
-        yield (None, "Sorry <@{0}>! <@{1}> has decided to award <@{2}> the win :smiling_imp:".format(loser, self.args["user"], winner))
+        yield (None, f"Sorry <@{loser}>! <@{self.args['user']}> has decided to award <@{winner}> the win :smiling_imp:")
