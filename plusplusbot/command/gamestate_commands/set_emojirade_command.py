@@ -38,7 +38,7 @@ class SetEmojirade(GameStateCommand):
         yield from super().execute()
 
         if self.args["user"] != self.gamestate.state[self.args["channel"]]["old_winner"]:
-            yield (None, "Err <@{user}> it's not your turn to provide the new 'rade :sweat:".format(**self.args))
+            yield (None, f"Err <@{self.args['user']}> it's not your turn to provide the new 'rade :sweat:")
             return
 
         if self.args["channel"] is None:
@@ -59,19 +59,14 @@ class SetEmojirade(GameStateCommand):
 
         # DM the winner with the new emojirade
         if len(raw_emojirades) > 1:
-            alternatives = ", with alternatives " + " OR ".join(["`{0}`".format(i) for i in raw_emojirades[1:]])
+            alternatives = ", with alternatives " + " OR ".join([f"`{i}`" for i in raw_emojirades[1:]])
         else:
             alternatives = ""
 
-        msg = "Hey, <@{user}> made the emojirade `{first}`{alternatives}, good luck!".format(
-            **self.args,
-            first=raw_emojirades[0],
-            alternatives=alternatives
-        )
-        yield (winner, msg)
+        yield (winner, f"Hey, <@{self.args['user']}> made the emojirade `{raw_emojirades[0]}`{alternatives}, good luck!")
 
         # Let the user know their 'rade has been accepted
-        yield (self.args["user"], "Thanks for that! I've let <@{winner}> know!".format(winner=winner))
+        yield (self.args["user"], f"Thanks for that! I've let <@{winner}> know!")
 
         # Let everyone else know
-        yield (self.args["channel"], ":mailbox: 'rade sent to <@{winner}>".format(winner=winner))
+        yield (self.args["channel"], f":mailbox: 'rade sent to <@{winner}>")

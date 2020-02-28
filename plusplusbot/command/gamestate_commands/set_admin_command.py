@@ -22,6 +22,6 @@ class SetAdmin(GameStateCommand):
         yield from super().execute()
 
         if self.gamestate.set_admin(self.args["channel"], self.args["admin"]):
-            yield (None, "<@{admin}> has been promoted to a game admin :tada:".format(**self.args))
+            yield (None, f"<@{self.args['admin']}> has been promoted to a game admin :tada:")
         else:
-            yield (None, "<@{admin}> is already an admin :face_with_rolling_eyes:".format(**self.args))
+            yield (None, f"<@{self.args['admin']}> is already an admin :face_with_rolling_eyes:")

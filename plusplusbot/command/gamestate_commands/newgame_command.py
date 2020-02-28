@@ -22,11 +22,11 @@ class NewGame(GameStateCommand):
         yield from super().execute()
 
         if self.args["winner"] == self.args["old_winner"]:
-            yield (None, "Sorry, but the old and current winner cannot be the same person (<@{winner}>)...".format(**self.args))
+            yield (None, f"Sorry, but the old and current winner cannot be the same person (<@{self.args['winner']}>)...")
             return
 
         self.gamestate.new_game(self.args["channel"], self.args["old_winner"], self.args["winner"])
-        yield (None, "<@{user}> has set the old winner to <@{old_winner}> and the winner to <@{winner}>".format(**self.args))
-        yield (None, "It's now <@{old_winner}>'s turn to provide <@{winner}> with the next 'rade!".format(**self.args))
-        yield (self.args["old_winner"], "You'll now need to send me the new 'rade for <@{winner}>".format(**self.args))
+        yield (None, f"<@{self.args['user']}> has set the old winner to <@{self.args['old_winner']}> and the winner to <@{self.args['winner']}>")
+        yield (None, f"It's now <@{self.args['old_winner']}>'s turn to provide <@{self.args['winner']}> with the next 'rade!")
+        yield (self.args["old_winner"], f"You'll now need to send me the new 'rade for <@{self.args['winner']}>")
         yield (self.args["old_winner"], "Please reply back in the format `emojirade Point Break` if `Point Break` was the new 'rade")
