@@ -1,6 +1,5 @@
-import plusplusbot.command.command_registry
-
-from plusplusbot.command.commands import Command
+from plusplusbot.commands.command import Command
+from plusplusbot.command import CommandRegistry
 
 
 class HelpCommand(Command):
@@ -30,7 +29,7 @@ class HelpCommand(Command):
     def execute(self):
         yield from super().execute()
 
-        commands = plusplusbot.command.command_registry.CommandRegistry.prepare_commands()
+        commands = CommandRegistry.prepare_commands()
 
         longest_description = 0
         longest_example = 0

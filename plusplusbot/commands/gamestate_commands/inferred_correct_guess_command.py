@@ -1,4 +1,4 @@
-from plusplusbot.command.gamestate_commands.gamestate_command import GameStateCommand
+from plusplusbot.commands.gamestate_commands import GameStateCommand
 from plusplusbot.wrappers import only_guessing
 
 import random

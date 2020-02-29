@@ -1,11 +1,11 @@
 import logging
-import os
 import time
+import os
 
-from plusplusbot.command.command_registry import CommandRegistry
+from plusplusbot.slack import SlackClient, slack
+from plusplusbot.commands import CommandRegistry
 from plusplusbot.scorekeeper import ScoreKeeper
 from plusplusbot.gamestate import GameState
-from plusplusbot.slack import SlackClient, slack
 
 module_logger = logging.getLogger("PlusPlusBot.bot")
 

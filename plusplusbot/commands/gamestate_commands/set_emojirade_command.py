@@ -1,5 +1,5 @@
-from plusplusbot.command.gamestate_commands.gamestate_command import GameStateCommand
 from plusplusbot.wrappers import only_in_progress, only_as_direct_message
+from plusplusbot.commands.gamestate_commands import GameStateCommand
 from plusplusbot.checks import emojirade_is_banned
 from plusplusbot.helpers import sanitize_text
 

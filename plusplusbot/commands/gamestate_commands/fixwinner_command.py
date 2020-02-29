@@ -1,4 +1,4 @@
-from plusplusbot.command.gamestate_commands.gamestate_command import GameStateCommand
+from plusplusbot.commands.gamestate_commands import GameStateCommand
 from plusplusbot.wrappers import admin_or_old_winner_check, only_not_in_progress
 
 
@@ -10,7 +10,7 @@ class FixWinner(GameStateCommand):
     )
 
     examples = [
-        ("<@{me}> fixwinner @foo", "Award the win to someone else"),
+        ("<@{me}> fixwinner @other-person", "Award the win to someone else"),
     ]
 
     def __init__(self, *args, **kwargs):

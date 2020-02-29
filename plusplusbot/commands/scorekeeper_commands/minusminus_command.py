@@ -1,4 +1,4 @@
-from plusplusbot.command.scorekeeper_commands.scorekeeper_command import ScoreKeeperCommand
+from plusplusbot.commands.scorekeeper_commands import ScoreKeeperCommand
 from plusplusbot.wrappers import admin_check
 
 
