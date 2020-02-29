@@ -8,6 +8,7 @@ registered_commands.extend(general_commands_list)
 registered_commands.extend(gamestate_commands_list)
 registered_commands.extend(scorekeeper_commands_list)
 
+
 def prepare_commands(commands=None):
     if commands is None:
         commands = registered_commands

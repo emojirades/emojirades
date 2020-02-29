@@ -1,5 +1,5 @@
 from plusplusbot.commands.command import Command
-from plusplusbot.command import CommandRegistry
+from plusplusbot.command import prepare_commands
 
 
 class HelpCommand(Command):
@@ -29,41 +29,42 @@ class HelpCommand(Command):
     def execute(self):
         yield from super().execute()
 
-        commands = CommandRegistry.prepare_commands()
+        commands = prepare_commands()
 
+        # Calculate the longest example & description
         longest_description = 0
         longest_example = 0
 
         for command in commands.values():
-            for description,  in command.examples:
-            description_length = len(command.short_description)
-            example_length = len(example[0]command.examples)
+            for example, description in command.examples:
+                description_length = len(description)
+                example_length = len(example)
 
-            if description_length > longest_description:
-                longest_description = description_length
+                if description_length > longest_description:
+                    longest_description = description_length
 
-            if example_length > longest_example:
-                longest_example = example_length
+                if example_length > longest_example:
+                    longest_example = example_length
 
         yield (None, "Available commands are:\n")
         message = f"```\n{'Example':<{longest_example}} {'Description':<{longest_description}}\n"
 
         for command in commands.values():
-            desc = command.short_description
-            example = command.example
+            for example, description in command.examples:
+                if len(description) > longest_description:
+                    description = f"{description[0:longest_description]}..."
 
-            if len(desc) > longest_description:
-                desc = f"{desc[0:longest_description]}..."
+                if len(example) > longest_example:
+                    example = f"{example[0:longest_example]}..."
 
-            if len(example) > longest_example:
-                example = f"{example[0:longest_example]}..."
-
-            message += f"{example:<{longest_example}} {desc:<{longest_description}}\n"
+                message += f"{example:<{longest_example}} {description:<{longest_description}}\n"
 
         message += "```"
-
         yield (None, message)
-        yield (None, "Game Admins: " + ", ".join([f"<@{i}>" for i in self.gamestate.game_status(self.args["channel"])["admins"]]))
+
+        game_admins = self.gamestate.game_status(self.args["channel"])["admins"]
+        admins_names = [f"<@{i}>" for i in game_admins]
+        yield (None, "Game Admins: " + ", ".join(game_admins))
 
     def __str__(self):
         return "HelpCommand"
