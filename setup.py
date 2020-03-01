@@ -7,7 +7,7 @@ with open(path.join(this_directory, "README.md"), encoding="utf-8") as f:
 
 setup(
     name="Emojirades PlusPlus",
-    version="0.8.0",
+    version="0.9.0",
     description="A Slack bot that understands the Emojirades game!",
     long_description=long_description,
     long_description_content_type="text/markdown",
