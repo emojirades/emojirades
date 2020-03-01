@@ -1,5 +1,5 @@
+from plusplusbot.wrappers import admin_or_old_winner_set_check
 from plusplusbot.commands import BaseCommand
-from plusplusbot.wrappers import admin_check
 
 
 class NewGameCommand(BaseCommand):
@@ -19,7 +19,7 @@ class NewGameCommand(BaseCommand):
     def prepare_args(self, event):
         super().prepare_args(event)
 
-    @admin_check
+    @admin_or_old_winner_set_check
     def execute(self):
         yield from super().execute()
 
