@@ -6,7 +6,7 @@ def admin_check(command):
     def wrapped_command(self):
         channel = self.args["channel"]
 
-        if self.gamestate.state[channel]["admins"] and self.args["user"] not in self.gamestate.state[channel]["admins"]:
+        if not self.gamestate.is_admin(channel, self.args["user"]):
             yield (None, f"Sorry <@{self.args['user']}> but you need to be a game admin to do that :upside_down_face:")
 
             admins = [f"<@{admin}>" for admin in self.gamestate.state[channel]["admins"]]
@@ -28,8 +28,38 @@ def admin_or_old_winner_check(command):
         if self.args["user"] == self.gamestate.state[channel]["old_winner"]:
             is_old_winner = True
 
-        if self.gamestate.state[channel]["admins"] and self.args["user"] in self.gamestate.state[channel]["admins"]:
+        if self.gamestate.is_admin(channel, self.args["user"]):
             is_admin = True
+
+        if not is_old_winner and not is_admin:
+            yield (None, f"Sorry <@{self.args['user']}> but you need to be the old winner (or a game admin) to do that :upside_down_face:")
+
+            admins = [f"<@{admin}>" for admin in self.gamestate.state[channel]["admins"]]
+            yield (None, f"Game admins currently are: {', '.join(admins)}")
+            return
+
+        yield from command(self)
+
+    return wrapped_command
+
+
+def admin_or_old_winner_set_check(command):
+    def wrapped_command(self):
+        channel = self.args["channel"]
+
+        is_old_winner = False
+        is_admin = False
+
+        if self.args["user"] == self.gamestate.state[channel]["old_winner"]:
+            is_old_winner = True
+
+        if self.gamestate.is_admin(channel, self.args["user"]):
+            is_admin = True
+
+        # Game can only be in the 'set' state if the user isn't an admin
+        if (not is_admin and is_old_winner) and self.gamestate.in_progress(channel):
+            yield (None, f"Sorry <@{self.args['user']}> but the game has already started :snail:")
+            return
 
         if not is_old_winner and not is_admin:
             yield (None, f"Sorry <@{self.args['user']}> but you need to be the old winner (or a game admin) to do that :upside_down_face:")
