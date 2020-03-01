@@ -1,6 +1,5 @@
 from plusplusbot.wrappers import only_in_progress, only_as_direct_message
 from plusplusbot.checks import emojirade_is_banned
-from plusplusbot.helpers import sanitize_text
 from plusplusbot.commands import BaseCommand
 
 
@@ -52,11 +51,10 @@ class SetEmojiradeCommand(BaseCommand):
             yield (None, "Sorry, but that emojirade contained a banned word/phrase :no_good:, try again?")
             return
 
-        # Break the alternatives out and sanitize the emojirade (apply consistent sanitization)
+        # Break the alternatives out
         raw_emojirades = [i.strip() for i in self.args["emojirade"].split("|")]
-        sanitized_emojirades = [sanitize_text(i) for i in raw_emojirades]
 
-        self.gamestate.set_emojirade(self.args["channel"], sanitized_emojirades)
+        self.gamestate.set_emojirade(self.args["channel"], raw_emojirades)
 
         winner = self.gamestate.state[self.args["channel"]]["winner"]
 

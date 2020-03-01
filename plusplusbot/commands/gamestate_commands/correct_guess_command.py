@@ -48,8 +48,13 @@ class CorrectGuessCommand(BaseCommand):
             return
 
         # Save a copy of the emojirade, as below clears it
-        raw_emojirades = list(state["emojirade"])
-        first_emojirade = raw_emojirades[0]
+        raw_emojirades = [i.replace("`", "") for i in state["emojirade"]]
+        first_emojirade = raw_emojirades.pop(0)
+
+        if raw_emojirades:
+            alternatives = ", with alternatives " + " OR ".join([f"`{i}`" for i in raw_emojirades[1:]])
+        else:
+            alternatives = ""
 
         self.gamestate.correct_guess(self.args["channel"], self.args["target_user"])
         score, position = self.scorekeeper.plusplus(self.args["channel"], self.args["target_user"])
@@ -65,10 +70,8 @@ class CorrectGuessCommand(BaseCommand):
 
         emoji = f" {emoji}"
 
-        if len(raw_emojirades) > 1:
-            alternatives = ", with alternatives " + " OR ".join([f"`{i}`" for i in raw_emojirades[1:]])
-        else:
-            alternatives = ""
+        if state.get("first_guess", False):
+            yield(None, "Holy bejesus Batman :bat::man:, they guessed it in one go! :clap:")
 
         yield (None, f"Congrats <@{state['winner']}>, you're now at {score} point{'s' if score > 1 else ''}{emoji}")
         yield (None, f"The correct emojirade was `{first_emojirade}`{alternatives}")
