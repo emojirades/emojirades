@@ -57,7 +57,7 @@ def admin_or_old_winner_set_check(command):
             is_admin = True
 
         # Game can only be in the 'set' state if the user isn't an admin
-        if (not is_admin and is_old_winner) and self.gamestate.in_progress(channel):
+        if (not is_admin and is_old_winner) and self.gamestate.guessing(channel):
             yield (None, f"Sorry <@{self.args['user']}> but the game has already started :snail:")
             return
 

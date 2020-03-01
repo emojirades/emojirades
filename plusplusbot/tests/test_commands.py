@@ -10,11 +10,29 @@ class TestBotCommands(EmojiradeBotTester):
     def test_plusplus_new_game(self):
         """ Cannot ++ someone when the game is not in progress """
         state = self.bot.gamestate.state[self.config.channel]
-
         assert state["step"] == "new_game"
 
         self.send_event(self.events.plusplus)
         assert (self.config.channel, "Sorry, but we need to be guessing! Get the winner to start posting the next 'rade!") in self.responses
+
+    def test_new_game_by_old_winner(self):
+        """ The old winner is allowed to 'reset' their rade if the game isn't in progress """
+        self.reset_and_transition_to("provided")
+        state = self.bot.gamestate.state[self.config.channel]
+        state["admins"].append(self.config.player_4)
+
+        # Should be allowed
+        self.send_event(self.events.new_game)
+        assert state["step"] == "waiting"
+
+        # Reset
+        self.reset_and_transition_to("guessing")
+        state = self.bot.gamestate.state[self.config.channel]
+        state["admins"].append(self.config.player_4)
+
+        # Should not be allowed
+        self.send_event(self.events.new_game)
+        assert state["step"] == "guessing"
 
     def test_leaderboard_output(self):
         """ Ensure leaderboard output is consistent """
