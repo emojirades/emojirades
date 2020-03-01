@@ -1,15 +1,17 @@
-from plusplusbot.command.gamestate_commands.gamestate_command import GameStateCommand
+from plusplusbot.commands import BaseCommand
 from plusplusbot.wrappers import admin_check
 
 
-class GameStatus(GameStateCommand):
+class GameStatusCommand(BaseCommand):
     description = "Prints out the game status"
-    short_description = "Print game status"
 
     patterns = (
         r"<@{me}> (game[\s]*){{0,1}}(status|state)",
     )
-    example = "<@{me}> game status"
+
+    examples = [
+        ("<@{me}> game status", "Print game status"),
+    ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

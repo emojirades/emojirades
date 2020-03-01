@@ -1,15 +1,19 @@
-from plusplusbot.command.gamestate_commands.gamestate_command import GameStateCommand
 from plusplusbot.wrappers import only_guessing
+from plusplusbot.commands import BaseCommand
 
 import random
 
 
-class InferredCorrectGuess(GameStateCommand):
-    description = "Takes the user that send the event as the winner, this is only ever fired internally"
-    short_description = "Internally awards a win"
+class CorrectGuessCommand(BaseCommand):
+    description = "Manually award a player the win, when automated inferrence didn't work"
 
-    patterns = tuple()
-    example = None
+    patterns = (
+        r"<@(?P<target_user>[0-9A-Z]+)>[\s]*\+\+",
+    )
+
+    examples = [
+        ("@winner ++", "Manually award a player the win"),
+    ]
 
     first_emojis = [":first_place_medal:"]
     second_emojis = [":second_place_medal:"]
@@ -28,13 +32,20 @@ class InferredCorrectGuess(GameStateCommand):
 
     def prepare_args(self, event):
         super().prepare_args(event)
-        self.args["target_user"] = self.args["user"]
 
     @only_guessing
     def execute(self):
         yield from super().execute()
 
         state = self.gamestate.state[self.args["channel"]]
+
+        if self.args["target_user"] in (state["old_winner"], state["winner"]):
+            yield (None, "You're not allowed to award current players the win >.>")
+            return
+
+        if self.args["user"] != state["winner"]:
+            yield (None, "You're not the current winner, stop awarding other people the win >.>")
+            return
 
         # Save a copy of the emojirade, as below clears it
         raw_emojirades = list(state["emojirade"])
@@ -59,10 +70,6 @@ class InferredCorrectGuess(GameStateCommand):
         else:
             alternatives = ""
 
-        if state.get("first_guess", False):
-            yield(None, "Holy bejesus Batman :bat::man:, they guessed it in one go! :clap:")
-
-        yield (None, f"<@{state['winner']}>++")
         yield (None, f"Congrats <@{state['winner']}>, you're now at {score} point{'s' if score > 1 else ''}{emoji}")
         yield (None, f"The correct emojirade was `{first_emojirade}`{alternatives}")
 

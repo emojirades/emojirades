@@ -1,17 +1,20 @@
-from plusplusbot.command.gamestate_commands.gamestate_command import GameStateCommand
 from plusplusbot.wrappers import only_in_progress, only_as_direct_message
-from plusplusbot.helpers import sanitize_text
 from plusplusbot.checks import emojirade_is_banned
+from plusplusbot.helpers import sanitize_text
+from plusplusbot.commands import BaseCommand
 
 
-class SetEmojirade(GameStateCommand):
+class SetEmojiradeCommand(BaseCommand):
     description = "Sets the new emojirade to be guessed"
-    short_description = "Sets the new emojirade"
 
     patterns = (
         r"^emojirade[s]* (?P<emojirade>.+)",
     )
-    example = "emojirade foo | bar | foobar"
+
+    examples = [
+        ("emojirade foo", "Sets the new emojirade to 'foo'"),
+        ("emojirade foo | bar", "Sets the new emojirade to 'foo' with 'bar' alternative"),
+    ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

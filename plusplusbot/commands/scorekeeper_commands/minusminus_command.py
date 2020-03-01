@@ -1,15 +1,17 @@
-from plusplusbot.command.scorekeeper_commands.scorekeeper_command import ScoreKeeperCommand
+from plusplusbot.commands import BaseCommand
 from plusplusbot.wrappers import admin_check
 
 
-class MinusMinusCommand(ScoreKeeperCommand):
+class MinusMinusCommand(BaseCommand):
     description = "Decrement the users score"
-    short_description = "Decrement users score"
 
     patterns = (
         r"<@(?P<target_user>[0-9A-Z]+)>[\s]*--",
     )
-    example = "@user --"
+
+    examples = [
+        ("@user --", "Decrement users score"),
+    ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

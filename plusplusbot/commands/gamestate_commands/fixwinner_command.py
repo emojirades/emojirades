@@ -1,15 +1,17 @@
-from plusplusbot.command.gamestate_commands.gamestate_command import GameStateCommand
 from plusplusbot.wrappers import admin_or_old_winner_check, only_not_in_progress
+from plusplusbot.commands import BaseCommand
 
 
-class FixWinner(GameStateCommand):
+class FixWinnerCommand(BaseCommand):
     description = "Resets the currently awarded win to another player (in case of a ninja or something)"
-    short_description = "Award the win to someone else"
 
     patterns = (
         r"<@{me}> fixwinner <@(?P<winner>[0-9A-Z]+)>",
     )
-    example = "<@{me}> fixwinner @foo"
+
+    examples = [
+        ("<@{me}> fixwinner @other-person", "Award the win to someone else"),
+    ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

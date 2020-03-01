@@ -1,15 +1,17 @@
-from plusplusbot.command.gamestate_commands.gamestate_command import GameStateCommand
+from plusplusbot.commands import BaseCommand
 from plusplusbot.wrappers import admin_check
 
 
-class SetAdmin(GameStateCommand):
+class SetAdminCommand(BaseCommand):
     description = "Promotes a user to a game admin!"
-    short_description = "Promote a user"
 
     patterns = (
         r"<@{me}> promote <@(?P<admin>[0-9A-Z]+)>",
     )
-    example = "<@{me}> promote @pleb"
+
+    examples = [
+        ("<@{me}> promote @pleb", "Promote a user"),
+    ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

@@ -4,17 +4,16 @@ import logging
 import re
 
 
-class Command(ABC):
+class BaseCommand(ABC):
     user_override_regex = re.compile(r".*(?P<override_cmd>[\s]+player=[\s]*(<@(?P<user_override>[0-9A-Z]+)>)).*")
     channel_override_regex = re.compile(r".*(?P<override_cmd>[\s]+channel=[\s]*(<#(?P<channel_override>[0-9A-Z]+)\|(?P<channel_name>[0-9A-Za-z_-]+)>)).*")
 
-    def __init__(self, slack, event, **kwargs):
+    def __init__(self, event, slack, scorekeeper, gamestate):
         self.logger = logging.getLogger("PlusPlusBot.Command")
 
         self.slack = slack
-
-        self.scorekeeper = kwargs["scorekeeper"]
-        self.gamestate = kwargs["gamestate"]
+        self.scorekeeper = scorekeeper
+        self.gamestate = gamestate
 
         self.args = {}
         self.prepare_args(event)
@@ -34,7 +33,7 @@ class Command(ABC):
         # Only check for overrides if admin
         if self.gamestate.is_admin(self.args["channel"], self.args["user"]):
             # Perform the channel override if it matches
-            channel_override_match = Command.channel_override_regex.match(event["text"])
+            channel_override_match = BaseCommand.channel_override_regex.match(event["text"])
 
             if channel_override_match:
                 self.args["original_channel"] = self.args["channel"]
@@ -43,7 +42,7 @@ class Command(ABC):
                 event["text"] = event["text"].replace(channel_override_match.groupdict()["override_cmd"], "")
 
             # Perform the user override if it matches
-            user_override_match = Command.user_override_regex.match(event["text"])
+            user_override_match = BaseCommand.user_override_regex.match(event["text"])
 
             if user_override_match:
                 self.args["original_user"] = self.args["user"]
@@ -93,7 +92,7 @@ class Command(ABC):
         pass
 
     @property
-    def example(self):
+    def examples(self):
         pass
 
     def __str__(self):

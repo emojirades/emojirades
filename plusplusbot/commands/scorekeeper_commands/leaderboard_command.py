@@ -1,14 +1,16 @@
-from plusplusbot.command.scorekeeper_commands.scorekeeper_command import ScoreKeeperCommand
+from plusplusbot.commands import BaseCommand
 
 
-class LeaderboardCommand(ScoreKeeperCommand):
+class LeaderboardCommand(BaseCommand):
     description = "Shows all the users scores"
-    short_description = "Show user scores"
 
     patterns = (
         r"<@{me}> (score|leader)[\s]*board",
     )
-    example = "<@{me}> scoreboard"
+
+    examples = [
+        ("<@{me}> scoreboard", "Show user scores"),
+    ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

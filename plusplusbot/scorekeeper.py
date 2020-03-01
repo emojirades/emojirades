@@ -7,7 +7,7 @@ import io
 from collections import defaultdict
 
 from plusplusbot.handlers import get_configuration_handler
-from plusplusbot.command.commands import Command
+
 
 module_logger = logging.getLogger("PlusPlusBot.scorekeeper")
 
