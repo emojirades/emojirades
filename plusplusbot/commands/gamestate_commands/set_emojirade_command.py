@@ -1,10 +1,10 @@
 from plusplusbot.wrappers import only_in_progress, only_as_direct_message
-from plusplusbot.commands.gamestate_commands import GameStateCommand
 from plusplusbot.checks import emojirade_is_banned
 from plusplusbot.helpers import sanitize_text
+from plusplusbot.commands import BaseCommand
 
 
-class SetEmojirade(GameStateCommand):
+class SetEmojiradeCommand(BaseCommand):
     description = "Sets the new emojirade to be guessed"
 
     patterns = (

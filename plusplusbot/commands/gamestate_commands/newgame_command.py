@@ -1,8 +1,8 @@
-from plusplusbot.commands.gamestate_commands import GameStateCommand
+from plusplusbot.commands import BaseCommand
 from plusplusbot.wrappers import admin_check
 
 
-class NewGame(GameStateCommand):
+class NewGameCommand(BaseCommand):
     description = "Initiate a new game by setting the Old Winner and the Winner"
 
     patterns = (

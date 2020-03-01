@@ -1,8 +1,8 @@
-from plusplusbot.commands.scorekeeper_commands import ScoreKeeperCommand
+from plusplusbot.commands import BaseCommand
 from plusplusbot.wrappers import admin_check
 
 
-class MinusMinusCommand(ScoreKeeperCommand):
+class MinusMinusCommand(BaseCommand):
     description = "Decrement the users score"
 
     patterns = (

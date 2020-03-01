@@ -1,8 +1,8 @@
-from plusplusbot.commands.gamestate_commands import GameStateCommand
 from plusplusbot.wrappers import admin_or_old_winner_check, only_not_in_progress
+from plusplusbot.commands import BaseCommand
 
 
-class FixWinner(GameStateCommand):
+class FixWinnerCommand(BaseCommand):
     description = "Resets the currently awarded win to another player (in case of a ninja or something)"
 
     patterns = (

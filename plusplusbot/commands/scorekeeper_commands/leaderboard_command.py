@@ -1,7 +1,7 @@
-from plusplusbot.commands.scorekeeper_commands import ScoreKeeperCommand
+from plusplusbot.commands import BaseCommand
 
 
-class LeaderboardCommand(ScoreKeeperCommand):
+class LeaderboardCommand(BaseCommand):
     description = "Shows all the users scores"
 
     patterns = (

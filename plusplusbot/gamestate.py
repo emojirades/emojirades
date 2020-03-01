@@ -4,12 +4,12 @@ import re
 
 from collections import defaultdict
 
-from plusplusbot.command.gamestate_commands.inferred_correct_guess_command import InferredCorrectGuess
+from plusplusbot.commands.gamestate_commands.inferred_correct_guess_command import InferredCorrectGuessCommand
 from plusplusbot.helpers import sanitize_text, match_emojirade, match_emoji
-from plusplusbot.handlers import get_configuration_handler
-
 from plusplusbot.helpers import ScottFactorExceededException
-from plusplusbot.command.commands import Command
+from plusplusbot.handlers import get_configuration_handler
+from plusplusbot.commands import BaseCommand
+
 
 module_logger = logging.getLogger("PlusPlusBot.gamestate")
 
@@ -113,7 +113,7 @@ class GameState(object):
 
         if self.is_admin(channel, user):
             # Double check if we're overriding the channel
-            channel_override_match = Command.channel_override_regex.match(text)
+            channel_override_match = BaseCommand.channel_override_regex.match(text)
 
             if channel_override_match:
                 original_channel = channel
@@ -122,7 +122,7 @@ class GameState(object):
                 text = text.replace(channel_override_match.groupdict()["override_cmd"], "")
 
             # Double check if we're overriding the user
-            user_override_match = Command.user_override_regex.match(text)
+            user_override_match = BaseCommand.user_override_regex.match(text)
 
             if user_override_match:
                 original_user = user
@@ -144,7 +144,8 @@ class GameState(object):
             try:
                 if match_emojirade(guess, state["emojirade"]):
                     self.logger.debug(f"emojirades='{'|'.join(state['emojirade'])}' guess='{guess}' status='correct'")
-                    yield InferredCorrectGuess
+
+                    yield InferredCorrectGuessCommand
                 else:
                     self.logger.debug(f"emojirades='{'|'.join(state['emojirade'])}' guess='{guess}' status='incorrect'")
             except ScottFactorExceededException as e:

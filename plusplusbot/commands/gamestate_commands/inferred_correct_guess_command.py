@@ -1,10 +1,10 @@
-from plusplusbot.commands.gamestate_commands import GameStateCommand
 from plusplusbot.wrappers import only_guessing
+from plusplusbot.commands import BaseCommand
 
 import random
 
 
-class InferredCorrectGuess(GameStateCommand):
+class InferredCorrectGuessCommand(BaseCommand):
     description = "Takes the user that send the event as the winner, this is only ever fired internally"
 
     patterns = tuple()

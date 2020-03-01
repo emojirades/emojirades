@@ -1,8 +1,8 @@
-from plusplusbot.commands.command import Command
-from plusplusbot.command import prepare_commands
+from plusplusbot.commands import BaseCommand
+import plusplusbot.commands.registry
 
 
-class HelpCommand(Command):
+class HelpCommand(BaseCommand):
     description = "Shows this help"
 
     patterns = (
@@ -29,7 +29,7 @@ class HelpCommand(Command):
     def execute(self):
         yield from super().execute()
 
-        commands = prepare_commands()
+        commands = plusplusbot.commands.registry.CommandRegistry.command_patterns()
 
         # Calculate the longest example & description
         longest_description = 0

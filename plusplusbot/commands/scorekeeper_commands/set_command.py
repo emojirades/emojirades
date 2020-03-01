@@ -1,8 +1,8 @@
-from plusplusbot.commands.scorekeeper_commands import ScoreKeeperCommand
+from plusplusbot.commands import BaseCommand
 from plusplusbot.wrappers import admin_check
 
 
-class SetCommand(ScoreKeeperCommand):
+class SetCommand(BaseCommand):
     description = "Manually set the users score"
 
     patterns = (

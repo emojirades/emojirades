@@ -1,7 +1,7 @@
-from plusplusbot.commands.scorekeeper_commands import ScoreKeeperCommand
+from plusplusbot.commands import BaseCommand
 
 
-class HistoryCommand(ScoreKeeperCommand):
+class HistoryCommand(BaseCommand):
     description = "Shows the latest few actions performed"
 
     patterns = (

@@ -1,8 +1,8 @@
-from plusplusbot.commands.gamestate_commands import GameStateCommand
+from plusplusbot.commands import BaseCommand
 from plusplusbot.wrappers import admin_check
 
 
-class GameStatus(GameStateCommand):
+class GameStatusCommand(BaseCommand):
     description = "Prints out the game status"
 
     patterns = (

@@ -1,10 +1,10 @@
-from plusplusbot.commands.gamestate_commands import GameStateCommand
 from plusplusbot.wrappers import only_guessing
+from plusplusbot.commands import BaseCommand
 
 import random
 
 
-class CorrectGuess(GameStateCommand):
+class CorrectGuessCommand(BaseCommand):
     description = "Manually award a player the win, when automated inferrence didn't work"
 
     patterns = (

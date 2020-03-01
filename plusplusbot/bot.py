@@ -2,10 +2,11 @@ import logging
 import time
 import os
 
+from plusplusbot.commands.registry import CommandRegistry
 from plusplusbot.slack import SlackClient, slack
-from plusplusbot.commands import CommandRegistry
 from plusplusbot.scorekeeper import ScoreKeeper
 from plusplusbot.gamestate import GameState
+
 
 module_logger = logging.getLogger("PlusPlusBot.bot")
 
@@ -34,11 +35,11 @@ class PlusPlusBot(object):
         self.logger.debug(f"Handling event: {event}")
 
         for GameCommand in self.gamestate.infer_commands(event):
-            yield GameCommand(self.slack, event, scorekeeper=self.scorekeeper, gamestate=self.gamestate)
+            yield GameCommand(event, self.slack, self.scorekeeper, self.gamestate)
 
         for Command in commands.values():
             if Command.match(event["text"], me=self.slack.bot_id):
-                yield Command(self.slack, event, scorekeeper=self.scorekeeper, gamestate=self.gamestate)
+                yield Command(event, self.slack, self.scorekeeper, self.gamestate)
 
     def valid_event(self, event):
         """
@@ -81,7 +82,7 @@ class PlusPlusBot(object):
             raise NotImplementedError(f"Returned channel '{channel}' wasn't decoded")
 
     def handle_event(self, **payload):
-        commands = CommandRegistry.prepare_commands()
+        commands = CommandRegistry.command_patterns()
 
         event = payload["data"]
         webclient = payload["web_client"]

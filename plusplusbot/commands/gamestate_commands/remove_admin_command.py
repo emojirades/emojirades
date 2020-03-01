@@ -1,8 +1,8 @@
-from plusplusbot.commands.gamestate_commands import GameStateCommand
+from plusplusbot.commands import BaseCommand
 from plusplusbot.wrappers import admin_check
 
 
-class RemoveAdmin(GameStateCommand):
+class RemoveAdminCommand(BaseCommand):
     description = "Removes a user from the admins group"
 
     patterns = (

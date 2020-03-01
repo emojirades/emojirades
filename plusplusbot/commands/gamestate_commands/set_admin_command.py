@@ -1,8 +1,8 @@
-from plusplusbot.commands.gamestate_commands import GameStateCommand
+from plusplusbot.commands import BaseCommand
 from plusplusbot.wrappers import admin_check
 
 
-class SetAdmin(GameStateCommand):
+class SetAdminCommand(BaseCommand):
     description = "Promotes a user to a game admin!"
 
     patterns = (

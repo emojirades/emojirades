@@ -179,14 +179,15 @@ class TestBotCommands(EmojiradeBotTester):
         assert state["winner"] == self.config.player_3
 
     def test_help(self):
-        from plusplusbot.command.command_registry import CommandRegistry
+        from plusplusbot.commands.registry import CommandRegistry
 
         self.send_event(self.events.help)
 
-        commands = CommandRegistry.prepare_commands()
+        commands = CommandRegistry.command_patterns()
 
         for command in commands.values():
-            assert re.compile(fr"{re.escape(command.example)}\s+{re.escape(command.short_description)}") \
+            for example, description in command.examples:
+                assert re.compile(fr"{re.escape(example)}\s+{re.escape(description)}") \
                      .search(self.responses[-2][1])
 
     def test_game_status(self):
