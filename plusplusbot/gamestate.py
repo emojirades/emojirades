@@ -8,6 +8,7 @@ from plusplusbot.commands.gamestate_commands.inferred_correct_guess_command impo
 from plusplusbot.helpers import sanitize_text, match_emojirade, match_emoji
 from plusplusbot.helpers import ScottFactorExceededException
 from plusplusbot.handlers import get_configuration_handler
+
 from plusplusbot.commands import BaseCommand
 
 
@@ -80,6 +81,7 @@ class GameState(object):
                 "old_winner": None,
                 "winner": None,
                 "emojirade": None,
+                "raw_emojirade": None,
                 "admins": [],
             }
 
@@ -192,14 +194,17 @@ class GameState(object):
         self.state[channel]["winner"] = winner
         self.state[channel]["step"] = "waiting"
         self.state[channel]["emojirade"] = None
+        self.state[channel]["raw_emojirade"] = None
         self.save()
 
-    def set_emojirade(self, channel, emojirade):
+    def set_emojirade(self, channel, emojirades):
         """ New emojirade word(s), 'emojirade' is a list of accepted answers """
         if self.state[channel]["step"] != "waiting":
             raise self.InvalidStateException("Expecting {channel}'s state to be 'waiting', it is actually {self.state[channel]['step'])}")
 
-        self.state[channel]["emojirade"] = emojirade
+        self.state[channel]["emojirade"] = [sanitize_text(i) for i in emojirades]
+        self.state[channel]["raw_emojirade"] = emojirades
+
         self.state[channel]["step"] = "provided"
         self.save()
 
@@ -221,6 +226,7 @@ class GameState(object):
         self.state[channel]["winner"] = winner
         self.state[channel]["step"] = "waiting"
         self.state[channel]["emojirade"] = None
+        self.state[channel]["raw_emojirade"] = None
         self.save()
 
     def game_status(self, channel):

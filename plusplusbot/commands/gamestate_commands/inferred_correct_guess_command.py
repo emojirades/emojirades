@@ -39,8 +39,13 @@ class InferredCorrectGuessCommand(BaseCommand):
         state = self.gamestate.state[self.args["channel"]]
 
         # Save a copy of the emojirade, as below clears it
-        raw_emojirades = list(state["emojirade"])
-        first_emojirade = raw_emojirades[0]
+        raw_emojirades = [i.replace("`", "") for i in state["raw_emojirade"]]
+        first_emojirade = raw_emojirades.pop(0)
+
+        if raw_emojirades:
+            alternatives = ", with alternatives " + " OR ".join([f"`{i}`" for i in raw_emojirades[1:]])
+        else:
+            alternatives = ""
 
         self.gamestate.correct_guess(self.args["channel"], self.args["target_user"])
         score, position = self.scorekeeper.plusplus(self.args["channel"], self.args["target_user"])
@@ -55,11 +60,6 @@ class InferredCorrectGuessCommand(BaseCommand):
             emoji = random.choice(self.other_emojis)
 
         emoji = f" {emoji}"
-
-        if len(raw_emojirades) > 1:
-            alternatives = ", with alternatives " + " OR ".join([f"`{i}`" for i in raw_emojirades[1:]])
-        else:
-            alternatives = ""
 
         if state.get("first_guess", False):
             yield(None, "Holy bejesus Batman :bat::man:, they guessed it in one go! :clap:")
