@@ -64,7 +64,7 @@ class HelpCommand(BaseCommand):
 
         game_admins = self.gamestate.game_status(self.args["channel"])["admins"]
         admins_names = [self.slack.pretty_name(i) for i in game_admins]
-        yield (None, "Game Admins: " + ", ".join(game_admins))
+        yield (None, "Game Admins: " + ", ".join(admins_names))
 
     def __str__(self):
         return "HelpCommand"
