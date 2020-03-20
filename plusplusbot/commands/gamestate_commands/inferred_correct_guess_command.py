@@ -43,7 +43,7 @@ class InferredCorrectGuessCommand(BaseCommand):
         first_emojirade = raw_emojirades.pop(0)
 
         if raw_emojirades:
-            alternatives = ", with alternatives " + " OR ".join([f"`{i}`" for i in raw_emojirades[1:]])
+            alternatives = ", with alternatives " + " OR ".join([f"`{i}`" for i in raw_emojirades])
         else:
             alternatives = ""
 
