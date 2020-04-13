@@ -1,4 +1,4 @@
 requests==2.23.0
 slackclient==2.5.0
-boto3==1.12.37
+boto3==1.12.39
 Unidecode==1.1.1
