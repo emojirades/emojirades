@@ -6,7 +6,8 @@ import tempfile
 import logging
 import os
 
-logging.basicConfig(level=logging.DEBUG)
+# export LOGGING_LEVEL=10 to turn on debug
+logging.basicConfig(level=int(os.getenv("LOGGING_LEVEL", logging.INFO)))
 
 
 class EmojiradeBotTester(unittest.TestCase):
