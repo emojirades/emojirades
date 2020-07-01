@@ -165,7 +165,7 @@ class TestBotCommands(EmojiradeBotTester):
         override = {"channel": self.config.channel}
         self.send_event({**self.events.posted_emojirade, **override})
 
-        print(self.responses)
+        # print(self.responses)
         assert (self.config.player_1_channel,
                 "Sorry, but this command can only be sent as a direct message!"
                 ) in self.responses
