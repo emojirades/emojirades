@@ -3,6 +3,7 @@ import json
 import csv
 import re
 import io
+import time
 
 from collections import defaultdict
 
@@ -53,10 +54,17 @@ class ScoreKeeper(object):
                player2: 50
            },
            "history": [
-               (player1, "++"),
-               (player2, "--")
-           ]
-       }
+           {
+                'timestamp': 1593565068.205327,
+                'user_id': player1,
+                'operation': "++"
+            },
+            {
+                'timestamp': 1593565068.205327,
+                'user_id': player2,
+                'operation': "++"
+            }]
+        }
     }
     """
 
@@ -94,21 +102,24 @@ class ScoreKeeper(object):
 
     def plusplus(self, channel, user):
         self.scoreboard[channel]["scores"][user] += 1
-        self.scoreboard[channel]["history"].append((user, "++"))
+        self.scoreboard[channel]["history"].append(self.history_template(user, "++"))
         self.save()
         return self.current_score(channel, user)
 
     def minusminus(self, channel, user):
         self.scoreboard[channel]["scores"][user] -= 1
-        self.scoreboard[channel]["history"].append((user, "--"))
+        self.scoreboard[channel]["history"].append(self.history_template(user, "--"))
         self.save()
         return self.current_score(channel, user)
 
     def overwrite(self, channel, user, score):
         self.scoreboard[channel]["scores"][user] = score
-        self.scoreboard[channel]["history"].append((user, f"Manually set to {score}"))
+        self.scoreboard[channel]["history"].append(self.history_template(user, f"Manually set to {score}"))
         self.save()
         return self.current_score(channel, user)
+
+    def history_template(self, user, operation):
+        return {'operation': operation, 'timestamp': time.time(), 'user_id': user}
 
     def leaderboard(self, channel, limit=leaderboard_limit):
         return sorted(self.scoreboard[channel]["scores"].items(), key=lambda i: (i[1], i[0]), reverse=True)[:limit]
