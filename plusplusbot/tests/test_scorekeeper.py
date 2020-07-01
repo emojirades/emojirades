@@ -2,7 +2,7 @@ from unittest import TestCase
 from unittest import mock
 
 from plusplusbot.scorekeeper import ScoreKeeper
-from plusplusbot.tests.helper import EmojiradeBotTester # TODO: Handle logging level better
+from plusplusbot.tests.helper import EmojiradeBotTester  # TODO: Handle logging level better
 
 import tempfile
 import json
