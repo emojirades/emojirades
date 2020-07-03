@@ -18,5 +18,3 @@ with open('history.csv', 'w') as csv_file:
     for event in history:
         event['timestamp'] = datetime.fromtimestamp(event['timestamp'], tz=pendulum.timezone('Australia/Melbourne'))
         writer.writerow(event)
-
-
