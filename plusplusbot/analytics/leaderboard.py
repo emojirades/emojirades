@@ -109,5 +109,3 @@ class LeaderBoard:
 
     def get_month(self, of_date: pendulum.DateTime):
         return self.get_by_range(of_date, 'month')
-
-
