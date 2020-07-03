@@ -1,3 +1,6 @@
+import pendulum
+
+from plusplusbot.analytics.leaderboard import LeaderBoard
 from plusplusbot.commands import BaseCommand
 
 
@@ -5,7 +8,8 @@ class LeaderboardCommand(BaseCommand):
     description = "Shows all the users scores"
 
     patterns = (
-        r"<@{me}> (score|leader)[\s]*board",
+        r"<@{me}> (score|leader)[\s]*board$",
+        r"<@{me}> (score|leader)[\s]*board (?P<range>weekly|monthly)",
     )
 
     examples = [
@@ -17,8 +21,21 @@ class LeaderboardCommand(BaseCommand):
 
     def execute(self):
         yield from super().execute()
+        leaderboard = []
 
-        leaderboard = self.scorekeeper.leaderboard(self.args["channel"])
+        time_unit = self.args.get('range')
+        if time_unit:
+            self.logger.debug(f"Getting a {time_unit} leaderboard")
+            history = self.scorekeeper.raw_history(self.args['channel'])
+            of_date = pendulum.now()
+            lb = LeaderBoard(history)
+
+            if time_unit == 'weekly':
+                leaderboard = lb.get_week(of_date)
+            elif time_unit == 'monthly':
+                leaderboard = lb.get_month(of_date)
+        else:
+            leaderboard = self.scorekeeper.leaderboard(self.args["channel"])
 
         self.logger.debug(f"Printing leaderboard: {leaderboard}")
 

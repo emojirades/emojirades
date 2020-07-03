@@ -26,9 +26,9 @@ class HistoryCommand(BaseCommand):
             yield (None, message)
             return
 
-        self.logger.debug("Printing history: {history}")
+        self.logger.debug(f"Printing history: {history}")
 
-        history_log = [f"{index}. <@{name}> > '{action}'" for index, (name, action) in enumerate(history, start=1)]
+        history_log = [f"{index}. <@{event['user_id']}> > '{event['operation']}'" for index, event in enumerate(history, start=1)]
         last_message = ["This is an in-memory log and only up-to-date from the last bot restart."]
 
         yield (None, "\n".join(history_log + last_message))

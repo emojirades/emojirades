@@ -1,8 +1,5 @@
 import logging
 import json
-import csv
-import re
-import io
 import time
 
 from collections import defaultdict
@@ -125,7 +122,10 @@ class ScoreKeeper(object):
         return sorted(self.scoreboard[channel]["scores"].items(), key=lambda i: (i[1], i[0]), reverse=True)[:limit]
 
     def history(self, channel, limit=history_limit):
-        return self.scoreboard[channel]["history"][::-1][:limit]
+        return self.raw_history(channel)[-limit:][::-1]
+
+    def raw_history(self, channel):
+        return self.scoreboard[channel]['history']
 
     def save(self):
         self.config.save(self.scoreboard)

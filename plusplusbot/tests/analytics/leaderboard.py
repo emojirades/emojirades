@@ -20,16 +20,16 @@ class TestLeaderBoard:
 
     def test_get_week(self, lb, current_date):
         assert lb.get_week(current_date) == [
-            {'U985L6R1M': 15},
-            {'U0VCW825A': 13},
-            {'U5HKU1Q0W': 12},
-            {'U0ZC11HC7': 9}
+            ('U985L6R1M', 15),
+            ('U0VCW825A', 13),
+            ('U5HKU1Q0W', 12),
+            ('U0ZC11HC7', 9)
         ]
 
     def test_get_month(self, lb, current_date):
         assert lb.get_month(current_date) == [
-            {'U0VCW825A': 44},
-            {'U5HKU1Q0W': 43},
-            {'U985L6R1M': 42},
-            {'U0ZC11HC7': 33}
+            ('U0VCW825A', 44),
+            ('U5HKU1Q0W', 43),
+            ('U985L6R1M', 42),
+            ('U0ZC11HC7', 33)
         ]
