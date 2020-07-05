@@ -15,8 +15,20 @@ class LeaderBoard:
         self.len = len(history)
         self.logger = logging.getLogger("PlusPlusBot.analytics.LeaderBoard")
 
-    # First step, find something in the history that matches the range.
-    def find_rows_in_range(self, start_time, end_time):
+    def find_rows_in_range(self, start_time: float, end_time: float) -> int:
+        """
+
+        :param start_time: timestamp of the start of the date range
+        :param end_time: timestamp of the end of the date range
+        :return: index of matched event in history
+
+        A modified binary search to find a single match of event within the date range.
+
+        - Get an approximate index by comparing requested daterange and the earliest and latest timestamp in history.
+        - If the number of events in history is distributed quiet evenly, this will usually match the first time.
+        - If not matched, jump to the half way point of the remaining events.
+        """
+
         low = 0
         high = self.len - 1
 
@@ -53,12 +65,21 @@ class LeaderBoard:
             else:
                 return guess
 
+            guess = math.floor((high - low) / 2 + low)
+
         # if somehow still find nothing
         return self.NOT_FOUND
 
-    # Second step, flood-fill up and bottom
-    # this reduces search time compared to finding the upper/lower bound
-    def get_data(self, start_time, end_time):
+    def get_data(self, start_time: float, end_time: float) -> list:
+        """
+
+        :param start_time: timestamp of the start of the date range
+        :param end_time: timestamp of the end of the date range
+        :return: a list of events
+
+        Find all events within the start and end time.
+        """
+
         results = []
         affected_row_index = self.find_rows_in_range(start_time, end_time)
 
@@ -92,11 +113,12 @@ class LeaderBoard:
         leaderboard = defaultdict(int)
 
         for item in history:
-            val = 0
             if item["operation"] == "++":
                 val = 1
             elif item["operation"] == "--":
                 val = -1
+            else:
+                continue
 
             leaderboard[item["user_id"]] += val
 

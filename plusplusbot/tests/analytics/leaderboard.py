@@ -12,10 +12,14 @@ class TestLeaderBoard:
         return LeaderBoard(history)
 
     @pytest.fixture
-    def current_date(self):
+    def current_date(self, mel_tz):
         return pendulum.datetime(
-            2020, 6, 20, tz=pendulum.timezone("Australia/Melbourne")
+            2020, 6, 20, tz=mel_tz
         )
+
+    @pytest.fixture
+    def mel_tz(self):
+        return pendulum.timezone("Australia/Melbourne")
 
     def test_fixture_loading(self, lb):
         assert len(lb.history) > 0
@@ -34,4 +38,15 @@ class TestLeaderBoard:
             ("U5HKU1Q0W", 43),
             ("U985L6R1M", 42),
             ("U0ZC11HC7", 33),
+        ]
+
+    def test_get_historical_month(self, lb, mel_tz):
+
+        historical_date = pendulum.datetime(2020, 5, 10, tz=mel_tz)
+
+        assert lb.get_month(historical_date) == [
+            ('U5HKU1Q0W', 74),
+            ('U0ZC11HC7', 64),
+            ('U0VCW825A', 57),
+            ('U985L6R1M', 41)
         ]

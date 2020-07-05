@@ -27,7 +27,7 @@ class LeaderboardCommand(BaseCommand):
         if time_unit:
             self.logger.debug(f"Getting a {time_unit} leaderboard")
             history = self.scorekeeper.raw_history(self.args["channel"])
-            of_date = pendulum.now()
+            of_date = pendulum.now("Australia/Melbourne")
             lb = LeaderBoard(history)
 
             if time_unit == "weekly":
