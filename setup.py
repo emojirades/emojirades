@@ -1,6 +1,7 @@
 from setuptools import setup, find_packages
 
 from os import path
+
 this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, "README.md"), encoding="utf-8") as f:
     long_description = f.read()
@@ -23,16 +24,9 @@ setup(
     keywords="slack slackbot emojirades",
     license="GNU",
     packages=find_packages(),
-    install_requires=[
-        "requests",
-        "slackclient",
-        "boto3",
-        "Unidecode",
-    ],
+    install_requires=["requests", "slackclient", "boto3", "Unidecode",],
     python_requires="~=3.7",
-    extras_require={
-        "test": ["pytest", "pycodestyle"],
-    },
+    extras_require={"test": ["pytest", "pycodestyle"],},
     scripts=["bin/emojirades-plusplus"],
     author="Michael Robbins",
     author_email="support@emojirades.io",

@@ -5,9 +5,7 @@ from plusplusbot.wrappers import admin_check
 class GameStatusCommand(BaseCommand):
     description = "Prints out the game status"
 
-    patterns = (
-        r"<@{me}> (game[\s]*){{0,1}}(status|state)",
-    )
+    patterns = (r"<@{me}> (game[\s]*){{0,1}}(status|state)",)
 
     examples = [
         ("<@{me}> game status", "Print game status"),

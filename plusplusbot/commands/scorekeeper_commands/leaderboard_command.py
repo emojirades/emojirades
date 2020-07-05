@@ -23,16 +23,16 @@ class LeaderboardCommand(BaseCommand):
         yield from super().execute()
         leaderboard = []
 
-        time_unit = self.args.get('range')
+        time_unit = self.args.get("range")
         if time_unit:
             self.logger.debug(f"Getting a {time_unit} leaderboard")
-            history = self.scorekeeper.raw_history(self.args['channel'])
+            history = self.scorekeeper.raw_history(self.args["channel"])
             of_date = pendulum.now()
             lb = LeaderBoard(history)
 
-            if time_unit == 'weekly':
+            if time_unit == "weekly":
                 leaderboard = lb.get_week(of_date)
-            elif time_unit == 'monthly':
+            elif time_unit == "monthly":
                 leaderboard = lb.get_month(of_date)
         else:
             leaderboard = self.scorekeeper.leaderboard(self.args["channel"])
@@ -64,7 +64,9 @@ class LeaderboardCommand(BaseCommand):
             name = self.slack.pretty_name(name)
             name = name if len(name) < 20 else "{name[0:18]}.."
 
-            lines.append(f"{index:>2}. {name:<{longest_name}} [ {score:>{biggest_score}} point{'s' if score > 1 else ' '} ]")
+            lines.append(
+                f"{index:>2}. {name:<{longest_name}} [ {score:>{biggest_score}} point{'s' if score > 1 else ' '} ]"
+            )
 
         lines.append("```")
 

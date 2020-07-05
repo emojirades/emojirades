@@ -4,9 +4,7 @@ from plusplusbot.commands import BaseCommand
 class HistoryCommand(BaseCommand):
     description = "Shows the latest few actions performed"
 
-    patterns = (
-        r"<@{me}> history",
-    )
+    patterns = (r"<@{me}> history",)
 
     examples = [
         ("<@{me}> history", "Shows history"),
@@ -28,7 +26,12 @@ class HistoryCommand(BaseCommand):
 
         self.logger.debug(f"Printing history: {history}")
 
-        history_log = [f"{index}. <@{event['user_id']}> > '{event['operation']}'" for index, event in enumerate(history, start=1)]
-        last_message = ["This is an in-memory log and only up-to-date from the last bot restart."]
+        history_log = [
+            f"{index}. <@{event['user_id']}> > '{event['operation']}'"
+            for index, event in enumerate(history, start=1)
+        ]
+        last_message = [
+            "This is an in-memory log and only up-to-date from the last bot restart."
+        ]
 
         yield (None, "\n".join(history_log + last_message))

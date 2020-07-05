@@ -5,9 +5,7 @@ from plusplusbot.wrappers import admin_check
 class MinusMinusCommand(BaseCommand):
     description = "Decrement the users score"
 
-    patterns = (
-        r"<@(?P<target_user>[0-9A-Z]+)>[\s]*--",
-    )
+    patterns = (r"<@(?P<target_user>[0-9A-Z]+)>[\s]*--",)
 
     examples = [
         ("@user --", "Decrement users score"),
@@ -30,4 +28,7 @@ class MinusMinusCommand(BaseCommand):
 
         score, _ = self.scorekeeper.current_score(self.args["channel"], target_user)
 
-        yield (None, f"Oops <@{target_user}>, you're now at {score} point{'s' if score > 1 else ''}")
+        yield (
+            None,
+            f"Oops <@{target_user}>, you're now at {score} point{'s' if score > 1 else ''}",
+        )

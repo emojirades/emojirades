@@ -20,8 +20,8 @@ class EmojiradeBotTester(unittest.TestCase):
         web_client.chat_postMessage = self.save_responses
 
         payload = {
-          "data": event,
-          "web_client": web_client,
+            "data": event,
+            "web_client": web_client,
         }
 
         self.bot.handle_event(**payload)
@@ -36,11 +36,22 @@ class EmojiradeBotTester(unittest.TestCase):
         elif state == "provided":
             events = [self.events.new_game, self.events.posted_emojirade]
         elif state == "guessing":
-            events = [self.events.new_game, self.events.posted_emojirade, self.events.posted_emoji]
+            events = [
+                self.events.new_game,
+                self.events.posted_emojirade,
+                self.events.posted_emoji,
+            ]
         elif state == "guessed":
-            events = [self.events.new_game, self.events.posted_emojirade, self.events.posted_emoji, self.events.correct_guess]
+            events = [
+                self.events.new_game,
+                self.events.posted_emojirade,
+                self.events.posted_emoji,
+                self.events.correct_guess,
+            ]
         else:
-            raise RuntimeError(f"Invalid state ({state}) provided to TestPlusPlusBot.transition_to()")
+            raise RuntimeError(
+                f"Invalid state ({state}) provided to TestPlusPlusBot.transition_to()"
+            )
 
         for event in events:
             self.send_event(event)

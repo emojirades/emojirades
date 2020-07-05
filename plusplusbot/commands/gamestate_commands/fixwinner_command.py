@@ -5,9 +5,7 @@ from plusplusbot.commands import BaseCommand
 class FixWinnerCommand(BaseCommand):
     description = "Resets the currently awarded win to another player (in case of a ninja or something)"
 
-    patterns = (
-        r"<@{me}> fixwinner <@(?P<winner>[0-9A-Z]+)>",
-    )
+    patterns = (r"<@{me}> fixwinner <@(?P<winner>[0-9A-Z]+)>",)
 
     examples = [
         ("<@{me}> fixwinner @other-person", "Award the win to someone else"),
@@ -24,7 +22,10 @@ class FixWinnerCommand(BaseCommand):
     def execute(self):
         yield from super().execute()
 
-        if self.args["winner"] == self.gamestate.state[self.args["channel"]]["old_winner"]:
+        if (
+            self.args["winner"]
+            == self.gamestate.state[self.args["channel"]]["old_winner"]
+        ):
             yield (None, ":face_palm: You can't award yourself the win")
             return
 
@@ -32,10 +33,15 @@ class FixWinnerCommand(BaseCommand):
             yield (None, "This won't actually do anything? :shrug::face_with_monocle:")
             return
 
-        loser, winner = self.gamestate.fixwinner(self.args["channel"], self.args["winner"])
+        loser, winner = self.gamestate.fixwinner(
+            self.args["channel"], self.args["winner"]
+        )
 
         if loser is None or winner is None:
-            yield (None, "Failed to fix the winner, no scores have been updated, please fix manually :(")
+            yield (
+                None,
+                "Failed to fix the winner, no scores have been updated, please fix manually :(",
+            )
             return
 
         yield (None, f"<@{loser}>--")
@@ -44,4 +50,7 @@ class FixWinnerCommand(BaseCommand):
         yield (None, f"<@{winner}>++")
         self.scorekeeper.plusplus(self.args["channel"], winner)
 
-        yield (None, f"Sorry <@{loser}>! <@{self.args['user']}> has decided to award <@{winner}> the win :smiling_imp:")
+        yield (
+            None,
+            f"Sorry <@{loser}>! <@{self.args['user']}> has decided to award <@{winner}> the win :smiling_imp:",
+        )

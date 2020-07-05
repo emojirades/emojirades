@@ -18,6 +18,7 @@ def get_handler(filename):
         """
         Handles CRUD for the ScoreKeeper configuration file
         """
+
         FILE_ENCODING = "utf-8"
 
         def __init__(self, *args, **kwargs):
@@ -87,7 +88,16 @@ class ScoreKeeper(object):
                 self.logger.info(f"Loaded scores from {filename}")
 
     def current_score(self, channel, user):
-        leaderboard = list(map(lambda x: x[0], sorted(self.scoreboard[channel]["scores"].items(), key=lambda x: x[1], reverse=True)))
+        leaderboard = list(
+            map(
+                lambda x: x[0],
+                sorted(
+                    self.scoreboard[channel]["scores"].items(),
+                    key=lambda x: x[1],
+                    reverse=True,
+                ),
+            )
+        )
 
         try:
             position = leaderboard.index(user) + 1
@@ -111,21 +121,27 @@ class ScoreKeeper(object):
 
     def overwrite(self, channel, user, score):
         self.scoreboard[channel]["scores"][user] = score
-        self.scoreboard[channel]["history"].append(self.history_template(user, f"Manually set to {score}"))
+        self.scoreboard[channel]["history"].append(
+            self.history_template(user, f"Manually set to {score}")
+        )
         self.save()
         return self.current_score(channel, user)
 
     def history_template(self, user, operation):
-        return {'operation': operation, 'timestamp': time.time(), 'user_id': user}
+        return {"operation": operation, "timestamp": time.time(), "user_id": user}
 
     def leaderboard(self, channel, limit=leaderboard_limit):
-        return sorted(self.scoreboard[channel]["scores"].items(), key=lambda i: (i[1], i[0]), reverse=True)[:limit]
+        return sorted(
+            self.scoreboard[channel]["scores"].items(),
+            key=lambda i: (i[1], i[0]),
+            reverse=True,
+        )[:limit]
 
     def history(self, channel, limit=history_limit):
         return self.raw_history(channel)[-limit:][::-1]
 
     def raw_history(self, channel):
-        return self.scoreboard[channel]['history']
+        return self.scoreboard[channel]["history"]
 
     def save(self):
         self.config.save(self.scoreboard)
