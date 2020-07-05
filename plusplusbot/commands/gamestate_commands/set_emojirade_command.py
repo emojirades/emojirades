@@ -6,13 +6,14 @@ from plusplusbot.commands import BaseCommand
 class SetEmojiradeCommand(BaseCommand):
     description = "Sets the new emojirade to be guessed"
 
-    patterns = (
-        r"^emojirade[s]* (?P<emojirade>.+)",
-    )
+    patterns = (r"^emojirade[s]* (?P<emojirade>.+)",)
 
     examples = [
         ("emojirade foo", "Sets the new emojirade to 'foo'"),
-        ("emojirade foo | bar", "Sets the new emojirade to 'foo' with 'bar' alternative"),
+        (
+            "emojirade foo | bar",
+            "Sets the new emojirade to 'foo' with 'bar' alternative",
+        ),
     ]
 
     def __init__(self, *args, **kwargs):
@@ -39,8 +40,14 @@ class SetEmojiradeCommand(BaseCommand):
     def execute(self):
         yield from super().execute()
 
-        if self.args["user"] != self.gamestate.state[self.args["channel"]]["old_winner"]:
-            yield (None, f"Err <@{self.args['user']}> it's not your turn to provide the new 'rade :sweat:")
+        if (
+            self.args["user"]
+            != self.gamestate.state[self.args["channel"]]["old_winner"]
+        ):
+            yield (
+                None,
+                f"Err <@{self.args['user']}> it's not your turn to provide the new 'rade :sweat:",
+            )
             return
 
         if self.args["channel"] is None:
@@ -48,7 +55,10 @@ class SetEmojiradeCommand(BaseCommand):
             return
 
         if emojirade_is_banned(self.args["emojirade"]):
-            yield (None, "Sorry, but that emojirade contained a banned word/phrase :no_good:, try again?")
+            yield (
+                None,
+                "Sorry, but that emojirade contained a banned word/phrase :no_good:, try again?",
+            )
             return
 
         # Break the alternatives out
@@ -60,11 +70,16 @@ class SetEmojiradeCommand(BaseCommand):
 
         # DM the winner with the new emojirade
         if len(raw_emojirades) > 1:
-            alternatives = ", with alternatives " + " OR ".join([f"`{i}`" for i in raw_emojirades[1:]])
+            alternatives = ", with alternatives " + " OR ".join(
+                [f"`{i}`" for i in raw_emojirades[1:]]
+            )
         else:
             alternatives = ""
 
-        yield (winner, f"Hey, <@{self.args['user']}> made the emojirade `{raw_emojirades[0]}`{alternatives}, good luck!")
+        yield (
+            winner,
+            f"Hey, <@{self.args['user']}> made the emojirade `{raw_emojirades[0]}`{alternatives}, good luck!",
+        )
 
         # Let the user know their 'rade has been accepted
         yield (self.args["user"], f"Thanks for that! I've let <@{winner}> know!")

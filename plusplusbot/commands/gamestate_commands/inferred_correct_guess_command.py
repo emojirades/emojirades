@@ -43,12 +43,16 @@ class InferredCorrectGuessCommand(BaseCommand):
         first_emojirade = raw_emojirades.pop(0)
 
         if raw_emojirades:
-            alternatives = ", with alternatives " + " OR ".join([f"`{i}`" for i in raw_emojirades])
+            alternatives = ", with alternatives " + " OR ".join(
+                [f"`{i}`" for i in raw_emojirades]
+            )
         else:
             alternatives = ""
 
         self.gamestate.correct_guess(self.args["channel"], self.args["target_user"])
-        score, position = self.scorekeeper.plusplus(self.args["channel"], self.args["target_user"])
+        score, position = self.scorekeeper.plusplus(
+            self.args["channel"], self.args["target_user"]
+        )
 
         if position == 1:
             emoji = random.choice(self.first_emojis + self.other_emojis)
@@ -62,11 +66,23 @@ class InferredCorrectGuessCommand(BaseCommand):
         emoji = f" {emoji}"
 
         if state.get("first_guess", False):
-            yield(None, "Holy bejesus Batman :bat::man:, they guessed it in one go! :clap:")
+            yield (
+                None,
+                "Holy bejesus Batman :bat::man:, they guessed it in one go! :clap:",
+            )
 
         yield (None, f"<@{state['winner']}>++")
-        yield (None, f"Congrats <@{state['winner']}>, you're now at {score} point{'s' if score > 1 else ''}{emoji}")
+        yield (
+            None,
+            f"Congrats <@{state['winner']}>, you're now at {score} point{'s' if score > 1 else ''}{emoji}",
+        )
         yield (None, f"The correct emojirade was `{first_emojirade}`{alternatives}")
 
-        yield (state["old_winner"], f"You'll now need to send me the new 'rade for <@{state['winner']}>")
-        yield (state["old_winner"], "Please reply back in the format `emojirade Point Break` if `Point Break` was the new 'rade")
+        yield (
+            state["old_winner"],
+            f"You'll now need to send me the new 'rade for <@{state['winner']}>",
+        )
+        yield (
+            state["old_winner"],
+            "Please reply back in the format `emojirade Point Break` if `Point Break` was the new 'rade",
+        )

@@ -5,11 +5,11 @@ import random
 
 
 class CorrectGuessCommand(BaseCommand):
-    description = "Manually award a player the win, when automated inferrence didn't work"
-
-    patterns = (
-        r"<@(?P<target_user>[0-9A-Z]+)>[\s]*\+\+",
+    description = (
+        "Manually award a player the win, when automated inferrence didn't work"
     )
+
+    patterns = (r"<@(?P<target_user>[0-9A-Z]+)>[\s]*\+\+",)
 
     examples = [
         ("@winner ++", "Manually award a player the win"),
@@ -44,7 +44,10 @@ class CorrectGuessCommand(BaseCommand):
             return
 
         if self.args["user"] != state["winner"]:
-            yield (None, "You're not the current winner, stop awarding other people the win >.>")
+            yield (
+                None,
+                "You're not the current winner, stop awarding other people the win >.>",
+            )
             return
 
         # Save a copy of the emojirade, as below clears it
@@ -52,12 +55,16 @@ class CorrectGuessCommand(BaseCommand):
         first_emojirade = raw_emojirades.pop(0)
 
         if raw_emojirades:
-            alternatives = ", with alternatives " + " OR ".join([f"`{i}`" for i in raw_emojirades])
+            alternatives = ", with alternatives " + " OR ".join(
+                [f"`{i}`" for i in raw_emojirades]
+            )
         else:
             alternatives = ""
 
         self.gamestate.correct_guess(self.args["channel"], self.args["target_user"])
-        score, position = self.scorekeeper.plusplus(self.args["channel"], self.args["target_user"])
+        score, position = self.scorekeeper.plusplus(
+            self.args["channel"], self.args["target_user"]
+        )
 
         if position == 1:
             emoji = random.choice(self.first_emojis + self.other_emojis)
@@ -71,10 +78,22 @@ class CorrectGuessCommand(BaseCommand):
         emoji = f" {emoji}"
 
         if state.get("first_guess", False):
-            yield(None, "Holy bejesus Batman :bat::man:, they guessed it in one go! :clap:")
+            yield (
+                None,
+                "Holy bejesus Batman :bat::man:, they guessed it in one go! :clap:",
+            )
 
-        yield (None, f"Congrats <@{state['winner']}>, you're now at {score} point{'s' if score > 1 else ''}{emoji}")
+        yield (
+            None,
+            f"Congrats <@{state['winner']}>, you're now at {score} point{'s' if score > 1 else ''}{emoji}",
+        )
         yield (None, f"The correct emojirade was `{first_emojirade}`{alternatives}")
 
-        yield (state["old_winner"], f"You'll now need to send me the new 'rade for <@{state['winner']}>")
-        yield (state["old_winner"], "Please reply back in the format `emojirade Point Break` if `Point Break` was the new 'rade")
+        yield (
+            state["old_winner"],
+            f"You'll now need to send me the new 'rade for <@{state['winner']}>",
+        )
+        yield (
+            state["old_winner"],
+            "Please reply back in the format `emojirade Point Break` if `Point Break` was the new 'rade",
+        )

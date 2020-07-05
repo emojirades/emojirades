@@ -75,7 +75,9 @@ class PlusPlusBot(object):
             dm_id = self.slack.find_im(channel)
 
             if dm_id is None:
-                raise RuntimeError(f"Unable to find direct message channel for '{channel}'")
+                raise RuntimeError(
+                    f"Unable to find direct message channel for '{channel}'"
+                )
 
             return dm_id
         else:
@@ -96,7 +98,9 @@ class PlusPlusBot(object):
             self.logger.debug(f"Matched {command} for event {event}")
 
             for channel, response in command.execute():
-                self.logger.debug(f"Command {command} executed with response: {(channel, response)}")
+                self.logger.debug(
+                    f"Command {command} executed with response: {(channel, response)}"
+                )
                 if channel is not None:
                     channel = self.decode_channel(channel)
                 else:

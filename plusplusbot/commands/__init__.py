@@ -5,8 +5,12 @@ import re
 
 
 class BaseCommand(ABC):
-    user_override_regex = re.compile(r".*(?P<override_cmd>[\s]+player=[\s]*(<@(?P<user_override>[0-9A-Z]+)>)).*")
-    channel_override_regex = re.compile(r".*(?P<override_cmd>[\s]+channel=[\s]*(<#(?P<channel_override>[0-9A-Z]+)\|(?P<channel_name>[0-9A-Za-z_-]+)>)).*")
+    user_override_regex = re.compile(
+        r".*(?P<override_cmd>[\s]+player=[\s]*(<@(?P<user_override>[0-9A-Z]+)>)).*"
+    )
+    channel_override_regex = re.compile(
+        r".*(?P<override_cmd>[\s]+channel=[\s]*(<#(?P<channel_override>[0-9A-Z]+)\|(?P<channel_name>[0-9A-Za-z_-]+)>)).*"
+    )
 
     def __init__(self, event, slack, scorekeeper, gamestate):
         self.logger = logging.getLogger("PlusPlusBot.Command")
@@ -33,13 +37,19 @@ class BaseCommand(ABC):
         # Only check for overrides if admin
         if self.gamestate.is_admin(self.args["channel"], self.args["user"]):
             # Perform the channel override if it matches
-            channel_override_match = BaseCommand.channel_override_regex.match(event["text"])
+            channel_override_match = BaseCommand.channel_override_regex.match(
+                event["text"]
+            )
 
             if channel_override_match:
                 self.args["original_channel"] = self.args["channel"]
-                self.args["channel"] = channel_override_match.groupdict()["channel_override"]
+                self.args["channel"] = channel_override_match.groupdict()[
+                    "channel_override"
+                ]
 
-                event["text"] = event["text"].replace(channel_override_match.groupdict()["override_cmd"], "")
+                event["text"] = event["text"].replace(
+                    channel_override_match.groupdict()["override_cmd"], ""
+                )
 
             # Perform the user override if it matches
             user_override_match = BaseCommand.user_override_regex.match(event["text"])
@@ -48,10 +58,14 @@ class BaseCommand(ABC):
                 self.args["original_user"] = self.args["user"]
                 self.args["user"] = user_override_match.groupdict()["user_override"]
 
-                event["text"] = event["text"].replace(user_override_match.groupdict()["override_cmd"], "")
+                event["text"] = event["text"].replace(
+                    user_override_match.groupdict()["override_cmd"], ""
+                )
 
         # Perform the command's actual match
-        patterns = tuple(i.format(me=self.slack.bot_id) if "{me}" in i else i for i in self.patterns)
+        patterns = tuple(
+            i.format(me=self.slack.bot_id) if "{me}" in i else i for i in self.patterns
+        )
 
         for pattern in patterns:
             self.logger.debug(f"Matching '{pattern}' against '{event['text']}'")
@@ -59,7 +73,9 @@ class BaseCommand(ABC):
             match = re.compile(pattern).match(event["text"])
 
             if not match:
-                self.logger.debug("Failed to match '{pattern}' against '{event['text']}'")
+                self.logger.debug(
+                    "Failed to match '{pattern}' against '{event['text']}'"
+                )
 
             if hasattr(match, "groupdict"):
                 self.args.update(match.groupdict())
@@ -73,7 +89,10 @@ class BaseCommand(ABC):
 
         if self.print_performed_by:
             # We leave channel none here to return on the channel the original message came in on
-            yield (None, f"This action was performed by <@{self.args['user']}>{shadow_user}")
+            yield (
+                None,
+                f"This action was performed by <@{self.args['user']}>{shadow_user}",
+            )
 
     @classmethod
     def match(cls, text, **kwargs):

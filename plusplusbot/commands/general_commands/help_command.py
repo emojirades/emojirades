@@ -5,9 +5,7 @@ import plusplusbot.commands.registry
 class HelpCommand(BaseCommand):
     description = "Shows this help"
 
-    patterns = (
-        r"<@{me}> help",
-    )
+    patterns = (r"<@{me}> help",)
 
     examples = [
         ("<@{me}> help", "Shows this help"),

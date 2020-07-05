@@ -4,7 +4,9 @@ import re
 
 from collections import defaultdict
 
-from plusplusbot.commands.gamestate_commands.inferred_correct_guess_command import InferredCorrectGuessCommand
+from plusplusbot.commands.gamestate_commands.inferred_correct_guess_command import (
+    InferredCorrectGuessCommand,
+)
 from plusplusbot.helpers import sanitize_text, match_emojirade, match_emoji
 from plusplusbot.helpers import ScottFactorExceededException
 from plusplusbot.handlers import get_configuration_handler
@@ -20,6 +22,7 @@ def get_handler(filename):
         """
         Handles CRUD for the Game State configuration file
         """
+
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
 
@@ -121,7 +124,9 @@ class GameState(object):
                 original_channel = channel
                 channel = channel_override_match.groupdict()["channel_override"]
 
-                text = text.replace(channel_override_match.groupdict()["override_cmd"], "")
+                text = text.replace(
+                    channel_override_match.groupdict()["override_cmd"], ""
+                )
 
             # Double check if we're overriding the user
             user_override_match = BaseCommand.user_override_regex.match(text)
@@ -136,22 +141,35 @@ class GameState(object):
         state = self.state[channel]
 
         # Check to see if the winner is posting emoji's
-        if state["step"] == "provided" and user == state["winner"] and match_emoji(text):
+        if (
+            state["step"] == "provided"
+            and user == state["winner"]
+            and match_emoji(text)
+        ):
             self.winner_posted(channel)
 
         # Check to see if the users guess is right!
-        elif state["step"] == "guessing" and user not in (state["old_winner"], state["winner"]):
+        elif state["step"] == "guessing" and user not in (
+            state["old_winner"],
+            state["winner"],
+        ):
             guess = sanitize_text(text)
 
             try:
                 if match_emojirade(guess, state["emojirade"]):
-                    self.logger.debug(f"emojirades='{'|'.join(state['emojirade'])}' guess='{guess}' status='correct'")
+                    self.logger.debug(
+                        f"emojirades='{'|'.join(state['emojirade'])}' guess='{guess}' status='correct'"
+                    )
 
                     yield InferredCorrectGuessCommand
                 else:
-                    self.logger.debug(f"emojirades='{'|'.join(state['emojirade'])}' guess='{guess}' status='incorrect'")
+                    self.logger.debug(
+                        f"emojirades='{'|'.join(state['emojirade'])}' guess='{guess}' status='incorrect'"
+                    )
             except ScottFactorExceededException as e:
-                self.logger.debug(f"emojirade='{'|'.join(state['emojirade'])}' guess='{guess}' status='scott factor exceeded'")
+                self.logger.debug(
+                    f"emojirade='{'|'.join(state['emojirade'])}' guess='{guess}' status='scott factor exceeded'"
+                )
 
             if state.get("first_guess", False):
                 state["first_guess"] = False
@@ -200,7 +218,9 @@ class GameState(object):
     def set_emojirade(self, channel, emojirades):
         """ New emojirade word(s), 'emojirade' is a list of accepted answers """
         if self.state[channel]["step"] != "waiting":
-            raise self.InvalidStateException("Expecting {channel}'s state to be 'waiting', it is actually {self.state[channel]['step'])}")
+            raise self.InvalidStateException(
+                "Expecting {channel}'s state to be 'waiting', it is actually {self.state[channel]['step'])}"
+            )
 
         self.state[channel]["emojirade"] = [sanitize_text(i) for i in emojirades]
         self.state[channel]["raw_emojirade"] = emojirades
@@ -211,7 +231,9 @@ class GameState(object):
     def winner_posted(self, channel):
         """ Winner has posted something after receiving the emojirade """
         if self.state[channel]["step"] != "provided":
-            raise self.InvalidStateException(f"Expecting {channel}'s state to be 'provided', it is actually {self.state['step']}")
+            raise self.InvalidStateException(
+                f"Expecting {channel}'s state to be 'provided', it is actually {self.state['step']}"
+            )
 
         self.state[channel]["step"] = "guessing"
         self.state[channel]["first_guess"] = True
@@ -220,7 +242,9 @@ class GameState(object):
     def correct_guess(self, channel, winner):
         """ Guesser has guessed the correct emojirade """
         if self.state[channel]["step"] != "guessing":
-            raise self.InvalidStateException(f"Expecting {channel}'s state to be 'guessing', it is actually {self.state[channel]['step']}")
+            raise self.InvalidStateException(
+                f"Expecting {channel}'s state to be 'guessing', it is actually {self.state[channel]['step']}"
+            )
 
         self.state[channel]["old_winner"] = self.state[channel]["winner"]
         self.state[channel]["winner"] = winner

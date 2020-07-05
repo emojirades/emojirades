@@ -7,6 +7,7 @@ class TestBotScenarios(EmojiradeBotTester):
     """
     Tests various game scenarios against the bot
     """
+
     def test_valid_complete_game(self):
         """ Performs a complete valid round """
         assert self.state["step"] == "new_game"
@@ -105,6 +106,7 @@ class TestBotScenarios(EmojiradeBotTester):
         Tests that the expected responses are bring returned
         Response order is asserted along with equality
         """
+
         def response(dst, msg):
             return (dst, re.compile(msg))
 
@@ -119,14 +121,22 @@ class TestBotScenarios(EmojiradeBotTester):
 
         # Expected *new* responses
         responses = [
-            response(self.config.channel,
-                     f"<@{self.config.player_1}> has set the old winner to <@{self.config.player_1}> and the winner to <@{self.config.player_2}>"),
-            response(self.config.channel,
-                     f"It's now <@{self.config.player_1}>'s turn to provide <@{self.config.player_2}> with the next 'rade!"),
-            response(self.config.player_1_channel,
-                     f"You'll now need to send me the new 'rade for <@{self.config.player_2}>"),
-            response(self.config.player_1_channel,
-                     "Please reply back in the format `emojirade Point Break` if `Point Break` was the new 'rade"),
+            response(
+                self.config.channel,
+                f"<@{self.config.player_1}> has set the old winner to <@{self.config.player_1}> and the winner to <@{self.config.player_2}>",
+            ),
+            response(
+                self.config.channel,
+                f"It's now <@{self.config.player_1}>'s turn to provide <@{self.config.player_2}> with the next 'rade!",
+            ),
+            response(
+                self.config.player_1_channel,
+                f"You'll now need to send me the new 'rade for <@{self.config.player_2}>",
+            ),
+            response(
+                self.config.player_1_channel,
+                "Please reply back in the format `emojirade Point Break` if `Point Break` was the new 'rade",
+            ),
         ]
 
         # Ensure each expected response exists in actual responses
@@ -143,12 +153,18 @@ class TestBotScenarios(EmojiradeBotTester):
 
         # Expected *new* responses
         responses = [
-            response(self.config.player_2_channel,
-                     f"Hey, <@{self.config.player_1}> made the emojirade `{self.config.emojirade}`, good luck!"),
-            response(self.config.player_1_channel,
-                     f"Thanks for that! I've let <@{self.config.player_2}> know!"),
-            response(self.config.channel,
-                     f":mailbox: 'rade sent to <@{self.config.player_2}>"),
+            response(
+                self.config.player_2_channel,
+                f"Hey, <@{self.config.player_1}> made the emojirade `{self.config.emojirade}`, good luck!",
+            ),
+            response(
+                self.config.player_1_channel,
+                f"Thanks for that! I've let <@{self.config.player_2}> know!",
+            ),
+            response(
+                self.config.channel,
+                f":mailbox: 'rade sent to <@{self.config.player_2}>",
+            ),
         ]
 
         # Ensure each expected response exists in actual responses
@@ -169,12 +185,27 @@ class TestBotScenarios(EmojiradeBotTester):
 
         # Expected *new* responses
         responses = [
-            response(self.config.channel, "Holy bejesus Batman :bat::man:, they guessed it in one go! :clap:"),
+            response(
+                self.config.channel,
+                "Holy bejesus Batman :bat::man:, they guessed it in one go! :clap:",
+            ),
             response(self.config.channel, f"<@{self.config.player_3}>\\+\\+"),
-            response(self.config.channel, f"Congrats <@{self.config.player_3}>, you're now at 1 point :[a-z_]+:"),
-            response(self.config.channel, f"The correct emojirade was `{self.config.emojirade}`"),
-            response(self.config.player_2_channel, f"You'll now need to send me the new 'rade for <@{self.config.player_3}>"),
-            response(self.config.player_2_channel, "Please reply back in the format `emojirade Point Break` if `Point Break` was the new 'rade"),
+            response(
+                self.config.channel,
+                f"Congrats <@{self.config.player_3}>, you're now at 1 point :[a-z_]+:",
+            ),
+            response(
+                self.config.channel,
+                f"The correct emojirade was `{self.config.emojirade}`",
+            ),
+            response(
+                self.config.player_2_channel,
+                f"You'll now need to send me the new 'rade for <@{self.config.player_3}>",
+            ),
+            response(
+                self.config.player_2_channel,
+                "Please reply back in the format `emojirade Point Break` if `Point Break` was the new 'rade",
+            ),
         ]
 
         # Ensure each expected response exists in actual responses
@@ -192,21 +223,30 @@ class TestBotScenarios(EmojiradeBotTester):
 
         self.send_event(self.events.correct_guess)
         assert self.state["step"] == "new_game"
-        assert (self.config.channel, f"<@{self.config.player_3}>++") not in self.responses
+        assert (
+            self.config.channel,
+            f"<@{self.config.player_3}>++",
+        ) not in self.responses
 
         self.send_event(self.events.new_game)
         assert self.state["step"] == "waiting"
 
         self.send_event(self.events.correct_guess)
         assert self.state["step"] == "waiting"
-        assert (self.config.channel, f"<@{self.config.player_3}>++") not in self.responses
+        assert (
+            self.config.channel,
+            f"<@{self.config.player_3}>++",
+        ) not in self.responses
 
         self.send_event(self.events.posted_emojirade)
         assert self.state["step"] == "provided"
 
         self.send_event(self.events.correct_guess)
         assert self.state["step"] == "provided"
-        assert (self.config.channel, f"<@{self.config.player_3}>++") not in self.responses
+        assert (
+            self.config.channel,
+            f"<@{self.config.player_3}>++",
+        ) not in self.responses
 
         self.send_event(self.events.posted_emoji)
         assert self.state["step"] == "guessing"
@@ -358,7 +398,7 @@ class TestBotScenarios(EmojiradeBotTester):
         """ Test that the sanitize_text helper works as expected """
         self.reset_and_transition_to("waiting")
 
-        raw_rade = u"Späce : THE\t\t\tfinal\v- f_r_ö_n+t/ier"
+        raw_rade = "Späce : THE\t\t\tfinal\v- f_r_ö_n+t/ier"
         override = {"text": f"emojirade   {raw_rade}"}
         self.send_event({**self.events.posted_emojirade, **override})
 

@@ -8,7 +8,7 @@ class ScottFactorExceededException(Exception):
     pass
 
 
-remove_punctuation = str.maketrans('', '', string.punctuation)
+remove_punctuation = str.maketrans("", "", string.punctuation)
 
 emoji_regex = re.compile(r":[a-zA-Z0-9-_']+:")
 
@@ -24,7 +24,7 @@ def sanitize_text(text):
     scrubbed = lowered.translate(remove_punctuation)
 
     # Strip excess whitespace
-    stripped = ' '.join(scrubbed.split())
+    stripped = " ".join(scrubbed.split())
 
     return stripped
 
