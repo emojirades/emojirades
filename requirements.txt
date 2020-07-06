@@ -1,5 +1,5 @@
 requests==2.24.0
 slackclient==2.7.2
-boto3==1.14.13
+boto3==1.14.17
 Unidecode==1.1.1
 pendulum==2.1.0
