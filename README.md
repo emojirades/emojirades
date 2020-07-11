@@ -58,6 +58,8 @@ sudo systemctl start emojirades
 4. TravisCI will automatically build and deploy on a tagged commit into master (the release does this)
 
 # Dealing with Containers
+Currently this repo is set to auto build Docker images and deploy to Dockerhub on each tagged commit to master
+
 ## Building the Container Image
 ```
 docker build --pull --no-cache -t michaelrobbins/emojirades:X.Y.Z -t michaelrobbins/emojirades:latest .
