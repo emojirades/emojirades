@@ -1,7 +1,7 @@
-# emojirades-plusplus
+# emojirades
 Slack bot that understands the emojirades game and handles score keeping
 
-[![Build Status](https://travis-ci.com/michael-robbins/emojirades-plusplus.svg?branch=master)](https://travis-ci.org/michael-robbins/emojirades-plusplus) [![PyPI version](https://badge.fury.io/py/Emojirades-PlusPlus.svg)](https://badge.fury.io/py/Emojirades-PlusPlus)
+[![Build Status](https://travis-ci.com/michael-robbins/emojirades.svg?branch=master)](https://travis-ci.org/michael-robbins/emojirades) [![PyPI version](https://badge.fury.io/py/Emojirades.svg)](https://badge.fury.io/py/Emojirades)
 
 # Installation Guide
 `# Preferably run on a virtualenv`
@@ -11,7 +11,7 @@ Slack bot that understands the emojirades game and handles score keeping
 
 ## Install the module ( For Dev )
 ```
-cd emojirades-plusplus
+cd emojirades
 pip3 install -e .
 ```
 
@@ -33,7 +33,7 @@ Optionally if you are saving data into S3, you might need to set the profile to 
 `export AWS_PROFILE='dev-profile'`
 
 ## Run the daemon
-`emojirades-plusplus --score-file scores.csv --state-file state.json -vv`
+`emojirades --score-file scores.csv --state-file state.json -vv`
 
 ## Service configuration
 ```
@@ -42,10 +42,10 @@ sudo chmod 0664 /etc/systemd/system/emojirades.service
 
 # Edit the /etc/systemd/system/emojirades.service file and update the user and group
 
-cp emojiradesplusplus.config /etc/emojiradesplusplus
-sudo chmod 0400 /etc/emojiradesplusplus
+cp emojirades.config /etc/emojirades
+sudo chmod 0400 /etc/emojirades
 
-# Edit the /etc/emojiradesplusplus config file with your configuration for the bot
+# Edit the /etc/emojirades config file with your configuration for the bot
 
 sudo systemctl daemon-reload
 sudo systemctl enable emojirades
