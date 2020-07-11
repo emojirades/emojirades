@@ -1,5 +1,4 @@
 from setuptools import setup, find_packages
-
 from os import path
 
 this_directory = path.abspath(path.dirname(__file__))
@@ -8,7 +7,7 @@ with open(path.join(this_directory, "README.md"), encoding="utf-8") as f:
 
 setup(
     name="Emojirades",
-    version="0.10.0",
+    version="0.10.1",
     description="A Slack bot that understands the Emojirades game!",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -29,6 +28,7 @@ setup(
         "slackclient",
         "boto3",
         "Unidecode",
+        "pendulum",
     ],
     python_requires="~=3.8",
     extras_require={
