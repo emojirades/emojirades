@@ -119,6 +119,9 @@ class EmojiradesBot(object):
                 args = response.get("args", [])
                 kwargs = response.get("kwargs", {})
 
+                if kwargs.get("channel") is None:
+                    kwargs["channel"] = channel
+
                 func(*args, **kwargs)
 
     def listen_for_commands(self):
