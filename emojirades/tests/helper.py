@@ -18,6 +18,7 @@ class EmojiradeBotTester(unittest.TestCase):
     def send_event(self, event):
         web_client = Mock()
         web_client.chat_postMessage = self.save_responses
+        web_client.reactions_add = self.save_responses
 
         payload = {
             "data": event,
@@ -54,8 +55,8 @@ class EmojiradeBotTester(unittest.TestCase):
         for event in events:
             self.send_event(event)
 
-    def save_responses(self, channel, text):
-        self.responses.append((channel, text))
+    def save_responses(self, channel, response):
+        self.responses.append((channel, response))
 
     def find_im(self, user_id):
         return user_id.replace("U", "D")
