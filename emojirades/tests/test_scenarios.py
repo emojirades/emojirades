@@ -106,11 +106,14 @@ class TestBotScenarios(EmojiradeBotTester):
         Tests that the expected responses are bring returned
         Response order is asserted along with equality
         """
-
         def response(dst, msg):
             return (dst, re.compile(msg))
 
+        def reaction(dst, emoji, ts):
+            return (dst, emoji, ts)
+
         total_responses = 0
+        total_reactions = 0
 
         # Assert game hasn't started yet
         assert self.state["step"] == "new_game"
@@ -216,6 +219,23 @@ class TestBotScenarios(EmojiradeBotTester):
         # Ensure total volume is as expected
         total_responses += len(responses)
         assert len(self.responses) == total_responses
+
+        # Expected *new* reactions
+        reactions = [
+            reaction(
+                self.config.channel,
+                "clap",
+                "1000000000.000001",
+            ),
+        ]
+
+        # Ensure each expected reaction exists
+        for i, reaction in enumerate(reactions):
+            assert reaction == self.reactions[total_reactions + i]
+
+        # Ensure total volume is as expected
+        total_reactions += len(reactions)
+        assert len(self.reactions) == total_reactions
 
     def test_only_guess_when_guessing(self):
         """ Ensures we can only 'guess' correctly when state is guessing """
@@ -428,3 +448,16 @@ class TestBotScenarios(EmojiradeBotTester):
         override = {"text": "gun :gun: gun"}
         self.send_event({**self.events.posted_emoji, **override})
         assert self.state["step"] == "guessing"
+
+    def test_correct_guess_reaction(self):
+        """ Checks that a :clap: emoji is 'reacted' on the winning guess """
+        self.reset_and_transition_to("guessing")
+
+        assert self.state["step"] == "guessing"
+        self.send_event(self.events.correct_guess)
+
+        assert self.state["step"] == "waiting"
+
+        # TODO: Assert the reaction is correctly set
+        # TODO: Update the default events to include incrementing 'ts'
+        #       so we can check against the hardcoded value for the 'correct guess'
