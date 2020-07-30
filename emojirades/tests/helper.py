@@ -18,7 +18,7 @@ class EmojiradeBotTester(unittest.TestCase):
     def send_event(self, event):
         web_client = Mock()
         web_client.chat_postMessage = self.save_responses
-        web_client.reactions_add = self.save_responses
+        web_client.reactions_add = self.save_reactions
 
         payload = {
             "data": event,
@@ -55,8 +55,11 @@ class EmojiradeBotTester(unittest.TestCase):
         for event in events:
             self.send_event(event)
 
-    def save_responses(self, channel, response):
-        self.responses.append((channel, response))
+    def save_responses(self, channel=None, text=None):
+        self.responses.append((channel, text))
+
+    def save_reactions(self, channel=None, name=None, timestamp=None):
+        self.reactions.append((channel, name, timestamp))
 
     def find_im(self, user_id):
         return user_id.replace("U", "D")
@@ -68,6 +71,8 @@ class EmojiradeBotTester(unittest.TestCase):
     @patch("slack.WebClient", autospec=True)
     def setUp(self, web_client, rtm_client):
         self.responses = []
+        self.reactions = []
+
         self.config, self.events = self.prepare_event_data()
 
         self.scorefile = tempfile.NamedTemporaryFile()
