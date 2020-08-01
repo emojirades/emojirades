@@ -1,5 +1,7 @@
 import slack
 
+from expiringdict import ExpiringDict
+
 
 class SlackClient(object):
     def __init__(self, token, logger):
@@ -11,10 +13,10 @@ class SlackClient(object):
 
         self.last_ts = float(0)
 
+        self.user_info_cache = ExpiringDict(max_len=100, max_age_seconds=172800)  # 2 days
+
         self.bot_id = self.webclient.auth_test()["user_id"]
         self.bot_name = self.user_info(self.bot_id)["real_name"]
-
-        self.pretty_names = dict()
 
     def start(self):
         self.rtmclient.start()
@@ -23,7 +25,14 @@ class SlackClient(object):
         self.webclient = webclient
 
     def user_info(self, user_id):
-        return self.webclient.users_info(user=user_id)["user"]
+        print(dir(self))
+        user = self.user_info_cache.get(user_id)
+
+        if user is None:
+            user = self.webclient.users_info(user=user_id)["user"]
+            self.user_info_cache[user_id] = user
+
+        return user
 
     def is_bot(self, user_id):
         return self.user_info(user_id)["is_bot"] or userid == "USLACKBOT"
@@ -40,12 +49,7 @@ class SlackClient(object):
         }
 
     def pretty_name(self, user_id):
-        if user_id not in self.pretty_names:
-            self.pretty_names[user_id] = self.user_info(user_id)
-
-        user = self.pretty_names[user_id]
-
-        return user.get("real_name", user.get("name", "Unknown User"))
+        return self.user_info(user_id).get("real_name", user.get("name", "Unknown User"))
 
     def find_im(self, user_id):
         # Find an existing IM (direct message) ID

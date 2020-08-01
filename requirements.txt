@@ -3,3 +3,4 @@ slackclient==2.7.3
 boto3==1.14.29
 Unidecode==1.1.1
 pendulum==2.1.2
+expiringdict==1.2.1

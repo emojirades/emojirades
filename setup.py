@@ -29,6 +29,7 @@ setup(
         "boto3",
         "Unidecode",
         "pendulum",
+        "expiringdict",
     ],
     python_requires="~=3.8",
     extras_require={
