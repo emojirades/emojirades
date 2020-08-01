@@ -25,7 +25,6 @@ class SlackClient(object):
         self.webclient = webclient
 
     def user_info(self, user_id):
-        print(dir(self))
         user = self.user_info_cache.get(user_id)
 
         if user is None:
