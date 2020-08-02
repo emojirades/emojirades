@@ -48,7 +48,8 @@ class SlackClient(object):
         }
 
     def pretty_name(self, user_id):
-        return self.user_info(user_id).get("real_name", user.get("name", "Unknown User"))
+        user = self.user_info(user_id)
+        return user.get("real_name", user.get("name", "Unknown User"))
 
     def find_im(self, user_id):
         # Find an existing IM (direct message) ID
