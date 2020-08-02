@@ -225,7 +225,7 @@ class TestBotScenarios(EmojiradeBotTester):
             reaction(
                 self.config.channel,
                 "clap",
-                "1000000000.000001",
+                self.events.correct_guess["ts"],
             ),
         ]
 
@@ -458,6 +458,10 @@ class TestBotScenarios(EmojiradeBotTester):
 
         assert self.state["step"] == "waiting"
 
-        # TODO: Assert the reaction is correctly set
-        # TODO: Update the default events to include incrementing 'ts'
-        #       so we can check against the hardcoded value for the 'correct guess'
+        expected_reaction = (
+            self.config.channel,
+            "clap",
+            self.events.correct_guess["ts"],
+        )
+
+        assert self.reactions[0] == expected_reaction

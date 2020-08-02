@@ -139,6 +139,7 @@ class EmojiradeBotTester(unittest.TestCase):
                 **{
                     "user": player_1,
                     "text": f"<@{bot_id}> new game <@{player_1}> <@{player_2}>",
+                    "ts": "1000000000.000002",
                 },
             },
             "posted_emojirade": {
@@ -147,6 +148,7 @@ class EmojiradeBotTester(unittest.TestCase):
                     "channel": bot_channel,
                     "user": player_1,
                     "text": f"emojirade {emojirade}",
+                    "ts": "1000000000.000003",
                 },
             },
             "posted_emoji": {
@@ -154,6 +156,7 @@ class EmojiradeBotTester(unittest.TestCase):
                 **{
                     "user": player_2,
                     "text": ":waddle:",
+                    "ts": "1000000000.000004",
                 },
             },
             "incorrect_guess": {
@@ -161,6 +164,7 @@ class EmojiradeBotTester(unittest.TestCase):
                 **{
                     "user": player_3,
                     "text": "foobar",
+                    "ts": "1000000000.000005",
                 },
             },
             "correct_guess": {
@@ -168,6 +172,7 @@ class EmojiradeBotTester(unittest.TestCase):
                 **{
                     "user": player_3,
                     "text": emojirade,
+                    "ts": "1000000000.000006",
                 },
             },
             "manual_award": {
@@ -175,6 +180,7 @@ class EmojiradeBotTester(unittest.TestCase):
                 **{
                     "user": player_2,
                     "text": f"<@{player_3}>++",
+                    "ts": "1000000000.000007",
                 },
             },
             "plusplus": {
@@ -182,6 +188,7 @@ class EmojiradeBotTester(unittest.TestCase):
                 **{
                     "user": player_1,
                     "text": f"<@{player_2}>++",
+                    "ts": "1000000000.000008",
                 },
             },
             "leaderboard": {
@@ -189,6 +196,7 @@ class EmojiradeBotTester(unittest.TestCase):
                 **{
                     "user": player_1,
                     "text": f"<@{bot_id}> leaderboard",
+                    "ts": "1000000000.000009",
                 },
             },
             "game_status": {
@@ -196,6 +204,7 @@ class EmojiradeBotTester(unittest.TestCase):
                 **{
                     "user": player_1,
                     "text": f"<@{bot_id}> game status",
+                    "ts": "1000000000.000010",
                 },
             },
             "help": {
@@ -203,6 +212,7 @@ class EmojiradeBotTester(unittest.TestCase):
                 **{
                     "user": player_1,
                     "text": f"<@{bot_id}> help",
+                    "ts": "1000000000.000011",
                 },
             },
             "fixwinner": {
@@ -210,6 +220,7 @@ class EmojiradeBotTester(unittest.TestCase):
                 **{
                     "user": player_2,
                     "text": f"<@{bot_id}> fixwinner <@{player_4}>",
+                    "ts": "1000000000.000012",
                 },
             },
         }
