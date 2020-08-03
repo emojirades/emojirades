@@ -33,6 +33,7 @@ class BaseCommand(ABC):
     def prepare_args(self, event):
         self.args["channel"] = event["channel"]
         self.args["user"] = event["user"]
+        self.args["ts"] = event["ts"]
 
         # Only check for overrides if admin
         if self.gamestate.is_admin(self.args["channel"], self.args["user"]):
