@@ -18,6 +18,7 @@ class EmojiradeBotTester(unittest.TestCase):
     def send_event(self, event):
         web_client = Mock()
         web_client.chat_postMessage = self.save_responses
+        web_client.reactions_add = self.save_reactions
 
         payload = {
             "data": event,
@@ -54,8 +55,11 @@ class EmojiradeBotTester(unittest.TestCase):
         for event in events:
             self.send_event(event)
 
-    def save_responses(self, channel, text):
+    def save_responses(self, channel=None, text=None):
         self.responses.append((channel, text))
+
+    def save_reactions(self, channel=None, name=None, timestamp=None):
+        self.reactions.append((channel, name, timestamp))
 
     def find_im(self, user_id):
         return user_id.replace("U", "D")
@@ -67,6 +71,8 @@ class EmojiradeBotTester(unittest.TestCase):
     @patch("slack.WebClient", autospec=True)
     def setUp(self, web_client, rtm_client):
         self.responses = []
+        self.reactions = []
+
         self.config, self.events = self.prepare_event_data()
 
         self.scorefile = tempfile.NamedTemporaryFile()
@@ -133,6 +139,7 @@ class EmojiradeBotTester(unittest.TestCase):
                 **{
                     "user": player_1,
                     "text": f"<@{bot_id}> new game <@{player_1}> <@{player_2}>",
+                    "ts": "1000000000.000002",
                 },
             },
             "posted_emojirade": {
@@ -141,6 +148,7 @@ class EmojiradeBotTester(unittest.TestCase):
                     "channel": bot_channel,
                     "user": player_1,
                     "text": f"emojirade {emojirade}",
+                    "ts": "1000000000.000003",
                 },
             },
             "posted_emoji": {
@@ -148,6 +156,7 @@ class EmojiradeBotTester(unittest.TestCase):
                 **{
                     "user": player_2,
                     "text": ":waddle:",
+                    "ts": "1000000000.000004",
                 },
             },
             "incorrect_guess": {
@@ -155,6 +164,7 @@ class EmojiradeBotTester(unittest.TestCase):
                 **{
                     "user": player_3,
                     "text": "foobar",
+                    "ts": "1000000000.000005",
                 },
             },
             "correct_guess": {
@@ -162,6 +172,7 @@ class EmojiradeBotTester(unittest.TestCase):
                 **{
                     "user": player_3,
                     "text": emojirade,
+                    "ts": "1000000000.000006",
                 },
             },
             "manual_award": {
@@ -169,6 +180,7 @@ class EmojiradeBotTester(unittest.TestCase):
                 **{
                     "user": player_2,
                     "text": f"<@{player_3}>++",
+                    "ts": "1000000000.000007",
                 },
             },
             "plusplus": {
@@ -176,6 +188,7 @@ class EmojiradeBotTester(unittest.TestCase):
                 **{
                     "user": player_1,
                     "text": f"<@{player_2}>++",
+                    "ts": "1000000000.000008",
                 },
             },
             "leaderboard": {
@@ -183,6 +196,7 @@ class EmojiradeBotTester(unittest.TestCase):
                 **{
                     "user": player_1,
                     "text": f"<@{bot_id}> leaderboard",
+                    "ts": "1000000000.000009",
                 },
             },
             "game_status": {
@@ -190,6 +204,7 @@ class EmojiradeBotTester(unittest.TestCase):
                 **{
                     "user": player_1,
                     "text": f"<@{bot_id}> game status",
+                    "ts": "1000000000.000010",
                 },
             },
             "help": {
@@ -197,6 +212,7 @@ class EmojiradeBotTester(unittest.TestCase):
                 **{
                     "user": player_1,
                     "text": f"<@{bot_id}> help",
+                    "ts": "1000000000.000011",
                 },
             },
             "fixwinner": {
@@ -204,6 +220,7 @@ class EmojiradeBotTester(unittest.TestCase):
                 **{
                     "user": player_2,
                     "text": f"<@{bot_id}> fixwinner <@{player_4}>",
+                    "ts": "1000000000.000012",
                 },
             },
         }

@@ -54,6 +54,17 @@ class InferredCorrectGuessCommand(BaseCommand):
             self.args["channel"], self.args["target_user"]
         )
 
+        yield (
+            None,
+            {
+                "func": "reactions_add",
+                "kwargs": {
+                    "name": "clap",
+                    "timestamp": self.args["ts"],
+                },
+            },
+        )
+
         if position == 1:
             emoji = random.choice(self.first_emojis + self.other_emojis)
         elif position == 2:

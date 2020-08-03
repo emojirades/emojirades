@@ -106,7 +106,23 @@ class EmojiradesBot(object):
                 else:
                     channel = self.decode_channel(event["channel"])
 
-                webclient.chat_postMessage(channel=channel, text=response)
+                if isinstance(response, str):
+                    # Plain strings are assumed as 'chat_postMessage'
+                    webclient.chat_postMessage(channel=channel, text=response)
+                    continue
+
+                func = getattr(webclient, response["func"], None)
+
+                if func is None:
+                    raise RuntimeError(f"Unmapped function '{response['func']}'")
+
+                args = response.get("args", [])
+                kwargs = response.get("kwargs", {})
+
+                if kwargs.get("channel") is None:
+                    kwargs["channel"] = channel
+
+                func(*args, **kwargs)
 
     def listen_for_commands(self):
         self.logger.info("Starting Slack monitor")
