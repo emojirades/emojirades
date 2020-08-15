@@ -110,7 +110,7 @@ class GameState(object):
         Not to be called directly, used as another command source from the bot
         """
         channel = str(event["channel"])
-        user = str(event["user"])
+        user = str(event.get("user", event.get("bot_id")))
         text = str(event["text"])
         state = self.state[channel]
 

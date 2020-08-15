@@ -32,7 +32,7 @@ class BaseCommand(ABC):
 
     def prepare_args(self, event):
         self.args["channel"] = event["channel"]
-        self.args["user"] = event["user"]
+        self.args["user"] = event.get("user", event.get("bot_id"))
         self.args["ts"] = event["ts"]
 
         # Only check for overrides if admin

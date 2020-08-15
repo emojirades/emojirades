@@ -51,12 +51,15 @@ class EmojiradesBot(object):
         expected_keys = {
             "text",
             "channel",
-            "user",
         }
+
+        id_keys = {"user", "bot_id"}
 
         if not event:
             return False
         elif not expected_keys.issubset(event.keys()):
+            return False
+        elif not len(id_keys.intersection(event.keys())) > 0:
             return False
 
         return True
