@@ -1,7 +1,7 @@
 # emojirades
 Slack bot that understands the emojirades game and handles score keeping
 
-[![Build Status](https://travis-ci.com/michael-robbins/emojirades.svg?branch=master)](https://travis-ci.org/michael-robbins/emojirades) [![PyPI version](https://badge.fury.io/py/Emojirades.svg)](https://badge.fury.io/py/Emojirades)
+[![Build Status](https://travis-ci.com/emojirades/emojirades.svg?branch=master)](https://travis-ci.org/emojirades/emojirades) [![PyPI version](https://badge.fury.io/py/Emojirades.svg)](https://badge.fury.io/py/Emojirades)
 
 # Installation Guide
 `# Preferably run on a virtualenv`
@@ -62,7 +62,7 @@ Currently this repo is set to auto build Docker images and deploy to Dockerhub o
 
 ## Building the Container Image
 ```
-docker build --pull --no-cache -t michaelrobbins/emojirades:X.Y.Z -t michaelrobbins/emojirades:latest .
+docker build --pull --no-cache -t emojirades/emojirades:X.Y.Z -t emojirades/emojirades:latest .
 ```
 
 ## Running the Container
@@ -73,7 +73,7 @@ docker run -d \
   -v "/path/to/your/.aws/:/root/.aws/:ro" \
   -e "AWS_PROFILE=emojirades" \
   -e "SLACK_BOT_TOKEN=xoxb-111111111111-222222222222222222222222" \
-  michaelrobbins/emojirades:X.Y.Z \
+  emojirades/emojirades:X.Y.Z \
     --score-file /path/to/scores.json \
     --state-file /path/to/state.json \
     -vv
