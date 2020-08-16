@@ -4,12 +4,14 @@ import pendulum
 import pytest
 import json
 
+from emojirades.tests.FileFixture import FileFixture
+
 
 class TestLeaderBoard:
     @pytest.fixture
     def lb(self):
-        history = json.load(open("../fixtures/history.json"))
-        return LeaderBoard(history)
+        with FileFixture("history.json").open() as ff:
+            return LeaderBoard(json.load(ff))
 
     @pytest.fixture
     def current_date(self, mel_tz):
