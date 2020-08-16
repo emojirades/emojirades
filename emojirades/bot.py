@@ -4,7 +4,7 @@ import os
 import traceback
 
 from emojirades.commands.registry import CommandRegistry
-from emojirades.slack.client import SlackClient
+from emojirades.slack.client import Client
 from emojirades.scorekeeper import ScoreKeeper
 from emojirades.gamestate import GameState
 
@@ -24,7 +24,7 @@ class EmojiradesBot(object):
         if not slack_bot_token:
             raise RuntimeError("Missing SLACK_BOT_TOKEN from environment vars")
 
-        self.slack = SlackClient(slack_bot_token, self.logger)
+        self.slack = Client(slack_bot_token, self.logger)
         self.logger.debug("Initialised application instance")
 
     def match_event(self, event, commands):

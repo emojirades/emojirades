@@ -3,7 +3,7 @@ import slack
 from expiringdict import ExpiringDict
 
 
-class SlackClient(object):
+class Client(object):
     def __init__(self, token, logger):
         self.token = token
         self.logger = logger
