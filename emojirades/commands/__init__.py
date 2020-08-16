@@ -3,6 +3,8 @@ from abc import ABC, abstractmethod, abstractproperty
 import logging
 import re
 
+from emojirades.slack.event import Event
+
 
 class BaseCommand(ABC):
     user_override_regex = re.compile(
@@ -12,7 +14,7 @@ class BaseCommand(ABC):
         r".*(?P<override_cmd>[\s]+channel=[\s]*(<#(?P<channel_override>[0-9A-Z]+)\|(?P<channel_name>[0-9A-Za-z_-]+)>)).*"
     )
 
-    def __init__(self, event, slack, scorekeeper, gamestate):
+    def __init__(self, event: Event, slack, scorekeeper, gamestate):
         self.logger = logging.getLogger("EmojiradesBot.Command")
 
         self.slack = slack
@@ -30,16 +32,16 @@ class BaseCommand(ABC):
 
         self.print_performed_by = False
 
-    def prepare_args(self, event):
-        self.args["channel"] = event["channel"]
-        self.args["user"] = event.get("user", event.get("bot_id"))
-        self.args["ts"] = event["ts"]
+    def prepare_args(self, event: Event):
+        self.args["channel"] = event.channel
+        self.args["user"] = event.player_id
+        self.args["ts"] = event.ts
 
         # Only check for overrides if admin
         if self.gamestate.is_admin(self.args["channel"], self.args["user"]):
             # Perform the channel override if it matches
             channel_override_match = BaseCommand.channel_override_regex.match(
-                event["text"]
+                event.text
             )
 
             if channel_override_match:
@@ -48,18 +50,18 @@ class BaseCommand(ABC):
                     "channel_override"
                 ]
 
-                event["text"] = event["text"].replace(
+                event.text = event.text.replace(
                     channel_override_match.groupdict()["override_cmd"], ""
                 )
 
             # Perform the user override if it matches
-            user_override_match = BaseCommand.user_override_regex.match(event["text"])
+            user_override_match = BaseCommand.user_override_regex.match(event.text)
 
             if user_override_match:
                 self.args["original_user"] = self.args["user"]
                 self.args["user"] = user_override_match.groupdict()["user_override"]
 
-                event["text"] = event["text"].replace(
+                event.text = event.text.replace(
                     user_override_match.groupdict()["override_cmd"], ""
                 )
 
@@ -69,13 +71,13 @@ class BaseCommand(ABC):
         )
 
         for pattern in patterns:
-            self.logger.debug(f"Matching '{pattern}' against '{event['text']}'")
+            self.logger.debug(f"Matching '{pattern}' against '{event.text}'")
 
-            match = re.compile(pattern).match(event["text"])
+            match = re.compile(pattern).match(event.text)
 
             if not match:
                 self.logger.debug(
-                    "Failed to match '{pattern}' against '{event['text']}'"
+                    f"Failed to match '{pattern}' against '{event.text}'"
                 )
 
             if hasattr(match, "groupdict"):
