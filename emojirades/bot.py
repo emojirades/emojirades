@@ -102,11 +102,6 @@ class EmojiradesBot(object):
         webclient = payload["web_client"]
         self.slack.set_webclient(webclient)
 
-        ## DEBUG
-        with open("bot_event.json", "a") as fp:
-            json.dump(event, fp)
-            fp.write("\n")
-
         if not self.valid_event(event):
             self.logger.debug("Skipping event due to being invalid")
             return
