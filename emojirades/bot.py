@@ -4,7 +4,7 @@ import os
 import traceback
 
 from emojirades.commands.registry import CommandRegistry
-from emojirades.slack import SlackClient, slack
+from emojirades.slack.client import SlackClient
 from emojirades.scorekeeper import ScoreKeeper
 from emojirades.gamestate import GameState
 
