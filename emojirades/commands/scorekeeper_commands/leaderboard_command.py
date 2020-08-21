@@ -9,12 +9,12 @@ class LeaderboardCommand(BaseCommand):
 
     patterns = (
         r"<@{me}> (score|leader)[\s]*board$",
-        r"<@{me}> (score|leader)[\s]*board (?P<range>weekly|monthly|overall)",
+        r"<@{me}> (score|leader)[\s]*board (?P<range>weekly|monthly|alltime)",
     )
 
     examples = [
         ("<@{me}> scoreboard", "Show user scores"),
-        ("<@{me}> scoreboard weekly|monthly|overall", "Show user scores on different brackets"),
+        ("<@{me}> scoreboard weekly|monthly|alltime", "Show user scores on different brackets"),
         ("<@{me}> leaderboard", "Alternative name for scoreboard"),
     ]
 
