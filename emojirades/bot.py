@@ -88,7 +88,8 @@ class EmojiradesBot(object):
         try:
             self._handle_event(**payload)
         except Exception as e:
-            traceback.print_exc()
+            if logging.root.level == logging.DEBUG:
+                traceback.print_exc()
             raise e
 
     def _handle_event(self, **payload):
