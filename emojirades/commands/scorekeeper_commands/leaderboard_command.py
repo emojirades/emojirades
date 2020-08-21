@@ -9,11 +9,13 @@ class LeaderboardCommand(BaseCommand):
 
     patterns = (
         r"<@{me}> (score|leader)[\s]*board$",
-        r"<@{me}> (score|leader)[\s]*board (?P<range>weekly|monthly)",
+        r"<@{me}> (score|leader)[\s]*board (?P<range>weekly|monthly|overall)",
     )
 
     examples = [
         ("<@{me}> scoreboard", "Show user scores"),
+        ("<@{me}> scoreboard weekly|monthly|overall", "Show user scores on different brackets"),
+        ("<@{me}> leaderboard", "Alternative name for scoreboard"),
     ]
 
     def __init__(self, *args, **kwargs):
@@ -21,10 +23,12 @@ class LeaderboardCommand(BaseCommand):
 
     def execute(self):
         yield from super().execute()
-        leaderboard = []
 
-        time_unit = self.args.get("range")
-        if time_unit:
+        time_unit = self.args.get("range", "weekly")
+
+        if time_unit == "overall":
+            leaderboard = self.scorekeeper.leaderboard(self.args["channel"])
+        else:
             self.logger.debug(f"Getting a {time_unit} leaderboard")
             history = self.scorekeeper.raw_history(self.args["channel"])
             of_date = pendulum.now("Australia/Melbourne")
@@ -34,8 +38,6 @@ class LeaderboardCommand(BaseCommand):
                 leaderboard = lb.get_week(of_date)
             elif time_unit == "monthly":
                 leaderboard = lb.get_month(of_date)
-        else:
-            leaderboard = self.scorekeeper.leaderboard(self.args["channel"])
 
         self.logger.debug(f"Printing leaderboard: {leaderboard}")
 
