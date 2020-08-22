@@ -1,31 +1,62 @@
 import logging
+import boto3
+import time
 import os
 import traceback
 
 from emojirades.commands import BaseCommand
+from emojirades.handlers import get_workspace_directory_handler
 from emojirades.commands.registry import CommandRegistry
 from emojirades.slack.slack_client import SlackClient
 from emojirades.scorekeeper import ScoreKeeper
 from emojirades.gamestate import GameState
 from emojirades.slack.event import Event
 
-module_logger = logging.getLogger("EmojiradesBot.bot")
+def get_handler(directory):
+    class BotWorkspaceDirectoryHander(get_workspace_directory_handler(directory)):
+        """
+        Handles discovering Workspaces from the Workspace Directory
+        """
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+
+
+    return 
+    return ScoreKeeperConfigHandler(filename)
 
 
 class EmojiradesBot(object):
-    def __init__(self, scorefile, statefile):
-        self.logger = logging.getLogger("EmojiradesBot.bot.Bot")
+    DEFAULT_WORKSPACE="_default"
 
-        self.scorekeeper = ScoreKeeper(scorefile)
-        self.gamestate = GameState(statefile)
+    def __init__(self):
+        self.logger = logging.getLogger("Emojirades.Bot")
+        self.workspaces = {}
+        self.onboarding_queue = None
 
-        slack_bot_token = os.environ.get("SLACK_BOT_TOKEN", None)
+    def configure_workspace(self, score_file, state_file, auth_file, workspace_id=None):
+        if workspace_id is None:
+            workspace_id = EmojiradesBot.DEFAULT_WORKSPACE
 
-        if not slack_bot_token:
-            raise RuntimeError("Missing SLACK_BOT_TOKEN from environment vars")
+        self.workspaces[workspace_id] = {
+            "scorekeeper": ScoreKeeper(score_file),
+            "gamestate": GameState(state_file),
+            "slack": SlackClient(auth_file, self.logger),
+        }
 
-        self.slack = SlackClient(slack_bot_token, self.logger)
-        self.logger.debug("Initialised application instance")
+    def configure_workspaces(self, workspaces_dir, onboarding_queue):
+        handler = get_workspace_directory_handler(workspaces_dir)
+
+        # Loop through all workspaces
+        for workspace in handler.workspaces():
+            self.configure_workspace(
+                workspace["score_file"],
+                workspace["state_file"],
+                workspace["auth_file"],
+                workspace_id=workspace["id"],
+            )
+
+        # Setup the queue for monitoring
+        self.onboarding_queue = onboarding_queue
 
     def match_event(self, event: Event, commands: dict) -> BaseCommand:
         """
