@@ -23,17 +23,44 @@ pytest
 ```
 
 ## Set environment variables
-Register your bot on slack, or pass me your email so I can add you to my Dev Slack workspace
+If you're using the built in AWS functionality to persist your data, you'll need to set the appropriate AWS_ environment variables.
 
-`export SLACK_BOT_TOKEN='xoxb-*******'`
+## Run the daemon for a single workspace
+This command uses locally stored files to keep the game state:
 
+`emojirades --score-file scores.csv --state-file state.json --auth-file auth.json`
 
-Optionally if you are saving data into S3, you might need to set the profile to use
+This command uses S3 stored files to keep the game state:
 
-`export AWS_PROFILE='dev-profile'`
+`emojirades --score-file s3://bucket/scores.csv --state-file s3://bucket/state.json --auth-file s3://bucket/auth.json
 
-## Run the daemon
-`emojirades --score-file scores.csv --state-file state.json -vv`
+## Run the daemon for multiple workspaces
+Here we provide a local folder of workspaces and an optional set of workspace ids (will load all in folder by default):
+
+`emojirades --workspaces-dir path/to/workspaces [--workspace-id A1B2C3D4E]`
+
+Here we provide an S3 path of workspaces and an optional set of workspace ids (will load all in folder by default):
+
+`emojirades --workspaces-dir s3://bucket/path/to/workspaces [--workspace-id A1B2C3D4E]`
+
+Here we provide an S3 path of workspaces and an AWS SQS queue to listen to for new workspaces:
+
+`emojirades --workspaces-dir s3://bucket/path/to/workspaces --onboarding-queue workspace-onboarding-queue`
+
+The workspaces directory must be in the following format:
+```
+./workspaces
+./workspaces/A1B2C3D4E
+./workspaces/A1B2C3D4E/state.json
+./workspaces/A1B2C3D4E/scores.json
+./workspaces/A1B2C3D4E/auth.json
+./workspaces/Z9Y8X7W6V
+./workspaces/Z9Y8X7W6V/state.json
+./workspaces/Z9Y8X7W6V/scores.json
+./workspaces/Z9Y8X7W6V/auth.json
+```
+
+The emojirades bot will take care of running multiple games across different channels in a single workspace.
 
 ## Service configuration
 ```
@@ -50,15 +77,14 @@ sudo chmod 0400 /etc/emojirades
 sudo systemctl daemon-reload
 sudo systemctl enable emojirades
 sudo systemctl start emojirades
+
 ```
 # Release process (for master branch)
 1. Create release branch containing new version in setup.py and Dockerfile
 2. Perform a PR into master
 3. Perform release in GitHub
 4. TravisCI will automatically build and deploy on a tagged commit into master (the release does this)
-
-# Dealing with Containers
-Currently this repo is set to auto build Docker images and deploy to Dockerhub on each tagged commit to master
+5. Docker Hub will automatically build and deploy on a tagged commit into master (the release does this)
 
 ## Building the Container Image
 ```
@@ -66,15 +92,17 @@ docker build --pull --no-cache -t emojirades/emojirades:X.Y.Z -t emojirades/emoj
 ```
 
 ## Running the Container
+In this example we run the game with S3 hosted configuration for a single workspace.
+
 ```
 docker run -d \
   --name emojirades \
   --restart=always \
   -v "/path/to/your/.aws/:/root/.aws/:ro" \
   -e "AWS_PROFILE=emojirades" \
-  -e "SLACK_BOT_TOKEN=xoxb-111111111111-222222222222222222222222" \
   emojirades/emojirades:X.Y.Z \
-    --score-file /path/to/scores.json \
-    --state-file /path/to/state.json \
+    --score-file s3://bucket/path/to/scores.json \
+    --state-file s3://bucket/path/to/state.json \
+    --auth-file s3://bucket/path/to/auth.json \
     -vv
 ```
