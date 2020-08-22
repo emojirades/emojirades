@@ -46,4 +46,3 @@ class LeaderboardCommand(BaseCommand):
 
         leaderboard_printer = LeaderboardPrinter(leaderboard, self.slack)
         yield from leaderboard_printer.print()
-

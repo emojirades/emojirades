@@ -9,4 +9,3 @@ class TimeRange:
         return [cls.WEEKLY,
                 cls.MONTHLY,
                 cls.ALLTIME]
-
