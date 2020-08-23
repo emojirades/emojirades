@@ -1,6 +1,7 @@
 import logging
 import time
 import os
+import traceback
 
 from emojirades.commands.registry import CommandRegistry
 from emojirades.slack import SlackClient, slack
@@ -84,6 +85,14 @@ class EmojiradesBot(object):
             raise NotImplementedError(f"Returned channel '{channel}' wasn't decoded")
 
     def handle_event(self, **payload):
+        try:
+            self._handle_event(**payload)
+        except Exception as e:
+            if logging.root.level == logging.DEBUG:
+                traceback.print_exc()
+            raise e
+
+    def _handle_event(self, **payload):
         commands = CommandRegistry.command_patterns()
 
         event = payload["data"]
