@@ -4,7 +4,7 @@ import traceback
 
 from emojirades.commands import BaseCommand
 from emojirades.commands.registry import CommandRegistry
-from emojirades.slack.client import Client
+from emojirades.slack.slack_client import SlackClient
 from emojirades.scorekeeper import ScoreKeeper
 from emojirades.gamestate import GameState
 from emojirades.slack.event import Event
@@ -24,7 +24,7 @@ class EmojiradesBot(object):
         if not slack_bot_token:
             raise RuntimeError("Missing SLACK_BOT_TOKEN from environment vars")
 
-        self.slack = Client(slack_bot_token, self.logger)
+        self.slack = SlackClient(slack_bot_token, self.logger)
         self.logger.debug("Initialised application instance")
 
     def match_event(self, event: Event, commands: dict) -> BaseCommand:
@@ -77,7 +77,7 @@ class EmojiradesBot(object):
     def _handle_event(self, **payload):
         commands = CommandRegistry.command_patterns()
 
-        event = Event(payload["data"])
+        event = Event(payload["data"], self.slack)
         webclient = payload["web_client"]
         self.slack.set_webclient(webclient)
 

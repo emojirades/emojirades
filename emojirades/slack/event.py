@@ -1,17 +1,21 @@
+from emojirades.slack.slack_client import SlackClient
+
+
 class InvalidEvent(Exception):
     pass
 
 
 class Event:
-    def __init__(self, data):
+    def __init__(self, data, slack_client: SlackClient):
         self.data = data
+        self.slack_client = slack_client
 
     @property
     def player_id(self):
         if "user" in self.data:
             return self.data["user"]
         elif "bot_id" in self.data:
-            return self.data["bot_id"]
+            return self.__get_bot_user_id()
         else:
             raise InvalidEvent("Can't find user id or bot id")
 
@@ -30,6 +34,9 @@ class Event:
     @property
     def ts(self):
         return self.data["ts"]
+
+    def __get_bot_user_id(self):
+        return self.slack_client.bot_info(self.data["bot_id"])["user_id"]
 
     def valid(self) -> bool:
         """
@@ -52,4 +59,3 @@ class Event:
                 return False
 
         return True
-

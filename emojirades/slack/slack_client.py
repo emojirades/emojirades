@@ -3,7 +3,7 @@ import slack
 from expiringdict import ExpiringDict
 
 
-class Client(object):
+class SlackClient(object):
     def __init__(self, token, logger):
         self.token = token
         self.logger = logger
@@ -14,6 +14,7 @@ class Client(object):
         self.last_ts = float(0)
 
         self.user_info_cache = ExpiringDict(max_len=100, max_age_seconds=172800)  # 2 days
+        self.bot_user_info_cache = ExpiringDict(max_len=100, max_age_seconds=172800)  # 2 days
 
         self.bot_id = self.webclient.auth_test()["user_id"]
         self.bot_name = self.user_info(self.bot_id)["real_name"]
@@ -33,8 +34,17 @@ class Client(object):
 
         return user
 
+    def bot_info(self, bot_id):
+        bot_user = self.bot_user_info_cache.get(bot_id)
+
+        if not bot_user:
+            bot_user = self.webclient.bots_info(bot=bot_id)["bot"]
+            self.bot_user_info_cache[bot_id] = bot_user
+
+        return bot_user
+
     def is_bot(self, user_id):
-        return self.user_info(user_id)["is_bot"] or userid == "USLACKBOT"
+        return self.user_info(user_id)["is_bot"] or user_id == "USLACKBOT"
 
     def is_admin(self, user_id):
         return self.user_info(user_id)["is_admin"]
@@ -60,7 +70,7 @@ class Client(object):
 
         # Attemp to locate an existing IM
         for im in self.webclient.im_list()["ims"]:
-            if im["user"] == userid:
+            if im["user"] == user_id:
                 return im["id"]
 
         return None
