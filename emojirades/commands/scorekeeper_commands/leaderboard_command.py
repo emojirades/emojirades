@@ -44,5 +44,5 @@ class LeaderboardCommand(BaseCommand):
             elif self.time_unit == TimeRange.MONTHLY:
                 leaderboard = lb.get_month(of_date)
 
-        leaderboard_printer = LeaderboardPrinter(leaderboard, self.slack)
+        leaderboard_printer = LeaderboardPrinter(leaderboard, self.slack, self.time_unit)
         yield from leaderboard_printer.print()
