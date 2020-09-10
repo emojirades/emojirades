@@ -155,15 +155,15 @@ class EmojiradeBotTester(unittest.TestCase):
             },
             "posted_emoji": {
                 **base_event,
-                **{"user": player_2, "text": ":waddle:", "ts": "1000000000.000004",},
+                **{"user": player_2, "text": ":waddle:", "ts": "1000000000.000004", },
             },
             "incorrect_guess": {
                 **base_event,
-                **{"user": player_3, "text": "foobar", "ts": "1000000000.000005",},
+                **{"user": player_3, "text": "foobar", "ts": "1000000000.000005", },
             },
             "correct_guess": {
                 **base_event,
-                **{"user": player_3, "text": emojirade, "ts": "1000000000.000006",},
+                **{"user": player_3, "text": emojirade, "ts": "1000000000.000006", },
             },
             "manual_award": {
                 **base_event,
