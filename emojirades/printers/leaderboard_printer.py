@@ -17,7 +17,7 @@ class LeaderboardPrinter:
             yield None, "Nothing to see here!"
             return
 
-        lines = ["```", f" :: {self.time_unit.capitalize()} leaderboard ::", ""]
+        lines = ["```", f" :: {self.time_unit.title()} leaderboard ::", ""]
 
         longest_name = 0
         biggest_score = 0

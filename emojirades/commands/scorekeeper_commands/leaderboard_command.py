@@ -12,12 +12,12 @@ class LeaderboardCommand(BaseCommand):
 
     patterns = (
         r"<@{me}> (score|leader)[\s]*board$",
-        r"<@{me}> (score|leader)[\s]*board (?P<range>weekly|monthly|alltime)",
+        r"<@{me}> (score|leader)[\s]*board (?P<range>weekly|monthly|all time)",
     )
 
     examples = [
         ("<@{me}> scoreboard", "Show user scores"),
-        ("<@{me}> scoreboard weekly|monthly|alltime", "Show user scores on different brackets"),
+        ("<@{me}> scoreboard weekly|monthly|all time", "Show user scores on different brackets"),
         ("<@{me}> leaderboard", "Alternative name for scoreboard"),
     ]
 
@@ -31,7 +31,7 @@ class LeaderboardCommand(BaseCommand):
         yield from super().execute()
         leaderboard = []
 
-        if self.time_unit == TimeRange.ALLTIME:
+        if self.time_unit == TimeRange.ALL_TIME:
             leaderboard = self.scorekeeper.leaderboard(self.args["channel"])
         else:
             self.logger.debug(f"Getting a {self.time_unit} leaderboard")

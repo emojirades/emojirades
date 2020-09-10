@@ -60,7 +60,7 @@ class TestBotCommands(EmojiradeBotTester):
         }
 
         expected = """```
- :: Alltime leaderboard ::
+ :: All Time leaderboard ::
 
  1. David Pham         [ 168 points ]
  2. fendy Haman        [ 120 points ]
