@@ -4,7 +4,9 @@ import re
 
 from collections import defaultdict
 
-from emojirades.commands.gamestate_commands.inferred_correct_guess_command import InferredCorrectGuessCommand
+from emojirades.commands.gamestate_commands.inferred_correct_guess_command import (
+    InferredCorrectGuessCommand,
+)
 from emojirades.helpers import sanitize_text, match_emojirade, match_emoji
 from emojirades.helpers import ScottFactorExceededException
 from emojirades.handlers import get_configuration_handler

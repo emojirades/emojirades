@@ -13,8 +13,12 @@ class SlackClient(object):
 
         self.last_ts = float(0)
 
-        self.user_info_cache = ExpiringDict(max_len=100, max_age_seconds=172800)  # 2 days
-        self.bot_user_info_cache = ExpiringDict(max_len=100, max_age_seconds=172800)  # 2 days
+        self.user_info_cache = ExpiringDict(
+            max_len=100, max_age_seconds=172800
+        )  # 2 days
+        self.bot_user_info_cache = ExpiringDict(
+            max_len=100, max_age_seconds=172800
+        )  # 2 days
 
         self.bot_id = self.webclient.auth_test()["user_id"]
         self.bot_name = self.user_info(self.bot_id)["real_name"]

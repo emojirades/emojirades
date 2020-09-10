@@ -2,7 +2,9 @@ from unittest import TestCase
 from unittest import mock
 
 from emojirades.scorekeeper import ScoreKeeper
-from emojirades.tests.helper import EmojiradeBotTester  # TODO: Handle logging level better
+from emojirades.tests.helper import (
+    EmojiradeBotTester,
+)  # TODO: Handle logging level better
 
 import tempfile
 import json
@@ -22,14 +24,10 @@ class ScoreKeeperTester(TestCase):
 
         scoreboard = {
             self.channel: {
-                "scores": {
-                    user: 1,
-                },
-                "history": [{
-                    'timestamp': 1593565068.205327,
-                    'user_id': user,
-                    'operation': "++"
-                }],
+                "scores": {user: 1,},
+                "history": [
+                    {"timestamp": 1593565068.205327, "user_id": user, "operation": "++"}
+                ],
             },
         }
 
@@ -51,14 +49,14 @@ class ScoreKeeperIntegrationTest(TestCase):
 
         scoreboard = {
             self.channel: {
-                "scores": {
-                    self.user_1: 10,
-                },
-                "history": [{
-                    'timestamp': 1593565068.205327,
-                    'user_id': self.user_1,
-                    'operation': "++"
-                }],
+                "scores": {self.user_1: 10,},
+                "history": [
+                    {
+                        "timestamp": 1593565068.205327,
+                        "user_id": self.user_1,
+                        "operation": "++",
+                    }
+                ],
             },
         }
 

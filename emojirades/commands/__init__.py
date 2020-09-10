@@ -76,9 +76,7 @@ class BaseCommand(ABC):
             match = re.compile(pattern).match(event.text)
 
             if not match:
-                self.logger.debug(
-                    f"Failed to match '{pattern}' against '{event.text}'"
-                )
+                self.logger.debug(f"Failed to match '{pattern}' against '{event.text}'")
 
             if hasattr(match, "groupdict"):
                 self.args.update(match.groupdict())

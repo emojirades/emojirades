@@ -10,15 +10,17 @@ from emojirades.tests.FileFixture import FileFixture
 class TestEvent:
 
     mock_slack_client = Mock()
-    mock_slack_client.bot_info = MagicMock(return_value={
-        "id": "BOTID0001",
-        "deleted": False,
-        "name": "bot-tester",
-        "updated": 1569646260,
-        "app_id": "APPID0001",
-        "user_id": "USERID007",
-        "icons": {}
-    })
+    mock_slack_client.bot_info = MagicMock(
+        return_value={
+            "id": "BOTID0001",
+            "deleted": False,
+            "name": "bot-tester",
+            "updated": 1569646260,
+            "app_id": "APPID0001",
+            "user_id": "USERID007",
+            "icons": {},
+        }
+    )
 
     @pytest.fixture
     def bot_event(self):

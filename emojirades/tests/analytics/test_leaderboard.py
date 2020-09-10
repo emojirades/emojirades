@@ -15,9 +15,7 @@ class TestLeaderBoard:
 
     @pytest.fixture
     def current_date(self, mel_tz):
-        return pendulum.datetime(
-            2020, 6, 20, tz=mel_tz
-        )
+        return pendulum.datetime(2020, 6, 20, tz=mel_tz)
 
     @pytest.fixture
     def mel_tz(self):
@@ -47,8 +45,8 @@ class TestLeaderBoard:
         historical_date = pendulum.datetime(2020, 5, 10, tz=mel_tz)
 
         assert lb.get_month(historical_date) == [
-            ('U5HKU1Q0W', 74),
-            ('U0ZC11HC7', 64),
-            ('U0VCW825A', 57),
-            ('U985L6R1M', 41)
+            ("U5HKU1Q0W", 74),
+            ("U0ZC11HC7", 64),
+            ("U0VCW825A", 57),
+            ("U985L6R1M", 41),
         ]

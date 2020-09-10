@@ -106,6 +106,7 @@ class TestBotScenarios(EmojiradeBotTester):
         Tests that the expected responses are bring returned
         Response order is asserted along with equality
         """
+
         def response(dst, msg):
             return (dst, re.compile(msg))
 
@@ -222,11 +223,7 @@ class TestBotScenarios(EmojiradeBotTester):
 
         # Expected *new* reactions
         reactions = [
-            reaction(
-                self.config.channel,
-                "clap",
-                self.events.correct_guess["ts"],
-            ),
+            reaction(self.config.channel, "clap", self.events.correct_guess["ts"],),
         ]
 
         # Ensure each expected reaction exists
