@@ -1,13 +1,13 @@
 import logging
-import time
 import os
 import traceback
 
+from emojirades.commands import BaseCommand
 from emojirades.commands.registry import CommandRegistry
-from emojirades.slack import SlackClient, slack
+from emojirades.slack.slack_client import SlackClient
 from emojirades.scorekeeper import ScoreKeeper
 from emojirades.gamestate import GameState
-
+from emojirades.slack.event import Event
 
 module_logger = logging.getLogger("EmojiradesBot.bot")
 
@@ -27,39 +27,21 @@ class EmojiradesBot(object):
         self.slack = SlackClient(slack_bot_token, self.logger)
         self.logger.debug("Initialised application instance")
 
-    def match_event(self, event, commands):
+    def match_event(self, event: Event, commands: dict) -> BaseCommand:
         """
         If the event is valid and matches a command, yield the instantiated command
-        :param event:
-        :return Command:
+        :param event: the event object
+        :param commands: a list of known commands
+        :return Command: The matched command to be executed
         """
-        self.logger.debug(f"Handling event: {event}")
+        self.logger.debug(f"Handling event: {event.data}")
 
         for GameCommand in self.gamestate.infer_commands(event):
             yield GameCommand(event, self.slack, self.scorekeeper, self.gamestate)
 
         for Command in commands.values():
-            if Command.match(event["text"], me=self.slack.bot_id):
+            if Command.match(event.text, me=self.slack.bot_id):
                 yield Command(event, self.slack, self.scorekeeper, self.gamestate)
-
-    def valid_event(self, event):
-        """
-        Assert the lowest level of things we need to see in an event to be parseable
-        :param event:
-        :return bool:
-        """
-        expected_keys = {
-            "text",
-            "channel",
-            "user",
-        }
-
-        if not event:
-            return False
-        elif not expected_keys.issubset(event.keys()):
-            return False
-
-        return True
 
     def decode_channel(self, channel):
         """
@@ -95,16 +77,16 @@ class EmojiradesBot(object):
     def _handle_event(self, **payload):
         commands = CommandRegistry.command_patterns()
 
-        event = payload["data"]
+        event = Event(payload["data"], self.slack)
         webclient = payload["web_client"]
         self.slack.set_webclient(webclient)
 
-        if not self.valid_event(event):
+        if not event.valid():
             self.logger.debug("Skipping event due to being invalid")
             return
 
         for command in self.match_event(event, commands):
-            self.logger.debug(f"Matched {command} for event {event}")
+            self.logger.debug(f"Matched {command} for event {event.data}")
 
             for channel, response in command.execute():
                 self.logger.debug("------------------------")
@@ -115,7 +97,7 @@ class EmojiradesBot(object):
                 if channel is not None:
                     channel = self.decode_channel(channel)
                 else:
-                    channel = self.decode_channel(event["channel"])
+                    channel = self.decode_channel(event.channel)
 
                 if isinstance(response, str):
                     # Plain strings are assumed as 'chat_postMessage'

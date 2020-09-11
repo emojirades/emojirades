@@ -58,10 +58,7 @@ class InferredCorrectGuessCommand(BaseCommand):
             None,
             {
                 "func": "reactions_add",
-                "kwargs": {
-                    "name": "clap",
-                    "timestamp": self.args["ts"],
-                },
+                "kwargs": {"name": "clap", "timestamp": self.args["ts"], },
             },
         )
 

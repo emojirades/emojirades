@@ -4,13 +4,15 @@ import re
 
 from collections import defaultdict
 
-from emojirades.commands.gamestate_commands.inferred_correct_guess_command import InferredCorrectGuessCommand
+from emojirades.commands.gamestate_commands.inferred_correct_guess_command import (
+    InferredCorrectGuessCommand,
+)
 from emojirades.helpers import sanitize_text, match_emojirade, match_emoji
 from emojirades.helpers import ScottFactorExceededException
 from emojirades.handlers import get_configuration_handler
 
 from emojirades.commands import BaseCommand
-
+from emojirades.slack.event import Event
 
 module_logger = logging.getLogger("EmojiradesBot.gamestate")
 
@@ -104,14 +106,14 @@ class GameState(object):
     def guessing(self, channel):
         return self.state[channel]["step"] in ("guessing",)
 
-    def infer_commands(self, event):
+    def infer_commands(self, event: Event):
         """
         Keeps tabs on the conversation and updates gamestate if required
         Not to be called directly, used as another command source from the bot
         """
-        channel = str(event["channel"])
-        user = str(event["user"])
-        text = str(event["text"])
+        channel = str(event.channel)
+        user = str(event.player_id)
+        text = str(event.text)
         state = self.state[channel]
 
         if self.is_admin(channel, user):
