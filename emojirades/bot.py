@@ -89,6 +89,8 @@ class EmojiradesBot(object):
             self.logger.debug(f"Matched {command} for event {event.data}")
 
             for channel, response in command.execute():
+                self.logger.debug("------------------------")
+
                 self.logger.debug(
                     f"Command {command} executed with response: {(channel, response)}"
                 )
