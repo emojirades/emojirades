@@ -60,6 +60,8 @@ class TestBotCommands(EmojiradeBotTester):
         }
 
         expected = """```
+ :: All Time leaderboard ::
+
  1. David Pham         [ 168 points ]
  2. fendy Haman        [ 120 points ]
  3. Michael Mitchell   [ 118 points ]

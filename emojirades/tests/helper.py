@@ -195,7 +195,7 @@ class EmojiradeBotTester(unittest.TestCase):
                 **base_event,
                 **{
                     "user": player_1,
-                    "text": f"<@{bot_id}> leaderboard",
+                    "text": f"<@{bot_id}> leaderboard all time",
                     "ts": "1000000000.000009",
                 },
             },
