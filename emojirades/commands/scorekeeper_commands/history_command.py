@@ -27,7 +27,7 @@ class HistoryCommand(BaseCommand):
         self.logger.debug(f"Printing history: {history}")
 
         history_log = [
-            f"{index}. <@{event['user_id']}> > '{event['operation']}'"
+            f"{index}. <{event['user_id']}> > '{event['operation']}'"
             for index, event in enumerate(history, start=1)
         ]
         last_message = [
