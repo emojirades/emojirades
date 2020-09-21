@@ -1,3 +1,5 @@
+import os
+
 import pendulum
 
 from emojirades.analytics.leaderboard import LeaderBoard
@@ -8,6 +10,7 @@ from emojirades.printers.leaderboard_printer import LeaderboardPrinter
 
 class LeaderboardCommand(BaseCommand):
 
+    TZ = "Australia/Melbourne"
     description = "Shows all the users scores"
 
     patterns = (
@@ -36,7 +39,14 @@ class LeaderboardCommand(BaseCommand):
         else:
             self.logger.debug(f"Getting a {self.time_unit} leaderboard")
             history = self.scorekeeper.raw_history(self.args["channel"])
-            of_date = pendulum.now("Australia/Melbourne")
+            of_date = pendulum.now(tz=self.TZ)
+
+            # Mockable date
+            mock_date = os.environ.get("EMOJIRADE_MOCK_DATE")
+            if mock_date:
+                of_date = pendulum.from_format(mock_date, "YYYYMMDD", tz=self.TZ)
+                self.logger.info(f"Date is now: {of_date}")
+
             lb = LeaderBoard(history)
 
             if self.time_unit == TimeRange.WEEKLY:
