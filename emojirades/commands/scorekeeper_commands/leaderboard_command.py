@@ -3,7 +3,7 @@ import os
 import pendulum
 
 from emojirades.analytics.leaderboard import LeaderBoard
-from emojirades.analytics.time_range import TimeRange
+from emojirades.analytics.time_unit import TimeUnit
 from emojirades.commands import BaseCommand
 from emojirades.printers.leaderboard_printer import LeaderboardPrinter
 
@@ -30,7 +30,7 @@ class LeaderboardCommand(BaseCommand):
         super().__init__(*args, **kwargs)
 
         # TODO: :thinking: Maybe we could add default value regex in the command translation
-        self.time_unit = self.args.get("range", TimeRange.WEEKLY)
+        self.time_unit = TimeUnit(self.args.get("range", TimeUnit.WEEKLY.value))
         self.on_date = self.args.get("on_date")
 
     def execute(self):
@@ -38,7 +38,7 @@ class LeaderboardCommand(BaseCommand):
 
         of_date = pendulum.now(tz=self.TZ)
 
-        if self.time_unit == TimeRange.ALL_TIME:
+        if self.time_unit == TimeUnit.ALL_TIME:
             leaderboard = self.scorekeeper.leaderboard(self.args["channel"])
         else:
             self.logger.debug(f"Getting a {self.time_unit} leaderboard")

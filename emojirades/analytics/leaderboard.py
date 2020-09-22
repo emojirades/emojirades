@@ -6,6 +6,7 @@ import logging
 import math
 
 from emojirades.analytics.time_range import TimeRange
+from emojirades.analytics.time_unit import TimeUnit
 
 
 class LeaderBoard:
@@ -129,7 +130,7 @@ class LeaderBoard:
             for u in sorted(leaderboard, key=leaderboard.get, reverse=True)
         ]
 
-    def get_by_range(self, of_date: pendulum.DateTime, time_unit):
+    def get_by_range(self, of_date: pendulum.DateTime, time_unit: TimeUnit):
         start_time = TimeRange.get_start_date(of_date, time_unit).timestamp()
         end_time = TimeRange.get_end_date(of_date, time_unit).timestamp()
 

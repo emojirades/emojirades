@@ -4,7 +4,7 @@ import pendulum
 import pytest
 import json
 
-from emojirades.analytics.time_range import TimeRange
+from emojirades.analytics.time_unit import TimeUnit
 from emojirades.tests.FileFixture import FileFixture
 
 
@@ -26,7 +26,7 @@ class TestLeaderBoard:
         assert len(lb.history) > 0
 
     def test_get_week(self, lb, current_date):
-        assert lb.get(current_date, TimeRange.WEEKLY) == [
+        assert lb.get(current_date, TimeUnit.WEEKLY) == [
             ("U985L6R1M", 15),
             ("U0VCW825A", 13),
             ("U5HKU1Q0W", 12),
@@ -34,7 +34,7 @@ class TestLeaderBoard:
         ]
 
     def test_get_month(self, lb, current_date):
-        assert lb.get(current_date, TimeRange.MONTHLY) == [
+        assert lb.get(current_date, TimeUnit.MONTHLY) == [
             ("U0VCW825A", 44),
             ("U5HKU1Q0W", 43),
             ("U985L6R1M", 42),
@@ -45,7 +45,7 @@ class TestLeaderBoard:
 
         historical_date = pendulum.datetime(2020, 5, 10, tz=mel_tz)
 
-        assert lb.get(historical_date, TimeRange.MONTHLY) == [
+        assert lb.get(historical_date, TimeUnit.MONTHLY) == [
             ("U5HKU1Q0W", 74),
             ("U0ZC11HC7", 64),
             ("U0VCW825A", 57),
