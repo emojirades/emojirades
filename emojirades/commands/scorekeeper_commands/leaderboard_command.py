@@ -15,12 +15,14 @@ class LeaderboardCommand(BaseCommand):
 
     patterns = (
         r"<@{me}> (score|leader)[\s]*board$",
+        r"<@{me}> (score|leader)[\s]*board (?P<range>weekly|monthly) (?P<on_date>[0-9]{{8}})",
         r"<@{me}> (score|leader)[\s]*board (?P<range>weekly|monthly|all time)",
     )
 
     examples = [
         ("<@{me}> scoreboard", "Show user scores"),
         ("<@{me}> scoreboard weekly|monthly|all time", "Show user scores on different brackets"),
+        ("<@{me}> scoreboard weekly|monthly YYYYMMDD", "Show user weekly or monthly scores from a different date"),
         ("<@{me}> leaderboard", "Alternative name for scoreboard"),
     ]
 
@@ -29,30 +31,30 @@ class LeaderboardCommand(BaseCommand):
 
         # TODO: :thinking: Maybe we could add default value regex in the command translation
         self.time_unit = self.args.get("range", TimeRange.WEEKLY)
+        self.on_date = self.args.get("on_date")
 
     def execute(self):
         yield from super().execute()
-        leaderboard = []
+
+        of_date = pendulum.now(tz=self.TZ)
 
         if self.time_unit == TimeRange.ALL_TIME:
             leaderboard = self.scorekeeper.leaderboard(self.args["channel"])
         else:
             self.logger.debug(f"Getting a {self.time_unit} leaderboard")
             history = self.scorekeeper.raw_history(self.args["channel"])
-            of_date = pendulum.now(tz=self.TZ)
 
-            # Mockable date
             mock_date = os.environ.get("EMOJIRADE_MOCK_DATE")
-            if mock_date:
+            if self.on_date:
+                of_date = pendulum.from_format(self.on_date, "YYYYMMDD", tz=self.TZ)
+                self.logger.info(f"User requested date to: {of_date}")
+            elif mock_date:
+                # Mockable date
                 of_date = pendulum.from_format(mock_date, "YYYYMMDD", tz=self.TZ)
-                self.logger.info(f"Date is now: {of_date}")
+                self.logger.info(f"Mocking date to: {of_date}")
 
             lb = LeaderBoard(history)
+            leaderboard = lb.get(of_date, self.time_unit)
 
-            if self.time_unit == TimeRange.WEEKLY:
-                leaderboard = lb.get_week(of_date)
-            elif self.time_unit == TimeRange.MONTHLY:
-                leaderboard = lb.get_month(of_date)
-
-        leaderboard_printer = LeaderboardPrinter(leaderboard, self.slack, self.time_unit)
+        leaderboard_printer = LeaderboardPrinter(leaderboard, self.slack, self.time_unit, of_date)
         yield from leaderboard_printer.print()
