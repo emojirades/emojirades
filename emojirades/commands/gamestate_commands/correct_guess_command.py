@@ -85,9 +85,11 @@ class CorrectGuessCommand(BaseCommand):
 
         # Build the score message
         if score == 1000:
-            prefix = f"Ok <@{state['winner']}> just give up already, you've won the game"
+            prefix = (
+                f"Ok <@{state['winner']}> just give up already, you've won the game"
+            )
         elif score == 500:
-              prefix = f":tada::tada: Ladies and gentlemen he's daym done it again :tada::tada:"
+            prefix = f":tada::tada: Ladies and gentlemen he's daym done it again :tada::tada:"
         elif score == 400:
             prefix = f":trophy: This is a big milestone <@{state['winner']}>, you should feel proud"
         elif score == 300:
@@ -101,7 +103,10 @@ class CorrectGuessCommand(BaseCommand):
         else:
             prefix = f"Congrats <@{state['winner']}>"
 
-        yield (None, f"{prefix}, you're now at {score} point{'s' if score > 1 else ''}{emoji}")
+        yield (
+            None,
+            f"{prefix}, you're now at {score} point{'s' if score > 1 else ''}{emoji}",
+        )
 
         yield (None, f"The correct emojirade was `{first_emojirade}`{alternatives}")
 
