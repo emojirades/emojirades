@@ -27,11 +27,20 @@ class CorrectGuessCommand(BaseCommand):
         "beers",
     ]
 
+    reaction_emojis = [
+        "tada",
+        "clap",
+        "+1",
+        "ok_hand",
+        "champagne",
+    ]
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def prepare_args(self, event):
         super().prepare_args(event)
+        self.args["inferred"] = False
 
     @only_guessing
     def execute(self):
@@ -39,16 +48,17 @@ class CorrectGuessCommand(BaseCommand):
 
         state = self.gamestate.state[self.args["channel"]]
 
-        if self.args["target_user"] in (state["old_winner"], state["winner"]):
-            yield (None, "You're not allowed to award current players the win >.>")
-            return
+        if not self.args["inferred"]:
+            if self.args["target_user"] in (state["old_winner"], state["winner"]):
+                yield (None, "You're not allowed to award current players the win >.>")
+                return
 
-        if self.args["user"] != state["winner"]:
-            yield (
-                None,
-                "You're not the current winner, stop awarding other people the win >.>",
-            )
-            return
+            if self.args["user"] != state["winner"]:
+                yield (
+                    None,
+                    "You're not the current winner, stop awarding other people the win >.>",
+                )
+                return
 
         # Save a copy of the emojirade, as below clears it
         raw_emojirades = [i.replace("`", "") for i in state["emojirade"]]
@@ -66,6 +76,18 @@ class CorrectGuessCommand(BaseCommand):
             self.args["channel"], self.args["target_user"]
         )
 
+        if self.args["inferred"]:
+            yield (
+                None,
+                {
+                    "func": "reactions_add",
+                    "kwargs": {
+                        "name": random.choice(self.reaction_emojis),
+                        "timestamp": self.args["ts"],
+                    },
+                },
+            )
+
         if position == 1:
             emoji = random.choice(self.first_emojis + self.other_emojis)
         elif position == 2:
@@ -82,6 +104,9 @@ class CorrectGuessCommand(BaseCommand):
                 None,
                 "Holy bejesus Batman :bat::man:, they guessed it in one go! :clap:",
             )
+
+        if self.args["inferred"]:
+            yield (None, f"<@{state['winner']}>++")
 
         # Build the score message
         if score == 1000:
