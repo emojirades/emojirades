@@ -111,7 +111,7 @@ class TestBotScenarios(EmojiradeBotTester):
             return (dst, re.compile(msg))
 
         def reaction(dst, emoji, ts):
-            return (dst, emoji, ts)
+            return (dst, re.compile(emoji), ts)
 
         total_responses = 0
         total_reactions = 0
@@ -223,12 +223,14 @@ class TestBotScenarios(EmojiradeBotTester):
 
         # Expected *new* reactions
         reactions = [
-            reaction(self.config.channel, "clap", self.events.correct_guess["ts"],),
+            reaction(self.config.channel, "[a-z_]+", self.events.correct_guess["ts"],),
         ]
 
         # Ensure each expected reaction exists
-        for i, reaction in enumerate(reactions):
-            assert reaction == self.reactions[total_reactions + i]
+        for i, (channel, emoji, ts) in enumerate(reactions):
+            assert channel == self.reactions[total_reactions + i][0]
+            assert emoji.match(self.reactions[total_reactions + i][1])
+            assert ts == self.reactions[total_reactions + i][2]
 
         # Ensure total volume is as expected
         total_reactions += len(reactions)
