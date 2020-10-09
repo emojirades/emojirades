@@ -65,12 +65,22 @@ class LeaderboardPrinter:
             if score_length > biggest_score:
                 biggest_score = score_length
 
+        rank_buffer = 0
+        last_score = 0
+
         for index, (name, score) in enumerate(leaderboard, start=1):
             name = self.slack.pretty_name(name)
             name = name if len(name) < 20 else "{name[0:18]}.."
 
+            if score == last_score:
+                rank_buffer -= 1
+            elif rank_buffer < 0:
+                rank_buffer = 0
+
+            last_score = score
+
             lines.append(
-                f"{index:>2}. {name:<{longest_name}} [ {score:>{biggest_score}} point{'s' if score > 1 else ' '} ]"
+                f"{index + rank_buffer:>2}. {name:<{longest_name}} [ {score:>{biggest_score}} point{'s' if score > 1 else ' '} ]"
             )
 
         lines.append("```")
