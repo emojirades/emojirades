@@ -2,6 +2,9 @@ language: python
 dist: bionic
 python:
 - 3.8
+branches:
+  only:
+    - master
 install:
 - pip install -r requirements.txt --upgrade
 - pip install -r requirements-dev.txt --upgrade
