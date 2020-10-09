@@ -233,7 +233,7 @@ class TestBotScenarios(EmojiradeBotTester):
 
         # Ensure each expected reaction exists
         while not self.reactions:
-            time.sleep(0.2)
+            time.sleep(0.5)
 
         for i, (channel, emoji, ts) in enumerate(reactions):
             assert channel == self.reactions[total_reactions + i][0]
@@ -472,7 +472,7 @@ class TestBotScenarios(EmojiradeBotTester):
         )
 
         while not self.reactions:
-            time.sleep(0.2)
+            time.sleep(0.5)
 
         assert expected_reaction[0] == self.reactions[0][0]
         assert expected_reaction[1].match(self.reactions[0][1])
