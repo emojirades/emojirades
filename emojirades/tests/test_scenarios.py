@@ -223,7 +223,11 @@ class TestBotScenarios(EmojiradeBotTester):
 
         # Expected *new* reactions
         reactions = [
-            reaction(self.config.channel, "[a-z_]+", self.events.correct_guess["ts"],),
+            reaction(
+                self.config.channel,
+                "[a-z_]+",
+                self.events.correct_guess["ts"],
+            ),
         ]
 
         # Ensure each expected reaction exists
@@ -449,7 +453,7 @@ class TestBotScenarios(EmojiradeBotTester):
         assert self.state["step"] == "guessing"
 
     def test_correct_guess_reaction(self):
-        """ Checks that a :clap: emoji is 'reacted' on the winning guess """
+        """ Checks that a valid emoji is 'reacted' on the winning guess """
         self.reset_and_transition_to("guessing")
 
         assert self.state["step"] == "guessing"
@@ -459,8 +463,10 @@ class TestBotScenarios(EmojiradeBotTester):
 
         expected_reaction = (
             self.config.channel,
-            "clap",
+            re.compile("[a-z_]+"),
             self.events.correct_guess["ts"],
         )
 
-        assert self.reactions[0] == expected_reaction
+        assert expected_reaction[0] == self.reactions[0][0]
+        assert expected_reaction[1].match(self.reactions[0][1])
+        assert expected_reaction[2] == self.reactions[0][2]
