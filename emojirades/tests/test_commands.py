@@ -50,10 +50,10 @@ class TestBotCommands(EmojiradeBotTester):
                 "Timothy Sinclair": 100,
                 "Stephen Verschuren": 81,
                 "Mark Chaves": 81,
-                "Andres Quillian": 30,
+                "Andres Quillian": 81,
                 "Justin Fendi": 24,
                 "Scott Burke": 23,
-                "Steve Robbins": 16,
+                "Steve Robbins": 9,
                 "Agung Alford": 9,
                 "James Gream": 1,
             },
@@ -67,12 +67,12 @@ class TestBotCommands(EmojiradeBotTester):
  3. Michael Mitchell   [ 118 points ]
  4. Timothy Sinclair   [ 100 points ]
  5. Stephen Verschuren [  81 points ]
- 6. Mark Chaves        [  81 points ]
- 7. Andres Quillian    [  30 points ]
+ 5. Mark Chaves        [  81 points ]
+ 5. Andres Quillian    [  81 points ]
  8. Justin Fendi       [  24 points ]
  9. Scott Burke        [  23 points ]
-10. Steve Robbins      [  16 points ]
-11. Agung Alford       [   9 points ]
+10. Steve Robbins      [   9 points ]
+10. Agung Alford       [   9 points ]
 12. James Gream        [   1 point  ]
 ```"""
 
