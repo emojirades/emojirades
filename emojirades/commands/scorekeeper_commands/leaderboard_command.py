@@ -21,8 +21,14 @@ class LeaderboardCommand(BaseCommand):
 
     examples = [
         ("<@{me}> scoreboard", "Show user scores"),
-        ("<@{me}> scoreboard weekly|monthly|all time", "Show user scores on different brackets"),
-        ("<@{me}> scoreboard weekly|monthly YYYYMMDD", "Show user weekly or monthly scores from a different date"),
+        (
+            "<@{me}> scoreboard weekly|monthly|all time",
+            "Show user scores on different brackets",
+        ),
+        (
+            "<@{me}> scoreboard weekly|monthly YYYYMMDD",
+            "Show user weekly or monthly scores from a different date",
+        ),
         ("<@{me}> leaderboard", "Alternative name for scoreboard"),
     ]
 
@@ -56,5 +62,8 @@ class LeaderboardCommand(BaseCommand):
             lb = LeaderBoard(history)
             leaderboard = lb.get(of_date, self.time_unit)
 
-        leaderboard_printer = LeaderboardPrinter(leaderboard, self.slack, self.time_unit, of_date)
+        leaderboard_printer = LeaderboardPrinter(
+            leaderboard, self.slack, self.time_unit, of_date
+        )
+
         yield from leaderboard_printer.print()

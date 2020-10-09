@@ -13,16 +13,24 @@ class InferredCorrectGuessCommand(BaseCommand):
         (None, "Internally awards a win"),
     ]
 
-    first_emojis = [":first_place_medal:"]
-    second_emojis = [":second_place_medal:"]
-    third_emojis = [":third_place_medal:"]
+    first_emojis = ["first_place_medal"]
+    second_emojis = ["second_place_medal"]
+    third_emojis = ["third_place_medal"]
 
     other_emojis = [
-        ":tada:",
-        ":sunglasses:",
-        ":nerd_face:",
-        ":birthday:",
-        ":beers:",
+        "tada",
+        "sunglasses",
+        "nerd_face",
+        "birthday",
+        "beers",
+    ]
+
+    reaction_emojis = [
+        "tada",
+        "clap",
+        "+1",
+        "ok_hand",
+        "champagne",
     ]
 
     def __init__(self, *args, **kwargs):
@@ -59,7 +67,7 @@ class InferredCorrectGuessCommand(BaseCommand):
             {
                 "func": "reactions_add",
                 "kwargs": {
-                    "name": "clap",
+                    "name": random.choice(self.reaction_emojis),
                     "timestamp": self.args["ts"],
                 },
             },
@@ -74,7 +82,7 @@ class InferredCorrectGuessCommand(BaseCommand):
         else:
             emoji = random.choice(self.other_emojis)
 
-        emoji = f" {emoji}"
+        emoji = f" :{emoji}:"
 
         if state.get("first_guess", False):
             yield (

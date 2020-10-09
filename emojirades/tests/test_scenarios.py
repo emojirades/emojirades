@@ -1,5 +1,6 @@
 from emojirades.tests.helper import EmojiradeBotTester
 
+import time
 import re
 
 
@@ -111,7 +112,7 @@ class TestBotScenarios(EmojiradeBotTester):
             return (dst, re.compile(msg))
 
         def reaction(dst, emoji, ts):
-            return (dst, emoji, ts)
+            return (dst, re.compile(emoji), ts)
 
         total_responses = 0
         total_reactions = 0
@@ -223,12 +224,21 @@ class TestBotScenarios(EmojiradeBotTester):
 
         # Expected *new* reactions
         reactions = [
-            reaction(self.config.channel, "clap", self.events.correct_guess["ts"],),
+            reaction(
+                self.config.channel,
+                "[a-z_]+",
+                self.events.correct_guess["ts"],
+            ),
         ]
 
         # Ensure each expected reaction exists
-        for i, reaction in enumerate(reactions):
-            assert reaction == self.reactions[total_reactions + i]
+        while not self.reactions:
+            time.sleep(0.5)
+
+        for i, (channel, emoji, ts) in enumerate(reactions):
+            assert channel == self.reactions[total_reactions + i][0]
+            assert emoji.match(re.escape(self.reactions[total_reactions + i][1]))
+            assert ts == self.reactions[total_reactions + i][2]
 
         # Ensure total volume is as expected
         total_reactions += len(reactions)
@@ -447,7 +457,7 @@ class TestBotScenarios(EmojiradeBotTester):
         assert self.state["step"] == "guessing"
 
     def test_correct_guess_reaction(self):
-        """ Checks that a :clap: emoji is 'reacted' on the winning guess """
+        """ Checks that a valid emoji is 'reacted' on the winning guess """
         self.reset_and_transition_to("guessing")
 
         assert self.state["step"] == "guessing"
@@ -457,8 +467,13 @@ class TestBotScenarios(EmojiradeBotTester):
 
         expected_reaction = (
             self.config.channel,
-            "clap",
+            re.compile("[a-z_]+"),
             self.events.correct_guess["ts"],
         )
 
-        assert self.reactions[0] == expected_reaction
+        while not self.reactions:
+            time.sleep(0.5)
+
+        assert expected_reaction[0] == self.reactions[0][0]
+        assert expected_reaction[1].match(re.escape(self.reactions[0][1]))
+        assert expected_reaction[2] == self.reactions[0][2]
