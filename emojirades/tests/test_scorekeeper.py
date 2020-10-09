@@ -24,7 +24,9 @@ class ScoreKeeperTester(TestCase):
 
         scoreboard = {
             self.channel: {
-                "scores": {user: 1, },
+                "scores": {
+                    user: 1,
+                },
                 "history": [
                     {"timestamp": 1593565068.205327, "user_id": user, "operation": "++"}
                 ],
@@ -49,7 +51,9 @@ class ScoreKeeperIntegrationTest(TestCase):
 
         scoreboard = {
             self.channel: {
-                "scores": {self.user_1: 10, },
+                "scores": {
+                    self.user_1: 10,
+                },
                 "history": [
                     {
                         "timestamp": 1593565068.205327,

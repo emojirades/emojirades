@@ -6,6 +6,4 @@ class TimeRange:
 
     @classmethod
     def list(cls):
-        return [cls.WEEKLY,
-                cls.MONTHLY,
-                cls.ALL_TIME]
+        return [cls.WEEKLY, cls.MONTHLY, cls.ALL_TIME]

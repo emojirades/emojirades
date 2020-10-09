@@ -32,7 +32,9 @@ setup(
         "expiringdict",
     ],
     python_requires="~=3.8",
-    extras_require={"test": ["pytest", "pycodestyle"], },
+    extras_require={
+        "test": ["pytest", "pycodestyle"],
+    },
     scripts=["bin/emojirades"],
     author="The Emojirades Development Team",
     author_email="support@emojirades.io",
