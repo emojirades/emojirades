@@ -237,7 +237,7 @@ class TestBotScenarios(EmojiradeBotTester):
 
         for i, (channel, emoji, ts) in enumerate(reactions):
             assert channel == self.reactions[total_reactions + i][0]
-            assert emoji.match(self.reactions[total_reactions + i][1])
+            assert emoji.match(re.escape(self.reactions[total_reactions + i][1]))
             assert ts == self.reactions[total_reactions + i][2]
 
         # Ensure total volume is as expected
@@ -475,5 +475,5 @@ class TestBotScenarios(EmojiradeBotTester):
             time.sleep(0.5)
 
         assert expected_reaction[0] == self.reactions[0][0]
-        assert expected_reaction[1].match(self.reactions[0][1])
+        assert expected_reaction[1].match(re.escape(self.reactions[0][1]))
         assert expected_reaction[2] == self.reactions[0][2]
