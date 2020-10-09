@@ -15,16 +15,16 @@ class CorrectGuessCommand(BaseCommand):
         ("@winner ++", "Manually award a player the win"),
     ]
 
-    first_emojis = [":first_place_medal:"]
-    second_emojis = [":second_place_medal:"]
-    third_emojis = [":third_place_medal:"]
+    first_emojis = ["first_place_medal"]
+    second_emojis = ["second_place_medal"]
+    third_emojis = ["third_place_medal"]
 
     other_emojis = [
-        ":tada:",
-        ":sunglasses:",
-        ":nerd_face:",
-        ":birthday:",
-        ":beers:",
+        "tada",
+        "sunglasses",
+        "nerd_face",
+        "birthday",
+        "beers",
     ]
 
     def __init__(self, *args, **kwargs):
@@ -75,7 +75,7 @@ class CorrectGuessCommand(BaseCommand):
         else:
             emoji = random.choice(self.other_emojis)
 
-        emoji = f" {emoji}"
+        emoji = f" :{emoji}:"
 
         if state.get("first_guess", False):
             yield (
