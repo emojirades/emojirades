@@ -226,7 +226,7 @@ class TestBotScenarios(EmojiradeBotTester):
         reactions = [
             reaction(
                 self.config.channel,
-                "[a-z_]+",
+                "[a-z_\+]+",
                 self.events.correct_guess["ts"],
             ),
         ]
@@ -467,7 +467,7 @@ class TestBotScenarios(EmojiradeBotTester):
 
         expected_reaction = (
             self.config.channel,
-            re.compile("[a-z_]+"),
+            re.compile("[a-z_\+]+"),
             self.events.correct_guess["ts"],
         )
 
