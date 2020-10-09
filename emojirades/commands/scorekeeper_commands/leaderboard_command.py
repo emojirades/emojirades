@@ -14,9 +14,9 @@ class LeaderboardCommand(BaseCommand):
     description = "Shows all the users scores"
 
     patterns = (
-        r"<@{me}> (score|leader)[\s]*board$",
-        r"<@{me}> (score|leader)[\s]*board (?P<range>weekly|monthly) (?P<on_date>[0-9]{{8}})",
-        r"<@{me}> (score|leader)[\s]*board (?P<range>weekly|monthly|all time)",
+        r"<@{me}>[\s]+(score|leader)[\s]*board$",
+        r"<@{me}>[\s]+(score|leader)[\s]*board (?P<range>weekly|monthly) (?P<on_date>[0-9]{{8}})",
+        r"<@{me}>[\s]+(score|leader)[\s]*board (?P<range>weekly|monthly|all time|alltime|all|everything)",
     )
 
     examples = [
@@ -35,7 +35,11 @@ class LeaderboardCommand(BaseCommand):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # TODO: :thinking: Maybe we could add default value regex in the command translation
+        all_time_values = ["all time", "alltime", "all", "everything"]
+
+        if self.args.get("range") in all_time_values:
+            self.args["range"] = "all time"
+
         self.time_unit = TimeUnit(self.args.get("range", TimeUnit.WEEKLY.value))
         self.on_date = self.args.get("on_date")
 
