@@ -5,6 +5,9 @@ import pendulum
 import logging
 import math
 
+from emojirades.analytics.time_range import TimeRange
+from emojirades.analytics.time_unit import TimeUnit
+
 
 class LeaderBoard:
 
@@ -127,9 +130,9 @@ class LeaderBoard:
             for u in sorted(leaderboard, key=leaderboard.get, reverse=True)
         ]
 
-    def get_by_range(self, of_date: pendulum.DateTime, unit: str):
-        start_time = of_date.start_of(unit).timestamp()
-        end_time = of_date.end_of(unit).timestamp()
+    def get_by_range(self, of_date: pendulum.DateTime, time_unit: TimeUnit):
+        start_time = TimeRange.get_start_date(of_date, time_unit).timestamp()
+        end_time = TimeRange.get_end_date(of_date, time_unit).timestamp()
 
         self.logger.debug(
             f"Getting date range from start_time: {start_time} to end_time: {end_time}"
@@ -137,8 +140,5 @@ class LeaderBoard:
 
         return self.calculate_score(self.get_data(start_time, end_time))
 
-    def get_week(self, of_date: pendulum.DateTime):
-        return self.get_by_range(of_date, "week")
-
-    def get_month(self, of_date: pendulum.DateTime):
-        return self.get_by_range(of_date, "month")
+    def get(self, of_date: pendulum.DateTime, time_unit):
+        return self.get_by_range(of_date, time_unit)
