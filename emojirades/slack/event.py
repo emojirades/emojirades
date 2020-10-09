@@ -58,4 +58,8 @@ class Event:
             except InvalidEvent:
                 return False
 
+            # If the event is coming from itself (the bot) ignore it
+            if self.player_id == self.slack_client.bot_id:
+                return False
+
         return True
