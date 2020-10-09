@@ -1,12 +1,39 @@
 import logging
 
+import pendulum
+
+from emojirades.analytics.time_range import TimeRange
+from emojirades.analytics.time_unit import TimeUnit
+
 
 class LeaderboardPrinter:
-    def __init__(self, data, slack, time_unit):
+    def __init__(self, data, slack, time_unit: TimeUnit, of_date: pendulum.DateTime):
         self.data = data
         self.logger = logging.getLogger("EmojiradesBot.printers.LeaderboardPrinter")
         self.slack = slack
         self.time_unit = time_unit
+        self.of_date = of_date
+
+    def print_date_range(self):
+        date_range = ""
+        if self.time_unit in [TimeUnit.WEEKLY, TimeUnit.MONTHLY]:
+            start = TimeRange.get_start_date(self.of_date, self.time_unit).format("YYYY-MM-DD")
+            end = TimeRange.get_end_date(self.of_date, self.time_unit).format("YYYY-MM-DD")
+            date_range = f"({start} - {end})"
+
+        return date_range
+
+    def print_title(self):
+        title = []
+        title.append("")
+        title.append("::")
+        title.append(f"{self.time_unit.value.title()}")
+        title.append("leaderboard")
+        if self.print_date_range():
+            title.append(self.print_date_range())
+        title.append("::")
+
+        return " ".join(title)
 
     def print(self):
         leaderboard = self.data
@@ -17,7 +44,10 @@ class LeaderboardPrinter:
             yield None, "Nothing to see here!"
             return
 
-        lines = ["```", f" :: {self.time_unit.title()} leaderboard ::", ""]
+        lines = [
+            "```",
+            self.print_title(),
+            ""]
 
         longest_name = 0
         biggest_score = 0
