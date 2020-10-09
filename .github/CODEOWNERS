@@ -1,4 +1,8 @@
-/emojirades/ @emojirades/developers
+# Developer Team
+/emojirades/     @emojirades/developers
+requirements.txt @emojirades/developers
+
+# Platform Team
 .travis.yml  @emojirades/platform
 Dockerfile   @emojirades/platform
 setup.py     @emojirades/platform
