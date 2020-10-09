@@ -114,7 +114,7 @@ class CorrectGuessCommand(BaseCommand):
                 f"Ok <@{state['winner']}> just give up already, you've won the game"
             )
         elif score == 500:
-            prefix = f":tada::tada: Ladies and gentlemen he's daym done it again :tada::tada:"
+            prefix = f":tada::tada: Ladies and gentlemen <@{state['winner']}> has daym done it again :tada::tada:"
         elif score == 400:
             prefix = f":trophy: This is a big milestone <@{state['winner']}>, you should feel proud"
         elif score == 300:
