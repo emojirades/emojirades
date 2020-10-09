@@ -1,5 +1,6 @@
 from emojirades.tests.helper import EmojiradeBotTester
 
+import time
 import re
 
 
@@ -231,6 +232,9 @@ class TestBotScenarios(EmojiradeBotTester):
         ]
 
         # Ensure each expected reaction exists
+        while not self.reactions:
+            time.sleep(0.2)
+
         for i, (channel, emoji, ts) in enumerate(reactions):
             assert channel == self.reactions[total_reactions + i][0]
             assert emoji.match(self.reactions[total_reactions + i][1])
@@ -466,6 +470,9 @@ class TestBotScenarios(EmojiradeBotTester):
             re.compile("[a-z_]+"),
             self.events.correct_guess["ts"],
         )
+
+        while not self.reactions:
+            time.sleep(0.2)
 
         assert expected_reaction[0] == self.reactions[0][0]
         assert expected_reaction[1].match(self.reactions[0][1])
