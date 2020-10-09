@@ -58,7 +58,10 @@ class InferredCorrectGuessCommand(BaseCommand):
             None,
             {
                 "func": "reactions_add",
-                "kwargs": {"name": "clap", "timestamp": self.args["ts"], },
+                "kwargs": {
+                    "name": "clap",
+                    "timestamp": self.args["ts"],
+                },
             },
         )
 
@@ -80,10 +83,32 @@ class InferredCorrectGuessCommand(BaseCommand):
             )
 
         yield (None, f"<@{state['winner']}>++")
+
+        # Build the score message
+        if score == 1000:
+            prefix = (
+                f"Ok <@{state['winner']}> just give up already, you've won the game"
+            )
+        elif score == 500:
+            prefix = f":tada::tada: Ladies and gentlemen he's daym done it again :tada::tada:"
+        elif score == 400:
+            prefix = f":trophy: This is a big milestone <@{state['winner']}>, you should feel proud"
+        elif score == 300:
+            prefix = f"Third century's the charm they say <@{state['winner']}>, congrats :sunglasses:"
+        elif score == 200:
+            prefix = f"Not going to lie <@{state['winner']}> this is pretty impressive"
+        elif score == 100:
+            prefix = f"Triple digits <@{state['winner']}>! Not everyone makes it this far! :tada:"
+        elif score % 50 == 0:
+            prefix = f"Another day, another 50 point milestone for <@{state['winner']}> :chart_with_upwards_trend:"
+        else:
+            prefix = f"Congrats <@{state['winner']}>"
+
         yield (
             None,
-            f"Congrats <@{state['winner']}>, you're now at {score} point{'s' if score > 1 else ''}{emoji}",
+            f"{prefix}, you're now at {score} point{'s' if score > 1 else ''}{emoji}",
         )
+
         yield (None, f"The correct emojirade was `{first_emojirade}`{alternatives}")
 
         yield (
