@@ -17,8 +17,12 @@ class LeaderboardPrinter:
     def print_date_range(self):
         date_range = ""
         if self.time_unit in [TimeUnit.WEEKLY, TimeUnit.MONTHLY]:
-            start = TimeRange.get_start_date(self.of_date, self.time_unit).format("YYYY-MM-DD")
-            end = TimeRange.get_end_date(self.of_date, self.time_unit).format("YYYY-MM-DD")
+            start = TimeRange.get_start_date(self.of_date, self.time_unit).format(
+                "YYYY-MM-DD"
+            )
+            end = TimeRange.get_end_date(self.of_date, self.time_unit).format(
+                "YYYY-MM-DD"
+            )
             date_range = f"({start} - {end})"
 
         return date_range
@@ -44,10 +48,7 @@ class LeaderboardPrinter:
             yield None, "Nothing to see here!"
             return
 
-        lines = [
-            "```",
-            self.print_title(),
-            ""]
+        lines = ["```", self.print_title(), ""]
 
         longest_name = 0
         biggest_score = 0
