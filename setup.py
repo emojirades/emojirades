@@ -7,11 +7,11 @@ with open(path.join(this_directory, "README.md"), encoding="utf-8") as f:
 
 setup(
     name="Emojirades",
-    version="0.11.2",
+    version="0.12.0",
     description="A Slack bot that understands the Emojirades game!",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/michael-robbins/emojirades",
+    url="https://github.com/emojirades/emojirades",
     classifiers=[
         "Development Status :: 4 - Beta",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
@@ -36,6 +36,6 @@ setup(
         "test": ["pytest", "pycodestyle"],
     },
     scripts=["bin/emojirades"],
-    author="The Emojirades Development Team",
+    author="The Emojirades Team",
     author_email="support@emojirades.io",
 )
