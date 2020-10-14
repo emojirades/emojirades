@@ -14,13 +14,14 @@ class LeaderboardCommand(BaseCommand):
     description = "Shows all the users scores"
 
     patterns = (
-        r"<@{me}>[\s]+(score|leader)[\s]*board$",
-        r"<@{me}>[\s]+(score|leader)[\s]*board (?P<range>weekly|monthly) (?P<on_date>[0-9]{{8}})",
-        r"<@{me}>[\s]+(score|leader)[\s]*board (?P<range>weekly|monthly|all time|alltime|all|everything)",
+        r"<@{me}>[\s]+(?:score|leader)[\s]*board(?P<all_boards>s){{0,1}}$",
+        r"<@{me}>[\s]+(?:score|leader)[\s]*board (?P<range>weekly|monthly) (?P<on_date>[0-9]{{8}})",
+        r"<@{me}>[\s]+(?:score|leader)[\s]*board (?P<range>weekly|monthly|all time|alltime|all|everything)",
     )
 
     examples = [
-        ("<@{me}> scoreboard", "Show user scores"),
+        ("<@{me}> scoreboard", "Show current weekly scoreboard (default)"),
+        ("<@{me}> scoreboards", "Show all scoreboards"),
         (
             "<@{me}> scoreboard weekly|monthly|all time",
             "Show user scores on different brackets",
@@ -40,34 +41,51 @@ class LeaderboardCommand(BaseCommand):
         if self.args.get("range") in all_time_values:
             self.args["range"] = "all time"
 
-        self.time_unit = TimeUnit(self.args.get("range", TimeUnit.WEEKLY.value))
+        if self.args.get("all_boards"):
+            self.time_units = (
+                TimeUnit.WEEKLY.value,
+                TimeUnit.MONTHLY.value,
+                TimeUnit.ALL_TIME.value,
+            )
+        else:
+            self.time_units = (TimeUnit(self.args.get("range", TimeUnit.WEEKLY.value)), )
+
         self.on_date = self.args.get("on_date")
+
+    def get_leaderboard(self, time_unit: TimeUnit, of_date: pendulum.DateTime):
+        """
+        Given a time unit and a date, return the appropriate leaderboard
+        """
+        self.logger.debug(f"Getting a {time_unit} leaderboard")
+
+        if time_unit == TimeUnit.ALL_TIME:
+            return self.scorekeeper.leaderboard(self.args["channel"])
+
+        all_history = self.scorekeeper.raw_history(self.args["channel"])
+        lb = LeaderBoard(all_history)
+
+        mock_date = os.environ.get("EMOJIRADE_MOCK_DATE")
+
+        if (mock_date := os.environ.get("EMOJIRADE_MOCK_DATE")):
+            date = mock_date
+        else:
+            date = self.on_date
+
+        of_date = pendulum.from_format(date, "YYYYMMDD", tz=self.TZ)
+        self.logger.debug("Leaderboard date was set to: {of_date}")
+
+        return lb.get(of_date, time_unit)
 
     def execute(self):
         yield from super().execute()
 
         of_date = pendulum.now(tz=self.TZ)
 
-        if self.time_unit == TimeUnit.ALL_TIME:
-            leaderboard = self.scorekeeper.leaderboard(self.args["channel"])
-        else:
-            self.logger.debug(f"Getting a {self.time_unit} leaderboard")
-            history = self.scorekeeper.raw_history(self.args["channel"])
+        for time_unit in self.time_units:
+            leaderboard = self.get_leaderboard(time_unit, of_date)
 
-            mock_date = os.environ.get("EMOJIRADE_MOCK_DATE")
-            if self.on_date:
-                of_date = pendulum.from_format(self.on_date, "YYYYMMDD", tz=self.TZ)
-                self.logger.info(f"User requested date to: {of_date}")
-            elif mock_date:
-                # Mockable date
-                of_date = pendulum.from_format(mock_date, "YYYYMMDD", tz=self.TZ)
-                self.logger.info(f"Mocking date to: {of_date}")
+            leaderboard_printer = LeaderboardPrinter(
+                leaderboard, self.slack, time_unit, of_date
+            )
 
-            lb = LeaderBoard(history)
-            leaderboard = lb.get(of_date, self.time_unit)
-
-        leaderboard_printer = LeaderboardPrinter(
-            leaderboard, self.slack, self.time_unit, of_date
-        )
-
-        yield from leaderboard_printer.print()
+            yield from leaderboard_printer.print()
