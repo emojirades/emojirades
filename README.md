@@ -7,17 +7,23 @@ Slack bot that understands the emojirades game and handles score keeping
 `# Preferably run on a virtualenv`
 
 ## Install the dependencies
-`pip3 install -r requirements.txt --upgrade`
+```bash
+pip3 install --upgrade pip wheel
+
+pip3 install -r requirements.txt --upgrade
+
+# If you're developing locally
+pip3 install -r test_requirements.txt --upgrade
+```
 
 ## Install the module ( For Dev )
-```
+```bash
 cd emojirades
 pip3 install -e .
 ```
 
 ## Run the tests
-```
-pip3 install -r test_requirements.txt --upgrade
+```bash
 pycodestyle
 pytest
 ```
