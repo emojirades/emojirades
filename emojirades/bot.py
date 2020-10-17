@@ -4,25 +4,13 @@ import time
 import os
 import traceback
 
-from emojirades.commands import BaseCommand
 from emojirades.handlers import get_workspace_directory_handler
 from emojirades.commands.registry import CommandRegistry
 from emojirades.slack.slack_client import SlackClient
 from emojirades.scorekeeper import ScoreKeeper
+from emojirades.commands import BaseCommand
 from emojirades.gamestate import GameState
 from emojirades.slack.event import Event
-
-def get_handler(directory):
-    class BotWorkspaceDirectoryHander(get_workspace_directory_handler(directory)):
-        """
-        Handles discovering Workspaces from the Workspace Directory
-        """
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-
-
-    return 
-    return ScoreKeeperConfigHandler(filename)
 
 
 class EmojiradesBot(object):
@@ -46,16 +34,9 @@ class EmojiradesBot(object):
     def configure_workspaces(self, workspaces_dir, onboarding_queue):
         handler = get_workspace_directory_handler(workspaces_dir)
 
-        # Loop through all workspaces
         for workspace in handler.workspaces():
-            self.configure_workspace(
-                workspace["score_file"],
-                workspace["state_file"],
-                workspace["auth_file"],
-                workspace_id=workspace["id"],
-            )
+            self.configure_workspace(**workspace)
 
-        # Setup the queue for monitoring
         self.onboarding_queue = onboarding_queue
 
     def match_event(self, event: Event, commands: dict) -> BaseCommand:

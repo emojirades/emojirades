@@ -12,15 +12,20 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-v", "--verbose", action="count", default=0, help="Logging level")
     parser.add_argument("--log-file", default=sys.stderr, help="File we will log to")
-    subparsers = parser.add_subparsers(help="Workspaces Mode")
 
+    subparsers = parser.add_subparsers(help="Workspaces Mode", dest="mode")
+    subparsers.required = True
+
+    # Single Workspace
     parser_single = subparsers.add_parser("single", help="Single Workspace")
-    parser_single.add_argument("--score-file", help="CSV file we use to persist scores", required=True)
+    parser_single.add_argument("--score-file", help="JSON file we use to persist scores", required=True)
     parser_single.add_argument("--state-file", help="JSON file we use to persist game state", required=True)
-    parser_single.add_argument("--auth-file", help="JSON file we use to authenticate with Slack", required=True)
+    parser_single.add_argument("--auth-file", help="JSON file we use to store auth config", required=True)
 
+    # Multiple Workspaces
     parser_multiple = subparsers.add_parser("multiple", help="Multiple Workspaces")
     parser_multiple.add_argument("--workspaces-dir", help="Folder path we persist workspaces to", required=True)
+    parser_multiple.add_argument("--workspace-id", dest="workspace_ids", action="append", help="Specific workspace IDs")
     parser_multiple.add_argument("--onboarding-queue", help="SQS queue containing new workspaces to onboard", required=False)
 
     args = parser.parse_args()
@@ -40,13 +45,17 @@ if __name__ == "__main__":
     # Register the event callback
     slack.RTMClient.on(event="message", callback=bot.handle_event)
 
-    # Configure the bot mode
-    if args.score_file and args.state_file and args.auth_file:
-        bot.configure_workspace(args.score_file, args.state_file, args.auth_file)
-    elif args.workspaces_dir:
-        bot.configure_workspaces(args.workspaces_dor, args.onboarding_queue)
+    print(args)
 
-    logger.debug("Initialised Bot")
+    # Configure the bot mode
+    if args.mode == "single":
+        logger.debug("Configurating for Single Workspace mode")
+        bot.configure_workspace(args.score_file, args.state_file, args.auth_file)
+    elif args.mode == "miltiple":
+        logger.debug("Configurating for Multiple Workspace mode")
+        bot.configure_workspaces(args.workspaces_dir, args.workspace_ids, args.onboarding_queue)
+
+    logger.debug("Configured bot")
 
     logger.info("Bot is listening for commands")
     bot.listen_for_commands()

@@ -44,17 +44,16 @@ class S3WorkspaceDirectoryHandler(WorkspaceDirectoryHandler):
         )
 
         for response in response_iterator:
-            for workspace in response["Contents"]:
-                workspace_path = workspace["Key"]
-                print(workspace)
-                # TODO: Extract Workspace ID, score/state/auth file
+            for content in response["Contents"]:
+                if not content["Key"].endswith(".json"):
+                    continue
 
-                yield {
-                    "workspace_id": workspace_id,
-                    "score_file": score_file,
-                    "state_file": state_file,
-                    "auth_file": auth_file,
-                }
+                s3_object = self._s3.get_object(
+                    Bucket=self._bucket,
+                    Key=content["Key"],
+                )
+
+                yield json.load(s3_object["Body"])
 
 
 class LocalWorkspaceDirectoryHandler(WorkspaceDirectoryHandler):
@@ -64,19 +63,15 @@ class LocalWorkspaceDirectoryHandler(WorkspaceDirectoryHandler):
         self._folder = pathlib.Path(self.workspace_path)
 
     def workspaces(self):
-        for workspace in self._folder.iterdir():
-            if not workspace.is_dir():
+        for entry in self._folder.iterdir():
+            if not entry.is_file():
                 continue
 
-            print(workspace)
-            # TODO: Extract Workspace ID, score/state/auth file
+            if not entry.suffix == ".json":
+                continue
 
-            yield {
-                "workspace_id": workspace_id,
-                "score_file": score_file,
-                "state_file": state_file,
-                "auth_file": auth_file,
-            }
+            with open(entry) as workspace_file:
+                yield json.load(config)
 
 
 def get_workspace_directory_handler(directory):

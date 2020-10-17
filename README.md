@@ -28,24 +28,24 @@ If you're using the built in AWS functionality to persist your data, you'll need
 ## Run the daemon for a single workspace
 This command uses locally stored files to keep the game state:
 
-`emojirades --score-file scores.csv --state-file state.json --auth-file auth.json`
+`emojirades single --score-file scores.csv --state-file state.json --auth-file auth.json`
 
 This command uses S3 stored files to keep the game state:
 
-`emojirades --score-file s3://bucket/scores.csv --state-file s3://bucket/state.json --auth-file s3://bucket/auth.json
+`emojirades single --score-file s3://bucket/scores.csv --state-file s3://bucket/state.json --auth-file s3://bucket/auth.json
 
 ## Run the daemon for multiple workspaces
 Here we provide a local folder of workspaces and an optional set of workspace ids (will load all in folder by default):
 
-`emojirades --workspaces-dir path/to/workspaces [--workspace-id A1B2C3D4E]`
+`emojirades mulitple --workspaces-dir path/to/workspaces [--workspace-id A1B2C3D4E]`
 
 Here we provide an S3 path of workspaces and an optional set of workspace ids (will load all in folder by default):
 
-`emojirades --workspaces-dir s3://bucket/path/to/workspaces [--workspace-id A1B2C3D4E]`
+`emojirades multiple --workspaces-dir s3://bucket/path/to/workspaces [--workspace-id A1B2C3D4E]`
 
 Here we provide an S3 path of workspaces and an AWS SQS queue to listen to for new workspaces:
 
-`emojirades --workspaces-dir s3://bucket/path/to/workspaces --onboarding-queue workspace-onboarding-queue`
+`emojirades multiple --workspaces-dir s3://bucket/path/to/workspaces --onboarding-queue workspace-onboarding-queue`
 
 The workspaces directory must be in the following format:
 ```
