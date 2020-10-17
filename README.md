@@ -24,7 +24,7 @@ pip3 install -e .
 
 ## Run the tests
 ```bash
-pycodestyle
+black .
 pytest
 ```
 
