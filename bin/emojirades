@@ -45,17 +45,15 @@ if __name__ == "__main__":
     # Register the event callback
     slack.RTMClient.on(event="message", callback=bot.handle_event)
 
-    print(args)
-
     # Configure the bot mode
     if args.mode == "single":
         logger.debug("Configurating for Single Workspace mode")
         bot.configure_workspace(args.score_file, args.state_file, args.auth_file)
-    elif args.mode == "miltiple":
+    elif args.mode == "multiple":
         logger.debug("Configurating for Multiple Workspace mode")
         bot.configure_workspaces(args.workspaces_dir, args.workspace_ids, args.onboarding_queue)
-
-    logger.debug("Configured bot")
+    else:
+        parser.error("Unknown mode")
 
     logger.info("Bot is listening for commands")
     bot.listen_for_commands()

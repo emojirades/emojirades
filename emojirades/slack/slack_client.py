@@ -1,7 +1,8 @@
-import slack
-
 from emojirades.handlers import get_configuration_handler
 from expiringdict import ExpiringDict
+
+import slack
+import json
 
 
 def get_handler(filename):
@@ -31,8 +32,8 @@ class SlackClient(object):
         self.config = get_handler(filename).load()
         self.logger = logger
 
-        self.rtmclient = slack.RTMClient(token=self.config.bot_access_token)
-        self.webclient = slack.WebClient(token=self.config.bot_access_token, timeout=30)
+        self.rtmclient = slack.RTMClient(token=self.config["bot_access_token"])
+        self.webclient = slack.WebClient(token=self.config["bot_access_token"], timeout=30)
 
         self.last_ts = float(0)
 

@@ -2,6 +2,7 @@ import botocore
 import pathlib
 import logging
 import boto3
+import json
 import csv
 
 class WorkspaceDirectoryHandler(object):
@@ -71,7 +72,7 @@ class LocalWorkspaceDirectoryHandler(WorkspaceDirectoryHandler):
                 continue
 
             with open(entry) as workspace_file:
-                yield json.load(config)
+                yield json.load(workspace_file)
 
 
 def get_workspace_directory_handler(directory):
