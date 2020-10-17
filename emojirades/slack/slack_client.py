@@ -27,13 +27,16 @@ def get_handler(filename):
 
     return SlackAuthConfigHandler(filename)
 
+
 class SlackClient(object):
     def __init__(self, filename, logger=None):
         self.config = get_handler(filename).load()
         self.logger = logger
 
         self.rtmclient = slack.RTMClient(token=self.config["bot_access_token"])
-        self.webclient = slack.WebClient(token=self.config["bot_access_token"], timeout=30)
+        self.webclient = slack.WebClient(
+            token=self.config["bot_access_token"], timeout=30
+        )
 
         self.last_ts = float(0)
 

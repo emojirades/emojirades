@@ -14,7 +14,7 @@ from emojirades.slack.event import Event
 
 
 class EmojiradesBot(object):
-    DEFAULT_WORKSPACE="_default"
+    DEFAULT_WORKSPACE = "_default"
 
     def __init__(self):
         self.logger = logging.getLogger("Emojirades.Bot")

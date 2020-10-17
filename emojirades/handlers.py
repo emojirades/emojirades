@@ -5,6 +5,7 @@ import boto3
 import json
 import csv
 
+
 class WorkspaceDirectoryHandler(object):
     """
     Workspace Directory Handlers deal with extracting Workspace Configuration files
