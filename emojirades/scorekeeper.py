@@ -2,9 +2,8 @@ import logging
 import json
 import time
 
-from collections import defaultdict
-
 from emojirades.handlers import get_configuration_handler
+from collections import defaultdict
 
 
 module_logger = logging.getLogger("EmojiradesBot.scorekeeper")

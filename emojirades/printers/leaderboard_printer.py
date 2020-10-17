@@ -1,6 +1,5 @@
-import logging
-
 import pendulum
+import logging
 
 from emojirades.analytics.time_range import TimeRange
 from emojirades.analytics.time_unit import TimeUnit
