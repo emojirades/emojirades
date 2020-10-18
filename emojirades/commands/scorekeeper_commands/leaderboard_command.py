@@ -48,7 +48,7 @@ class LeaderboardCommand(BaseCommand):
                 TimeUnit.ALL_TIME.value,
             )
         else:
-            self.time_units = (TimeUnit(self.args.get("range", TimeUnit.WEEKLY.value)), )
+            self.time_units = (TimeUnit(self.args.get("range", TimeUnit.WEEKLY.value)),)
 
         self.on_date = self.args.get("on_date")
 
@@ -66,7 +66,7 @@ class LeaderboardCommand(BaseCommand):
 
         mock_date = os.environ.get("EMOJIRADE_MOCK_DATE")
 
-        if (mock_date := os.environ.get("EMOJIRADE_MOCK_DATE")):
+        if (mock_date := os.environ.get("EMOJIRADE_MOCK_DATE")) :
             date = mock_date
         else:
             date = self.on_date

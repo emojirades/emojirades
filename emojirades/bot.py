@@ -1,49 +1,63 @@
 import logging
+import boto3
+import time
 import os
 import traceback
 
-from emojirades.commands import BaseCommand
+from emojirades.handlers import get_workspace_directory_handler
 from emojirades.commands.registry import CommandRegistry
 from emojirades.slack.slack_client import SlackClient
 from emojirades.scorekeeper import ScoreKeeper
+from emojirades.commands import BaseCommand
 from emojirades.gamestate import GameState
 from emojirades.slack.event import Event
 
-module_logger = logging.getLogger("EmojiradesBot.bot")
-
 
 class EmojiradesBot(object):
-    def __init__(self, scorefile, statefile):
-        self.logger = logging.getLogger("EmojiradesBot.bot.Bot")
+    DEFAULT_WORKSPACE = "_default"
 
-        self.scorekeeper = ScoreKeeper(scorefile)
-        self.gamestate = GameState(statefile)
+    def __init__(self):
+        self.logger = logging.getLogger("Emojirades.Bot")
+        self.workspaces = {}
+        self.onboarding_queue = None
 
-        slack_bot_token = os.environ.get("SLACK_BOT_TOKEN", None)
+    def configure_workspace(self, score_file, state_file, auth_file, workspace_id=None):
+        if workspace_id is None:
+            workspace_id = EmojiradesBot.DEFAULT_WORKSPACE
 
-        if not slack_bot_token:
-            raise RuntimeError("Missing SLACK_BOT_TOKEN from environment vars")
+        self.workspaces[workspace_id] = {
+            "scorekeeper": ScoreKeeper(score_file),
+            "gamestate": GameState(state_file),
+            "slack": SlackClient(auth_file, self.logger),
+        }
 
-        self.slack = SlackClient(slack_bot_token, self.logger)
-        self.logger.debug("Initialised application instance")
+    def configure_workspaces(self, workspaces_dir, workspace_ids, onboarding_queue):
+        WorkspaceHandler = get_workspace_directory_handler(workspaces_dir)
+        handler = WorkspaceHandler(workspaces_dir)
 
-    def match_event(self, event: Event, commands: dict) -> BaseCommand:
+        for workspace in handler.workspaces():
+            self.configure_workspace(**workspace)
+
+        self.onboarding_queue = onboarding_queue
+
+    def match_event(self, event: Event, workspace: dict, commands: dict) -> BaseCommand:
         """
         If the event is valid and matches a command, yield the instantiated command
         :param event: the event object
+        :param workspace: Workspace object containing state
         :param commands: a list of known commands
         :return Command: The matched command to be executed
         """
         self.logger.debug(f"Handling event: {event.data}")
 
-        for GameCommand in self.gamestate.infer_commands(event):
-            yield GameCommand(event, self.slack, self.scorekeeper, self.gamestate)
+        for GameCommand in workspace["gamestate"].infer_commands(event):
+            yield GameCommand(event, workspace)
 
         for Command in commands.values():
-            if Command.match(event.text, me=self.slack.bot_id):
-                yield Command(event, self.slack, self.scorekeeper, self.gamestate)
+            if Command.match(event.text, me=workspace["slack"].bot_id):
+                yield Command(event, workspace)
 
-    def decode_channel(self, channel):
+    def decode_channel(self, channel, workspace):
         """
         Figures out the channel destination
         """
@@ -55,7 +69,7 @@ class EmojiradesBot(object):
             return channel
         elif channel.startswith("U"):
             # Channel is a User ID, which means the real channel is the DM with that user
-            dm_id = self.slack.find_im(channel)
+            dm_id = workspace["slack"].find_im(channel)
 
             if dm_id is None:
                 raise RuntimeError(
@@ -77,15 +91,22 @@ class EmojiradesBot(object):
     def _handle_event(self, **payload):
         commands = CommandRegistry.command_patterns()
 
-        event = Event(payload["data"], self.slack)
+        workspace_id = payload["data"]["team"]
+
+        if workspace_id not in self.workspaces:
+            workspace_id = EmojiradesBot.DEFAULT_WORKSPACE
+
+        workspace = self.workspaces[workspace_id]
+
+        event = Event(payload["data"], workspace["slack"])
         webclient = payload["web_client"]
-        self.slack.set_webclient(webclient)
+        workspace["slack"].set_webclient(webclient)
 
         if not event.valid():
             self.logger.debug("Skipping event due to being invalid")
             return
 
-        for command in self.match_event(event, commands):
+        for command in self.match_event(event, workspace, commands):
             self.logger.debug(f"Matched {command} for event {event.data}")
 
             for channel, response in command.execute():
@@ -95,9 +116,9 @@ class EmojiradesBot(object):
                     f"Command {command} executed with response: {(channel, response)}"
                 )
                 if channel is not None:
-                    channel = self.decode_channel(channel)
+                    channel = self.decode_channel(channel, workspace)
                 else:
-                    channel = self.decode_channel(event.channel)
+                    channel = self.decode_channel(event.channel, workspace)
 
                 if isinstance(response, str):
                     # Plain strings are assumed as 'chat_postMessage'
@@ -118,5 +139,7 @@ class EmojiradesBot(object):
                 func(*args, **kwargs)
 
     def listen_for_commands(self):
-        self.logger.info("Starting Slack monitor")
-        self.slack.start()
+        self.logger.info("Starting Slack monitor(s)")
+
+        for workspace in self.workspaces.values():
+            workspace["slack"].start()

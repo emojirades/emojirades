@@ -1,12 +1,11 @@
 # Thanks to https://github.com/BeheadedKamikaze for his help with the algorithm
-from collections import defaultdict
-
 import pendulum
 import logging
 import math
 
 from emojirades.analytics.time_range import TimeRange
 from emojirades.analytics.time_unit import TimeUnit
+from collections import defaultdict
 
 
 class LeaderBoard:

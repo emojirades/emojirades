@@ -109,6 +109,7 @@ ENV/
 *.swp
 
 # emojirades testing config
+workspaces/
 scores.csv
 scores.json
 state.json
