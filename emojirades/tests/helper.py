@@ -4,6 +4,7 @@ from unittest.mock import patch, Mock
 import unittest
 import tempfile
 import logging
+import json
 import os
 
 # export LOGGING_LEVEL=10 to turn on debug
@@ -79,16 +80,31 @@ class EmojiradeBotTester(unittest.TestCase):
 
         self.scorefile = tempfile.NamedTemporaryFile()
         self.statefile = tempfile.NamedTemporaryFile()
+        self.authfile = tempfile.NamedTemporaryFile()
 
-        os.environ["SLACK_BOT_TOKEN"] = "xoxb-000000000000-aaaaaaaaaaaaaaaaaaaaaaaa"
+        auth_config = {
+            "bot_access_token": "xoxb-000000000000-aaaaaaaaaaaaaaaaaaaaaaaa"
+        }
 
-        self.bot = EmojiradesBot(self.scorefile.name, self.statefile.name)
-        self.bot.slack.bot_id = self.config.bot_id
-        self.bot.slack.find_im = self.find_im
-        self.bot.slack.pretty_name = self.pretty_name
+        self.authfile.write(json.dumps(auth_config).encode("utf-8"))
+        self.authfile.seek(0)
 
-        self.state = self.bot.gamestate.state[self.config.channel]
-        self.scoreboard = self.bot.scorekeeper.scoreboard[self.config.channel]
+        self.bot = EmojiradesBot()
+        self.bot.configure_workspace(
+            self.scorefile.name,
+            self.statefile.name,
+            self.authfile.name,
+        )
+
+        workspace_id = self.bot.DEFAULT_WORKSPACE
+        self.workspace = self.bot.workspaces[workspace_id]
+
+        self.workspace["slack"].bot_id = self.config.bot_id
+        self.workspace["slack"].find_im = self.find_im
+        self.workspace["slack"].pretty_name = self.pretty_name
+
+        self.state = self.workspace["gamestate"].state[self.config.channel]
+        self.scoreboard = self.workspace["scorekeeper"].scoreboard[self.config.channel]
 
     def tearDown(self):
         self.scorefile.close()

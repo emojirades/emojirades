@@ -14,12 +14,12 @@ class BaseCommand(ABC):
         r".*(?P<override_cmd>[\s]+channel=[\s]*(<#(?P<channel_override>[0-9A-Z]+)\|(?P<channel_name>[0-9A-Za-z_-]+)>)).*"
     )
 
-    def __init__(self, event: Event, slack, scorekeeper, gamestate):
+    def __init__(self, event: Event, workspace: dict):
         self.logger = logging.getLogger("EmojiradesBot.Command")
 
-        self.slack = slack
-        self.scorekeeper = scorekeeper
-        self.gamestate = gamestate
+        self.slack = workspace["slack"]
+        self.scorekeeper = workspace["scorekeeper"]
+        self.gamestate = workspace["gamestate"]
 
         self.args = {}
         self.prepare_args(event)

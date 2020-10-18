@@ -50,7 +50,7 @@ class EmojiradesBot(object):
         """
         self.logger.debug(f"Handling event: {event.data}")
 
-        for GameCommand in self.gamestate.infer_commands(event):
+        for GameCommand in workspace["gamestate"].infer_commands(event):
             yield GameCommand(event, workspace)
 
         for Command in commands.values():

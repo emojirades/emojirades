@@ -10,7 +10,7 @@ class TestBotCommands(EmojiradeBotTester):
 
     def test_plusplus_new_game(self):
         """ Cannot ++ someone when the game is not in progress """
-        state = self.bot.gamestate.state[self.config.channel]
+        state = self.workspace["gamestate"].state[self.config.channel]
         assert state["step"] == "new_game"
 
         self.send_event(self.events.plusplus)
@@ -22,7 +22,7 @@ class TestBotCommands(EmojiradeBotTester):
     def test_new_game_by_old_winner(self):
         """ The old winner is allowed to 'reset' their rade if the game isn't in progress """
         self.reset_and_transition_to("provided")
-        state = self.bot.gamestate.state[self.config.channel]
+        state = self.workspace["gamestate"].state[self.config.channel]
         state["admins"].append(self.config.player_4)
 
         # Should be allowed
@@ -31,7 +31,7 @@ class TestBotCommands(EmojiradeBotTester):
 
         # Reset
         self.reset_and_transition_to("guessing")
-        state = self.bot.gamestate.state[self.config.channel]
+        state = self.workspace["gamestate"].state[self.config.channel]
         state["admins"].append(self.config.player_4)
 
         # Should not be allowed
@@ -42,7 +42,7 @@ class TestBotCommands(EmojiradeBotTester):
         """ Ensure leaderboard output is consistent """
         self.reset_and_transition_to("waiting")
 
-        self.bot.scorekeeper.scoreboard[self.config.channel] = {
+        self.workspace["scorekeeper"].scoreboard[self.config.channel] = {
             "scores": {
                 "David Pham": 168,
                 "fendy Haman": 120,
@@ -84,22 +84,22 @@ class TestBotCommands(EmojiradeBotTester):
         """ Ensure fixwinner does the right thing """
         self.reset_and_transition_to("guessed")
 
-        state = self.bot.gamestate.state[self.config.channel]
+        state = self.workspace["gamestate"].state[self.config.channel]
 
         self.send_event(self.events.fixwinner)
         assert state["old_winner"] == self.config.player_2
         assert state["winner"] == self.config.player_4
-        assert self.bot.scorekeeper.current_score(
+        assert self.workspace["scorekeeper"].current_score(
             self.config.channel, self.config.player_3
         ) == (0, 2)
-        assert self.bot.scorekeeper.current_score(
+        assert self.workspace["scorekeeper"].current_score(
             self.config.channel, self.config.player_4
         ) == (1, 1)
 
         # Check the user cannot award to themselves
         self.reset_and_transition_to("guessed")
 
-        state = self.bot.gamestate.state[self.config.channel]
+        state = self.workspace["gamestate"].state[self.config.channel]
 
         override = {
             "text": f"<@{self.config.bot_id}> fixwinner <@{self.config.player_2}>"
@@ -111,17 +111,17 @@ class TestBotCommands(EmojiradeBotTester):
 
         assert state["old_winner"] == self.config.player_2
         assert state["winner"] == self.config.player_3
-        assert self.bot.scorekeeper.current_score(
+        assert self.workspace["scorekeeper"].current_score(
             self.config.channel, self.config.player_3
         ) == (1, 1)
-        assert self.bot.scorekeeper.current_score(
+        assert self.workspace["scorekeeper"].current_score(
             self.config.channel, self.config.player_4
         ) == (0, -1)
 
         # Check the user cannot award to the winner (no-op)
         self.reset_and_transition_to("guessed")
 
-        state = self.bot.gamestate.state[self.config.channel]
+        state = self.workspace["gamestate"].state[self.config.channel]
 
         override = {
             "text": f"<@{self.config.bot_id}> fixwinner <@{self.config.player_3}>"
@@ -133,10 +133,10 @@ class TestBotCommands(EmojiradeBotTester):
 
         assert state["old_winner"] == self.config.player_2
         assert state["winner"] == self.config.player_3
-        assert self.bot.scorekeeper.current_score(
+        assert self.workspace["scorekeeper"].current_score(
             self.config.channel, self.config.player_3
         ) == (1, 1)
-        assert self.bot.scorekeeper.current_score(
+        assert self.workspace["scorekeeper"].current_score(
             self.config.channel, self.config.player_4
         ) == (0, -1)
 
@@ -144,7 +144,7 @@ class TestBotCommands(EmojiradeBotTester):
         """ Ensure that the emojirade can't contain banned words """
         self.reset_and_transition_to("waiting")
 
-        state = self.bot.gamestate.state[self.config.channel]
+        state = self.workspace["gamestate"].state[self.config.channel]
 
         banned_emojirade = dict(self.events.posted_emojirade)
         banned_emojirade["text"] = "emojirade foo :pie: bar"
@@ -202,7 +202,7 @@ class TestBotCommands(EmojiradeBotTester):
     def test_user_override(self):
         self.reset_and_transition_to("guessing")
 
-        state = self.bot.gamestate.state[self.config.channel]
+        state = self.workspace["gamestate"].state[self.config.channel]
 
         # Player 4 is not involved in this round
         override = {
@@ -217,7 +217,7 @@ class TestBotCommands(EmojiradeBotTester):
     def test_channel_override(self):
         self.reset_and_transition_to("guessing")
 
-        state = self.bot.gamestate.state[self.config.channel]
+        state = self.workspace["gamestate"].state[self.config.channel]
 
         override = {
             "channel": self.config.bot_channel,
