@@ -53,18 +53,27 @@ Here we provide an S3 path of workspaces and an AWS SQS queue to listen to for n
 
 `emojirades multiple --workspaces-dir s3://bucket/path/to/workspaces --onboarding-queue workspace-onboarding-queue`
 
-The workspaces directory must be in the following format:
+The workspaces directory must be in the following format (local or s3):
 ```
 ./workspaces
-./workspaces/A1B2C3D4E
-./workspaces/A1B2C3D4E/state.json
-./workspaces/A1B2C3D4E/scores.json
-./workspaces/A1B2C3D4E/auth.json
-./workspaces/Z9Y8X7W6V
-./workspaces/Z9Y8X7W6V/state.json
-./workspaces/Z9Y8X7W6V/scores.json
-./workspaces/Z9Y8X7W6V/auth.json
+
+./workspaces/shards
+./workspaces/shards/0
+./workspaces/shards/0/A1B2C3D4E.json
+./workspaces/shards/0/Z9Y8X7W6V.json
+
+./workspaces/directory
+./workspaces/directory/A1B2C3D4E
+./workspaces/directory/A1B2C3D4E/state.json
+./workspaces/directory/A1B2C3D4E/scores.json
+./workspaces/directory/A1B2C3D4E/auth.json
+./workspaces/directory/Z9Y8X7W6V
+./workspaces/directory/Z9Y8X7W6V/state.json
+./workspaces/directory/Z9Y8X7W6V/scores.json
+./workspaces/directory/Z9Y8X7W6V/auth.json
 ```
+
+The concept above with the two different directories is shards to allow for the bot to scale out horizontally. As the bot(s) get busier, the operator can increase the shard (bot instance) count and new onboarded workspaces are allocated to the next available shard with capacity.
 
 The emojirades bot will take care of running multiple games across different channels in a single workspace.
 
