@@ -17,8 +17,11 @@ class EmojiradesBot(object):
 
     def __init__(self):
         self.logger = logging.getLogger("Emojirades.Bot")
+
         self.workspaces = {}
         self.onboarding_queue = None
+
+        self.command_registry = CommandRegistry.command_patterns()
 
     def configure_workspace(self, score_file, state_file, auth_file, workspace_id=None):
         if workspace_id is None:
@@ -39,12 +42,11 @@ class EmojiradesBot(object):
 
         self.onboarding_queue = onboarding_queue
 
-    def match_event(self, event: Event, workspace: dict, commands: dict) -> BaseCommand:
+    def match_event(self, event: Event, workspace: dict) -> BaseCommand:
         """
         If the event is valid and matches a command, yield the instantiated command
         :param event: the event object
         :param workspace: Workspace object containing state
-        :param commands: a list of known commands
         :return Command: The matched command to be executed
         """
         self.logger.debug(f"Handling event: {event.data}")
@@ -52,7 +54,7 @@ class EmojiradesBot(object):
         for GameCommand in workspace["gamestate"].infer_commands(event):
             yield GameCommand(event, workspace)
 
-        for Command in commands.values():
+        for Command in self.command_registry.values():
             if Command.match(event.text, me=workspace["slack"].bot_id):
                 yield Command(event, workspace)
 
@@ -88,8 +90,6 @@ class EmojiradesBot(object):
             raise e
 
     def _handle_event(self, **payload):
-        commands = CommandRegistry.command_patterns()
-
         workspace_id = payload["data"]["team"]
 
         if workspace_id not in self.workspaces:
@@ -105,7 +105,7 @@ class EmojiradesBot(object):
             self.logger.debug("Skipping event due to being invalid")
             return
 
-        for command in self.match_event(event, workspace, commands):
+        for command in self.match_event(event, workspace):
             self.logger.debug(f"Matched {command} for event {event.data}")
 
             for channel, response in command.execute():
