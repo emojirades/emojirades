@@ -1,5 +1,4 @@
 import logging
-import boto3
 import time
 import os
 import traceback
