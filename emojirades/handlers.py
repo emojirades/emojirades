@@ -35,7 +35,7 @@ class S3WorkspaceDirectoryHandler(WorkspaceDirectoryHandler):
 
         _, _, self._bucket, self._prefix = self.workspace_path.split("/", 3)
 
-        self._s3 = boto3.resource("s3")
+        self._s3 = boto3.client("s3")
 
     def workspaces(self):
         paginator = self._s3.get_paginator("list_objects_v2")
@@ -112,13 +112,15 @@ class S3ConfiguationHandler(ConfigurationHandler):
 
         _, _, self._bucket, self._key = self.filename.split("/", 3)
 
-        self._s3 = boto3.resource("s3")
-        self._object = self._s3.Object(self._bucket, self._key)
+        self._s3 = boto3.client("s3")
 
     @property
     def exists(self):
         try:
-            self._s3.Object(self._bucket, self._key).load()
+            self._s3.head_object(
+                Bucket=self._bucket,
+                Key=self._key,
+            )
             return True
         except botocore.exceptions.ClientError as e:
             if e.response["Error"]["Code"] == "404":
@@ -128,7 +130,12 @@ class S3ConfiguationHandler(ConfigurationHandler):
 
     def load(self):
         if self.exists:
-            return self._object.get()["Body"].read()
+            response = self._s3.get_object(
+                Bucket=self._bucket,
+                Key=self._key,
+            )
+
+            return response["Body"].read()
         else:
             return None
 
