@@ -82,9 +82,7 @@ class EmojiradeBotTester(unittest.TestCase):
         self.statefile = tempfile.NamedTemporaryFile()
         self.authfile = tempfile.NamedTemporaryFile()
 
-        auth_config = {
-            "bot_access_token": "xoxb-000000000000-aaaaaaaaaaaaaaaaaaaaaaaa"
-        }
+        auth_config = {"bot_access_token": "xoxb-000000000000-aaaaaaaaaaaaaaaaaaaaaaaa"}
 
         self.authfile.write(json.dumps(auth_config).encode("utf-8"))
         self.authfile.seek(0)
