@@ -6,20 +6,22 @@ from emojirades.analytics.time_unit import TimeUnit
 
 
 class LeaderboardPrinter:
-    def __init__(self, data, slack, time_unit: TimeUnit, of_date: pendulum.DateTime):
+    def __init__(
+        self, data, slack, time_unit: TimeUnit, parsed_date: pendulum.DateTime
+    ):
         self.data = data
         self.logger = logging.getLogger("EmojiradesBot.printers.LeaderboardPrinter")
         self.slack = slack
         self.time_unit = time_unit
-        self.of_date = of_date
+        self.parsed_date = parsed_date
 
     def print_date_range(self):
         date_range = ""
         if self.time_unit in [TimeUnit.WEEKLY, TimeUnit.MONTHLY]:
-            start = TimeRange.get_start_date(self.of_date, self.time_unit).format(
+            start = TimeRange.get_start_date(self.parsed_date, self.time_unit).format(
                 "YYYY-MM-DD"
             )
-            end = TimeRange.get_end_date(self.of_date, self.time_unit).format(
+            end = TimeRange.get_end_date(self.parsed_date, self.time_unit).format(
                 "YYYY-MM-DD"
             )
             date_range = f"({start} - {end})"
