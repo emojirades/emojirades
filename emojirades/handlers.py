@@ -140,7 +140,11 @@ class S3ConfiguationHandler(ConfigurationHandler):
             return None
 
     def save(self, content):
-        self._object.put(Body=content)
+        self._s3.put_object(
+            Bucket=self._bucket,
+            Key=self._key,
+            Body=content,
+        )
 
 
 class LocalConfigurationHandler(ConfigurationHandler):
