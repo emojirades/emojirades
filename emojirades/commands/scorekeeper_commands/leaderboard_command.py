@@ -43,9 +43,9 @@ class LeaderboardCommand(BaseCommand):
 
         if self.args.get("all_boards"):
             self.time_units = (
-                TimeUnit.WEEKLY.value,
-                TimeUnit.MONTHLY.value,
-                TimeUnit.ALL_TIME.value,
+                TimeUnit.WEEKLY,
+                TimeUnit.MONTHLY,
+                TimeUnit.ALL_TIME,
             )
         else:
             self.time_units = (TimeUnit(self.args.get("range", TimeUnit.WEEKLY.value)),)
