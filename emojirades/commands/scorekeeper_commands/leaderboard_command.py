@@ -70,7 +70,7 @@ class LeaderboardCommand(BaseCommand):
             if self.args.get("user_date"):
                 date = self.args["user_date"]
             else:
-                date = pendulum.now(tz=self.TZ)
+                date = pendulum.now(tz=self.TZ).strftime("%Y%m%d")
 
         parsed_date = pendulum.from_format(date, "YYYYMMDD", tz=self.TZ)
         self.logger.debug("Leaderboard date was set to: {parsed_date}")
