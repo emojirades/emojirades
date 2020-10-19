@@ -43,23 +43,38 @@ class Event:
         Assert the lowest level of things we need to see in an event to be parseable
         :return bool:
         """
+        # Data shouldn't be empty
+        if not self.data:
+            return False
+
+        # Events with a subtype are considered invalid
+        # As they are all not related to a user 'guessing'
+        allowed_subtypes = {
+            "bot_message",
+            "me_message",
+        }
+
+        if self.data.get("subtype") and not self.data["subtype"] in allowed_subtypes:
+            return False
+
+        # We assert each message event has a set of keys
         expected_keys = {
             "text",
             "channel",
         }
 
-        if not self.data:
+        if not expected_keys.issubset(self.data.keys()):
             return False
-        elif not expected_keys.issubset(self.data.keys()):
+
+        # Player ID should be resolved correctly
+        try:
+            self.player_id
+        except InvalidEvent:
             return False
-        else:
-            try:
-                self.player_id
-            except InvalidEvent:
-                return False
 
-            # If the event is coming from itself (the bot) ignore it
-            if self.player_id == self.slack_client.bot_id:
-                return False
+        # If the event is coming from itself (the bot) ignore it
+        if self.player_id == self.slack_client.bot_id:
+            return False
 
+        # Event is probably correct!
         return True
