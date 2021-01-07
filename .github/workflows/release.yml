@@ -19,6 +19,13 @@ jobs:
           echo "::set-output name=version::$(python setup.py --version)"
           echo "::set-output name=version_with_prefix::v$(python setup.py --version)"
 
+      - id: changelog
+        uses: ScottBrenner/generate-changelog-action@1.0.2
+        env:
+          REPO: ${{ github.repository }}
+        with:
+          package-dir: .github/workflows/changelog_package.json
+
       - id: create_release
         uses: actions/create-release@v1
         env:
@@ -26,7 +33,7 @@ jobs:
         with:
           tag_name: ${{ steps.version.outputs.version_with_prefix }}
           release_name: Release ${{ steps.version.outputs.version_with_prefix }}
-          body: ${{ steps.tag_version.outputs.changelog }}
+          body: ${{ steps.changelog.outputs.changelog }}
 
       # Build and push python package
       - uses: actions/setup-python@v2
