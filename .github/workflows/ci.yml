@@ -46,7 +46,7 @@ jobs:
       - name: Install dependencies
         run: |
           set -e
-          python -m pip install --user --upgrade pip
+          python -m pip install --user --upgrade pip wheel
 
           pip install -r requirements.txt --upgrade
           pip install -r requirements-dev.txt --upgrade
