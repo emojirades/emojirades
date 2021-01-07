@@ -1,11 +1,32 @@
 ---
 name: CI Jobs
 
-'on': push
+on: push
 
 jobs:
-  ci:
+  linter:
     runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - run: pip install black
+      - run: black --check .
+
+    outputs:
+      lint_outcome: ${{ success() }}
+
+  test:
+    runs-on: ubuntu-20.04
+
+    needs: linter
+    if: ${{ needs.linter.outputs.lint_outcome }}
 
     strategy:
       matrix:
@@ -28,9 +49,6 @@ jobs:
           pip install -r requirements.txt --upgrade
           pip install -r requirements-dev.txt --upgrade
           pip install -e .
-
-      - name: Lint with Black
-        run: black --check .
 
       - name: Test with pytest
         run: pytest

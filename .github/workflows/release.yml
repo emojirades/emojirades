@@ -1,7 +1,7 @@
 ---
 name: Release Jobs
 
-'on':
+on:
   push:
     branches:
       - master
