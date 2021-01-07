@@ -80,7 +80,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.release.outputs.upload_url }}
+          upload_url: ${{ needs.release.outputs.release_upload_url }}
           asset_path: ./dist/Emojirades-${{ needs.release.outputs.version }}-py3-none-any.whl
           asset_name: Emojirades-${{ needs.release.outputs.version }}-py3-none-any.whl
           asset_content_type: application/x-pywheel+zip
