@@ -59,6 +59,8 @@ jobs:
         with:
           python-version: 3.9
 
+      - run: pip install wheel
+
       - run: python setup.py sdist bdist_wheel
 
       - name: upload sdist
