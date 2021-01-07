@@ -1,9 +1,9 @@
 ---
 name: Release jobs
 
-on:
+'on':
   push:
-    branches:    
+    branches:
       - master
 
 jobs:
@@ -17,9 +17,12 @@ jobs:
       - id: version
         run: |
           echo "::set-output name=version::$(python setup.py --version)"
-          echo "::set-output name=version_with_prefix::v$(python setup.py --version)"
+
+      - id: tag_check
+        run: [[ $(git tag | grep 'v${{ steps.version.outputs.version }}') != '' ]]
 
       - id: changelog
+        if: ${{ success() }}
         uses: ScottBrenner/generate-changelog-action@1.0.2
         env:
           REPO: ${{ github.repository }}
@@ -27,13 +30,28 @@ jobs:
           package-dir: .github/workflows/changelog_package.json
 
       - id: create_release
+        if: ${{ success() }}
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.version.outputs.version_with_prefix }}
-          release_name: Release ${{ steps.version.outputs.version_with_prefix }}
+          tag_name: v${{ steps.version.outputs.version }}
+          release_name: Release v${{ steps.version.outputs.version }}
           body: ${{ steps.changelog.outputs.changelog }}
+
+      outputs:
+        tag_check: ${{ steps.tag_check.conclusion }}
+        version: ${{ steps.version.outputs.version }}
+        release_upload_url: ${{ steps.create_release.outputs.upload_url }}
+
+  build_python:
+    runs-on: ubuntu-20.04
+
+    needs: release
+    if: ${{ needs.release.outputs.tag_check == 'success' }}
+
+    steps:
+      - uses: actions/checkout@v2
 
       # Build and push python package
       - uses: actions/setup-python@v2
@@ -48,9 +66,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/Emojirades-${{ steps.version.outputs.version }}.tar.gz
-          asset_name: Emojirades-${{ steps.version.outputs.version }}.tar.gz
+          upload_url: ${{ needs.release.outputs.release_upload_url }}
+          asset_path: ./dist/Emojirades-${{ needs.release.outputs.version }}.tar.gz
+          asset_name: Emojirades-${{ needs.release.outputs.version }}.tar.gz
           asset_content_type: application/tar+gzip
 
       - name: upload bdist_wheel
@@ -59,9 +77,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/Emojirades-${{ steps.version.outputs.version }}-py3-none-any.whl
-          asset_name: Emojirades-${{ steps.version.outputs.version }}-py3-none-any.whl
+          upload_url: ${{ needs.release.outputs.upload_url }}
+          asset_path: ./dist/Emojirades-${{ needs.release.outputs.version }}-py3-none-any.whl
+          asset_name: Emojirades-${{ needs.release.outputs.version }}-py3-none-any.whl
           asset_content_type: application/x-pywheel+zip
 
       - uses: pypa/gh-action-pypi-publish@v1.4.1
@@ -69,7 +87,15 @@ jobs:
           user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }}
 
-      # Build and push container image
+  build_container:
+    runs-on: ubuntu-20.04
+
+    needs: release
+    if: ${{ needs.release.outputs.tag_check == 'success' }}
+
+    steps:
+      - uses: actions/checkout@v2
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
 
@@ -77,7 +103,7 @@ jobs:
         uses: docker/setup-buildx-action@v1
 
       - name: Login to DockerHub
-        uses: docker/login-action@v1 
+        uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -90,4 +116,4 @@ jobs:
           push: true
           tags:
             emojirades/emojirades:latest
-            emojirades/emojirades:${{ steps.version.outputs.version }}
+            emojirades/emojirades:${{ needs.release.outputs.version }}
