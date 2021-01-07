@@ -21,7 +21,6 @@ jobs:
       - id: tag_check
         run: |
           [[ $(git tag | grep "v${{ steps.version.outputs.version }}") != '' ]]
-          echo $?
 
       - id: changelog
         if: ${{ success() }}
