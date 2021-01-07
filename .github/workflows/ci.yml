@@ -17,16 +17,17 @@ jobs:
           python-version: 3.9
 
       - run: pip install black
-      - run: black --check .
+      - id: black
+        run: black --check .
 
     outputs:
-      lint_outcome: ${{ success() }}
+      outcome: ${{ steps.black.conclusion }}
 
   test:
     runs-on: ubuntu-20.04
 
     needs: linter
-    if: ${{ needs.linter.outputs.lint_outcome }}
+    if: ${{ needs.linter.outputs.conclusion == 'success' }}
 
     strategy:
       matrix:
