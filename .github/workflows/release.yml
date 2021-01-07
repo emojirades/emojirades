@@ -1,5 +1,5 @@
 ---
-name: Release jobs
+name: Release Jobs
 
 'on':
   push:
