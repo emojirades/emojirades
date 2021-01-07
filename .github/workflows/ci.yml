@@ -17,13 +17,14 @@ jobs:
           python-version: 3.9
 
       - run: pip install black
+
       - id: black
         run: black --check .
 
     outputs:
       conclusion: ${{ steps.black.conclusion }}
 
-  test:
+  pytest:
     runs-on: ubuntu-20.04
 
     needs: linter
