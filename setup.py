@@ -7,7 +7,7 @@ with open(path.join(this_directory, "README.md"), encoding="utf-8") as f:
 
 setup(
     name="Emojirades",
-    version="0.13.5",
+    version="0.13.6",
     description="A Slack bot that understands the Emojirades game!",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -17,11 +17,11 @@ setup(
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Operating System :: POSIX :: Linux",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Topic :: Communications :: Chat",
         "Topic :: Games/Entertainment",
     ],
-    keywords="slack slackbot emojirades plusplus",
-    license="GNU",
+    keywords="slack slackbot emojirades plusplus game",
     packages=find_packages(),
     install_requires=[
         "requests",
