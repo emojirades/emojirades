@@ -41,10 +41,10 @@ jobs:
           release_name: Release v${{ steps.version.outputs.version }}
           body: ${{ steps.changelog.outputs.changelog }}
 
-      outputs:
-        tag_check: ${{ steps.tag_check.conclusion }}
-        version: ${{ steps.version.outputs.version }}
-        release_upload_url: ${{ steps.create_release.outputs.upload_url }}
+    outputs:
+      tag_check: ${{ steps.tag_check.conclusion }}
+      version: ${{ steps.version.outputs.version }}
+      release_upload_url: ${{ steps.create_release.outputs.upload_url }}
 
   build_python:
     runs-on: ubuntu-20.04
