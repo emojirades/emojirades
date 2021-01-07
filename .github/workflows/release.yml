@@ -64,6 +64,7 @@ jobs:
       - run: python setup.py sdist bdist_wheel
 
       - name: upload sdist
+        if: ${{ success() }}
         id: upload_sdist
         uses: actions/upload-release-asset@v1
         env:
@@ -75,17 +76,19 @@ jobs:
           asset_content_type: application/tar+gzip
 
       - name: upload bdist_wheel
+        if: ${{ success() }}
         id: upload_bdist_wheel
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.release.outputs.upload_url }}
+          upload_url: ${{ needs.release.outputs.release_upload_url }}
           asset_path: ./dist/Emojirades-${{ needs.release.outputs.version }}-py3-none-any.whl
           asset_name: Emojirades-${{ needs.release.outputs.version }}-py3-none-any.whl
           asset_content_type: application/x-pywheel+zip
 
       - uses: pypa/gh-action-pypi-publish@v1.4.1
+        if: ${{ success() }}
         with:
           user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }}
@@ -112,10 +115,11 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push
+        if: ${{ success() }}
         id: docker_build
         uses: docker/build-push-action@v2
         with:
-          platforms: linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
           tags: |
             emojirades/emojirades:latest
