@@ -117,6 +117,6 @@ jobs:
         with:
           platforms: linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6
           push: true
-          tags:
+          tags: |
             emojirades/emojirades:latest
             emojirades/emojirades:${{ needs.release.outputs.version }}
