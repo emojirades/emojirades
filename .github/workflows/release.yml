@@ -19,7 +19,9 @@ jobs:
           echo "::set-output name=version::$(python setup.py --version)"
 
       - id: tag_check
-        run: [[ $(git tag | grep 'v${{ steps.version.outputs.version }}') != '' ]]
+        run: |
+          [[ $(git tag | grep "v${{ steps.version.outputs.version }}") != '' ]]
+          echo $?
 
       - id: changelog
         if: ${{ success() }}
