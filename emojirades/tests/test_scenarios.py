@@ -180,7 +180,7 @@ class TestBotScenarios(EmojiradeBotTester):
         # Expected *new* reactions
         reactions = [
             reaction(
-                self.config.channel,
+                self.config.player_1_channel,
                 r"\+1",
                 self.events.posted_emojirade["ts"],
             ),
