@@ -492,6 +492,8 @@ class TestBotScenarios(EmojiradeBotTester):
         while not self.reactions:
             time.sleep(0.5)
 
-        assert expected_reaction[0] == self.reactions[0][0]
-        assert expected_reaction[1].match(self.reactions[0][1])
-        assert expected_reaction[2] == self.reactions[0][2]
+        # First reaction is for setting the emojirade
+        # We test the second one (this one)
+        assert expected_reaction[0] == self.reactions[1][0]
+        assert expected_reaction[1].match(self.reactions[1][1])
+        assert expected_reaction[2] == self.reactions[1][2]
