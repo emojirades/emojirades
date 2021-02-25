@@ -82,7 +82,16 @@ class SetEmojiradeCommand(BaseCommand):
         )
 
         # Let the user know their 'rade has been accepted
-        yield (self.args["user"], f"Thanks for that! I've let <@{winner}> know!")
+        yield (
+            self.args["user"],
+            {
+                "func": "reactions_add",
+                "kwargs": {
+                    "name": "+1",
+                    "timestamp": self.args["ts"],
+                },
+            },
+        )
 
         # Let everyone else know
         yield (self.args["channel"], f":mailbox: 'rade sent to <@{winner}>")
