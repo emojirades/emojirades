@@ -93,15 +93,10 @@ class SlackClient(object):
         return user.get("real_name", user.get("name", "Unknown User"))
 
     def find_im(self, user_id):
-        # Find an existing IM (direct message) ID
-        response = self.webclient.im_open(user=user_id)
+        # Open or resume a direct message with the target user
+        response = self.webclient.conversations_open(users=[user_id])
 
         if response["ok"]:
             return response["channel"]["id"]
-
-        # Attemp to locate an existing IM
-        for im in self.webclient.im_list()["ims"]:
-            if im["user"] == user_id:
-                return im["id"]
 
         return None
