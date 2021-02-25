@@ -156,6 +156,16 @@ class TestBotCommands(EmojiradeBotTester):
         ) in self.responses
         assert state["step"] == "waiting"
 
+        banned_emojirade = dict(self.events.posted_emojirade)
+        banned_emojirade["text"] = "emojirade foo :+1: bar"
+
+        self.send_event(banned_emojirade)
+        assert (
+            self.config.bot_channel,
+            "Sorry, but that emojirade contained a banned word/phrase :no_good:, try again?",
+        ) in self.responses
+        assert state["step"] == "waiting"
+
         self.send_event(self.events.posted_emojirade)
         assert state["step"] == "provided"
 
