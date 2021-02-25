@@ -163,10 +163,6 @@ class TestBotScenarios(EmojiradeBotTester):
                 f"Hey, <@{self.config.player_1}> made the emojirade `{self.config.emojirade}`, good luck!",
             ),
             response(
-                self.config.player_1_channel,
-                f"Thanks for that! I've let <@{self.config.player_2}> know!",
-            ),
-            response(
                 self.config.channel,
                 f":mailbox: 'rade sent to <@{self.config.player_2}>",
             ),
@@ -180,6 +176,28 @@ class TestBotScenarios(EmojiradeBotTester):
         # Ensure total volume is as expected
         total_responses += len(responses)
         assert len(self.responses) == total_responses
+
+        # Expected *new* reactions
+        reactions = [
+            reaction(
+                self.config.player_1_channel,
+                r"\+1",
+                self.events.posted_emojirade["ts"],
+            ),
+        ]
+
+        # Ensure each expected reaction exists
+        while not self.reactions:
+            time.sleep(0.5)
+
+        for i, (channel, emoji, ts) in enumerate(reactions):
+            assert channel == self.reactions[total_reactions + i][0]
+            assert emoji.match(self.reactions[total_reactions + i][1])
+            assert ts == self.reactions[total_reactions + i][2]
+
+        # Ensure total volume is as expected
+        total_reactions += len(reactions)
+        assert len(self.reactions) == total_reactions
 
         # User starts posting emoji's for the current round
         self.send_event(self.events.posted_emoji)
@@ -474,6 +492,8 @@ class TestBotScenarios(EmojiradeBotTester):
         while not self.reactions:
             time.sleep(0.5)
 
-        assert expected_reaction[0] == self.reactions[0][0]
-        assert expected_reaction[1].match(self.reactions[0][1])
-        assert expected_reaction[2] == self.reactions[0][2]
+        # First reaction is for setting the emojirade
+        # We test the second one (this one)
+        assert expected_reaction[0] == self.reactions[1][0]
+        assert expected_reaction[1].match(self.reactions[1][1])
+        assert expected_reaction[2] == self.reactions[1][2]
