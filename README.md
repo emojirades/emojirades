@@ -121,3 +121,5 @@ docker run -d \
     --auth-file s3://bucket/path/to/auth.json \
     -vv
 ```
+
+Trigger
