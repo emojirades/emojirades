@@ -123,6 +123,8 @@ class CorrectGuessCommand(BaseCommand):
             prefix = f"Not going to lie <@{state['winner']}> this is pretty impressive"
         elif score == 100:
             prefix = f"Triple digits <@{state['winner']}>! Not everyone makes it this far! :tada:"
+        elif score == 50:
+            prefix = f"50 points! That's a big milestone <@{state['winner']}>, 100's within your grasp!"
         elif score % 50 == 0:
             prefix = f"Another day, another 50 point milestone for <@{state['winner']}> :chart_with_upwards_trend:"
         else:
