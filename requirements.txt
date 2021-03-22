@@ -1,6 +1,6 @@
 slackclient==2.9.3
 requests==2.25.1
-boto3==1.17.27
+boto3==1.17.33
 Unidecode==1.2.0
 pendulum==2.1.2
 expiringdict==1.2.1
