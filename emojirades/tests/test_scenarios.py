@@ -10,7 +10,7 @@ class TestBotScenarios(EmojiradeBotTester):
     """
 
     def test_valid_complete_game(self):
-        """ Performs a complete valid round """
+        """Performs a complete valid round"""
         assert self.state["step"] == "new_game"
         assert self.state["old_winner"] is None
         assert self.state["winner"] is None
@@ -53,7 +53,7 @@ class TestBotScenarios(EmojiradeBotTester):
         assert (self.config.channel, f"<@{self.config.player_3}>++") in self.responses
 
     def test_valid_manually_awarded_complete_game(self):
-        """ Performs a complete valid round but the win is manually awarded """
+        """Performs a complete valid round but the win is manually awarded"""
         assert self.state["step"] == "new_game"
         assert self.state["old_winner"] is None
         assert self.state["winner"] is None
@@ -263,7 +263,7 @@ class TestBotScenarios(EmojiradeBotTester):
         assert len(self.reactions) == total_reactions
 
     def test_only_guess_when_guessing(self):
-        """ Ensures we can only 'guess' correctly when state is guessing """
+        """Ensures we can only 'guess' correctly when state is guessing"""
         assert self.state["step"] == "new_game"
 
         self.send_event(self.events.correct_guess)
@@ -301,7 +301,7 @@ class TestBotScenarios(EmojiradeBotTester):
         assert (self.config.channel, f"<@{self.config.player_3}>++") in self.responses
 
     def test_two_games_in_a_row(self):
-        """ Plays 2 games in a row to ensure state is maintained """
+        """Plays 2 games in a row to ensure state is maintained"""
         self.reset_and_transition_to("guessing")
         assert self.state["step"] == "guessing"
         assert self.state["old_winner"] == self.config.player_1
@@ -354,7 +354,7 @@ class TestBotScenarios(EmojiradeBotTester):
         )
 
     def test_emojirade_alternatives(self):
-        """ Performs alternative emojirades checks """
+        """Performs alternative emojirades checks"""
         # Check alternative A ('foo')
         self.reset_and_transition_to("waiting")
 
@@ -400,7 +400,7 @@ class TestBotScenarios(EmojiradeBotTester):
         assert self.state["raw_emojirade"] is None
 
     def test_scott_factor_exceeded(self):
-        """ Performs tests for guesses exceeding the scott factor """
+        """Performs tests for guesses exceeding the scott factor"""
         # Test something 'within' the scott factor
         self.reset_and_transition_to("guessing")
 
@@ -420,7 +420,7 @@ class TestBotScenarios(EmojiradeBotTester):
         assert self.state["step"] == "guessing"
 
     def test_word_boundary_matching(self):
-        """ Performs tests to ensure emojirade matches only occur on word boundaries """
+        """Performs tests to ensure emojirade matches only occur on word boundaries"""
         # Test a word, should work
         self.reset_and_transition_to("guessing")
 
@@ -440,7 +440,7 @@ class TestBotScenarios(EmojiradeBotTester):
         assert self.state["step"] == "guessing"
 
     def test_sanitization(self):
-        """ Test that the sanitize_text helper works as expected """
+        """Test that the sanitize_text helper works as expected"""
         self.reset_and_transition_to("waiting")
 
         raw_rade = "Späce : THE\t\t\tfinal\v- f_r_ö_n+t/ier"
@@ -452,7 +452,7 @@ class TestBotScenarios(EmojiradeBotTester):
         assert self.state["raw_emojirade"] == [raw_rade]
 
     def test_emoji_detection(self):
-        """ Performs tests to ensure when an emoji is posted the game progresses in state """
+        """Performs tests to ensure when an emoji is posted the game progresses in state"""
         self.reset_and_transition_to("provided")
 
         # Valid emoji
@@ -475,7 +475,7 @@ class TestBotScenarios(EmojiradeBotTester):
         assert self.state["step"] == "guessing"
 
     def test_correct_guess_reaction(self):
-        """ Checks that a valid emoji is 'reacted' on the winning guess """
+        """Checks that a valid emoji is 'reacted' on the winning guess"""
         self.reset_and_transition_to("guessing")
 
         assert self.state["step"] == "guessing"

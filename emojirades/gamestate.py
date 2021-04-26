@@ -175,7 +175,7 @@ class GameState(object):
                 state["first_guess"] = False
 
     def set_admin(self, channel, admin):
-        """ Sets a new game admin! """
+        """Sets a new game admin!"""
         if admin in self.state[channel]["admins"]:
             return False
 
@@ -185,7 +185,7 @@ class GameState(object):
         return True
 
     def remove_admin(self, channel, admin):
-        """ Removes the admin status of a user """
+        """Removes the admin status of a user"""
         if admin not in self.state[channel]["admins"]:
             return False
 
@@ -207,7 +207,7 @@ class GameState(object):
         return False
 
     def new_game(self, channel, old_winner, winner):
-        """ Winners should be the unique Slack User IDs """
+        """Winners should be the unique Slack User IDs"""
         self.state[channel]["old_winner"] = old_winner
         self.state[channel]["winner"] = winner
         self.state[channel]["step"] = "waiting"
@@ -216,7 +216,7 @@ class GameState(object):
         self.save()
 
     def set_emojirade(self, channel, emojirades):
-        """ New emojirade word(s), 'emojirade' is a list of accepted answers """
+        """New emojirade word(s), 'emojirade' is a list of accepted answers"""
         if self.state[channel]["step"] != "waiting":
             raise self.InvalidStateException(
                 "Expecting {channel}'s state to be 'waiting', it is actually {self.state[channel]['step'])}"
@@ -229,7 +229,7 @@ class GameState(object):
         self.save()
 
     def winner_posted(self, channel):
-        """ Winner has posted something after receiving the emojirade """
+        """Winner has posted something after receiving the emojirade"""
         if self.state[channel]["step"] != "provided":
             raise self.InvalidStateException(
                 f"Expecting {channel}'s state to be 'provided', it is actually {self.state['step']}"
@@ -240,7 +240,7 @@ class GameState(object):
         self.save()
 
     def correct_guess(self, channel, winner):
-        """ Guesser has guessed the correct emojirade """
+        """Guesser has guessed the correct emojirade"""
         if self.state[channel]["step"] != "guessing":
             raise self.InvalidStateException(
                 f"Expecting {channel}'s state to be 'guessing', it is actually {self.state[channel]['step']}"
@@ -254,11 +254,11 @@ class GameState(object):
         self.save()
 
     def game_status(self, channel):
-        """ Returns the game state """
+        """Returns the game state"""
         return self.state[channel]
 
     def fixwinner(self, channel, winner):
-        """ Updates the current winner with the newly provided winner and handles score updates """
+        """Updates the current winner with the newly provided winner and handles score updates"""
         loser = self.state[channel]["winner"]
         self.state[channel]["winner"] = winner
         self.save()

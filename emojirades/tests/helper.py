@@ -29,7 +29,7 @@ class EmojiradeBotTester(unittest.TestCase):
         self.bot.handle_event(**payload)
 
     def reset_and_transition_to(self, state):
-        """ From the beginning state, transition to another state the user wants """
+        """From the beginning state, transition to another state the user wants"""
         self.setUp()
         assert self.state["step"] == "new_game"
 

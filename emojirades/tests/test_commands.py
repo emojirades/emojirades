@@ -9,7 +9,7 @@ class TestBotCommands(EmojiradeBotTester):
     """
 
     def test_plusplus_new_game(self):
-        """ Cannot ++ someone when the game is not in progress """
+        """Cannot ++ someone when the game is not in progress"""
         state = self.workspace["gamestate"].state[self.config.channel]
         assert state["step"] == "new_game"
 
@@ -20,7 +20,7 @@ class TestBotCommands(EmojiradeBotTester):
         ) in self.responses
 
     def test_new_game_by_old_winner(self):
-        """ The old winner is allowed to 'reset' their rade if the game isn't in progress """
+        """The old winner is allowed to 'reset' their rade if the game isn't in progress"""
         self.reset_and_transition_to("provided")
         state = self.workspace["gamestate"].state[self.config.channel]
         state["admins"].append(self.config.player_4)
@@ -39,7 +39,7 @@ class TestBotCommands(EmojiradeBotTester):
         assert state["step"] == "guessing"
 
     def test_leaderboard_output(self):
-        """ Ensure leaderboard output is consistent """
+        """Ensure leaderboard output is consistent"""
         self.reset_and_transition_to("waiting")
 
         self.workspace["scorekeeper"].scoreboard[self.config.channel] = {
@@ -81,7 +81,7 @@ class TestBotCommands(EmojiradeBotTester):
         assert (self.config.channel, expected) in self.responses
 
     def test_fixwinner(self):
-        """ Ensure fixwinner does the right thing """
+        """Ensure fixwinner does the right thing"""
         self.reset_and_transition_to("guessed")
 
         state = self.workspace["gamestate"].state[self.config.channel]
@@ -141,7 +141,7 @@ class TestBotCommands(EmojiradeBotTester):
         ) == (0, -1)
 
     def test_set_emojirade_banned_words(self):
-        """ Ensure that the emojirade can't contain banned words """
+        """Ensure that the emojirade can't contain banned words"""
         self.reset_and_transition_to("waiting")
 
         state = self.workspace["gamestate"].state[self.config.channel]
@@ -170,7 +170,7 @@ class TestBotCommands(EmojiradeBotTester):
         assert state["step"] == "provided"
 
     def test_set_emojirade_raw_output(self):
-        """ Ensure that the emojirade passed to the winner isn't sanitized """
+        """Ensure that the emojirade passed to the winner isn't sanitized"""
         self.reset_and_transition_to("waiting")
 
         emojirade = "test-123-test_123"
@@ -184,7 +184,7 @@ class TestBotCommands(EmojiradeBotTester):
         ) in self.responses
 
     def test_set_emojirade_alternatives_output(self):
-        """ Ensure that the emojirade alternatives output is expected """
+        """Ensure that the emojirade alternatives output is expected"""
         self.reset_and_transition_to("waiting")
 
         emojirade = "foo | bar"
@@ -198,7 +198,7 @@ class TestBotCommands(EmojiradeBotTester):
         ) in self.responses
 
     def test_set_emojirade_public_channel(self):
-        """ Ensure that the emojirade can only be set in a DM channel """
+        """Ensure that the emojirade can only be set in a DM channel"""
         self.reset_and_transition_to("waiting")
 
         override = {"channel": self.config.channel}

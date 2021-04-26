@@ -64,7 +64,7 @@ class LeaderboardCommand(BaseCommand):
 
         mock_date = os.environ.get("EMOJIRADE_MOCK_DATE")
 
-        if (mock_date := os.environ.get("EMOJIRADE_MOCK_DATE")) :
+        if mock_date := os.environ.get("EMOJIRADE_MOCK_DATE"):
             date = mock_date
         else:
             if self.args.get("user_date"):
