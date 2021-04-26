@@ -16,7 +16,7 @@ jobs:
         with:
           python-version: 3.9
 
-      - run: pip install black
+      - run: pip3 install --upgrade -r requirements-dev.txt
 
       - id: black
         run: black --check .
