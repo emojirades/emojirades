@@ -29,11 +29,17 @@ class SetEmojiradeCommand(BaseCommand):
 
         # Figure out the channel to use
         for channel_name, channel in self.gamestate.state.items():
-            if channel["step"] == "waiting" and channel["old_winner"] == self.args["user"]:
+            if (
+                channel["step"] == "waiting"
+                and channel["old_winner"] == self.args["user"]
+            ):
                 # First channel that is 'waiting for a rade'
                 self.args["channel"] = channel_name
                 break
-            elif channel["step"] == "provided" and channel["old_winner"] == self.args["user"]:
+            elif (
+                channel["step"] == "provided"
+                and channel["old_winner"] == self.args["user"]
+            ):
                 # User is 'redoing the rade'
                 self.args["channel"] = channel_name
                 break
