@@ -1,0 +1,19 @@
+version: 2
+updates:
+- package-ecosystem: pip
+  directory: "/"
+  schedule:
+    interval: weekly
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: black
+    versions:
+    - 21.4b0
+  - dependency-name: boto3
+    versions:
+    - 1.16.63
+    - 1.17.17
+    - 1.17.22
+    - 1.17.3
+    - 1.17.44
+    - 1.17.53
