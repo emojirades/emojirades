@@ -1,2 +1,2 @@
 pytest==6.2.3
-black==21.4b0
+black==21.4b2
