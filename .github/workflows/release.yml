@@ -23,7 +23,7 @@ jobs:
 
       - id: changelog
         if: ${{ success() }}
-        uses: ScottBrenner/generate-changelog-action@1.0.2
+        uses: ScottBrenner/generate-changelog-action@1.3.1
         env:
           REPO: ${{ github.repository }}
         with:
