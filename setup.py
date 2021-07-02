@@ -33,7 +33,7 @@ setup(
     ],
     python_requires="~=3.8",
     extras_require={
-        "test": ["pytest", "black"],
+        "test": ["boto3", "pytest", "black"],
     },
     scripts=["bin/emojirades"],
     author="The Emojirades Team",
