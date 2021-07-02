@@ -95,11 +95,13 @@ sudo systemctl start emojirades
 
 ```
 # Release process (for master branch)
-1. Create release branch containing new version in setup.py and Dockerfile
-2. Perform a PR into master
-3. Perform release in GitHub
-4. TravisCI will automatically build and deploy on a tagged commit into master (the release does this)
-5. Docker Hub will automatically build and deploy on a tagged commit into master (the release does this)
+1. Update `setup.py` with the new version (vX.Y.Z)
+2. Commit into the master branch
+3. Tag the commit with vX.Y.Z
+4. Github Actions will trigger the Release Job when a tagged commit to master is detected
+    1. Changelog will be generated and a Github Release as well with the changelog
+    2. New python wheel will be built and published to PyPI and attached to the Release
+    3. New container image will be built and published to Docker Hub
 
 ## Building the Container Image
 ```
