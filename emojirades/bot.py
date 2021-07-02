@@ -58,7 +58,7 @@ class EmojiradesBot(object):
             if Command.match(event.text, me=workspace["slack"].bot_id):
                 yield Command(event, workspace)
 
-    def decode_channel(self, channel, workspace):
+    def decode_channel(self, channel: str, workspace: dict):
         """
         Figures out the channel destination
         """
@@ -115,10 +115,10 @@ class EmojiradesBot(object):
 
             for channel, response in command.execute():
                 self.logger.debug("------------------------")
-
                 self.logger.debug(
                     f"Command {command} executed with response: {(channel, response)}"
                 )
+
                 if channel is not None:
                     channel = self.decode_channel(channel, workspace)
                 else:

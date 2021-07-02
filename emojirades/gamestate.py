@@ -137,7 +137,7 @@ class GameState(object):
 
                 text = text.replace(user_override_match.groupdict()["override_cmd"], "")
 
-        # User the overridden channel if applicable
+        # Use the overridden channel if applicable
         state = self.state[channel]
 
         # Check to see if the winner is posting emoji's
@@ -147,6 +147,10 @@ class GameState(object):
             and match_emoji(text)
         ):
             self.winner_posted(channel)
+
+        # If a user has edited their message, don't check if for a guess
+        elif event.is_edit:
+            pass
 
         # Check to see if the users guess is right!
         elif state["step"] == "guessing" and user not in (

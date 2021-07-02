@@ -14,6 +14,8 @@ class Event:
     def player_id(self):
         if "user" in self.data:
             return self.data["user"]
+        elif self.data.get("message", {}).get("user"):
+            return self.data["message"]["user"]
         elif "bot_id" in self.data:
             return self.__get_bot_user_id()
         else:
@@ -35,6 +37,10 @@ class Event:
     def ts(self):
         return self.data["ts"]
 
+    @property
+    def is_edit(self):
+        return self.data.get("subtype", "") == "message_changed"
+
     def __get_bot_user_id(self):
         return self.slack_client.bot_info(self.data["bot_id"])["user_id"]
 
@@ -52,15 +58,21 @@ class Event:
         allowed_subtypes = {
             "bot_message",
             "me_message",
+            "message_changed",
         }
 
-        if self.data.get("subtype") and not self.data["subtype"] in allowed_subtypes:
-            return False
+        if self.data.get("subtype"):
+            if not self.data["subtype"] in allowed_subtypes:
+                return False
+
+            if self.data["subtype"] == "message_changed":
+                self.data["text"] = self.data["message"]["text"]
 
         # We assert each message event has a set of keys
         expected_keys = {
             "text",
             "channel",
+            "ts",
         }
 
         if not expected_keys.issubset(self.data.keys()):
