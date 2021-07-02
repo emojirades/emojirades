@@ -1,3 +1,4 @@
+import urllib.parse
 import botocore
 import pathlib
 import logging
@@ -8,12 +9,11 @@ import csv
 
 class WorkspaceDirectoryHandler(object):
     """
-    Workspace Directory Handlers deal with extracting Workspace Configuration files
-    The various implementations iterate through the expected path structure yielding workspaces
+    Workspace Directory Handlers deal with extracting Workspace Configuration from files
+    Implementations iterate through the expected path structure yielding json blobs from the file content
     """
-
     def __init__(self, *args, **kwargs):
-        for arg, pos in [("workspace_path", 0)]:
+        for pos, arg in [(0, "workspace_path")]:
             if pos is not None:
                 if len(args) > pos:
                     setattr(self, arg, args[pos])
@@ -76,7 +76,76 @@ class LocalWorkspaceDirectoryHandler(WorkspaceDirectoryHandler):
                 yield json.load(workspace_file)
 
 
+class WorkspaceDatabaseHandler(object):
+    """
+    Workspace Database Handlers deal with extacting Workspace Configuration from databases
+    Implementations load the database and look for a specific table yielding json blobs from the rows
+    """
+    def __init__(self, *args, **kwargs):
+        for pos, arg in [(0, "database_uri")]:
+            if pos is not None:
+                if len(args) > pos:
+                    setattr(self, arg, args[pos])
+                else:
+                    raise TypeError(
+                        f"{self} is missing a required positional argument '{arg}' in position {pos}"
+                    )
+            elif arg in kwargs:
+                setattr(self, arg, kwargs[arg])
+            else:
+                raise TypeError(
+                    f"{self} is missing a required keyword argument '{arg}'"
+                )
+
+        parsed = urllib.parse.urlparse(self.database_uri)
+
+        if not parse.hostname:
+            raise RuntimeError("DB URI missing hostname?")
+
+        if not parse.path[1:]:
+            raise RuntimeError("DB URI missing database?")
+
+        self.username = parse.username
+        self.password = parse.password
+        self.hostname = parse.hostname
+        self.database = parse.path[1:]
+
+
+class PostgresWorkspaceDatabaseHandler(object):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self._connection = psycopg2.connect(self.database_uri)
+
+    def workspaces(self):
+        cursor = self._connection.cursor()
+
+        cursor.execute("SELECT * FROM workspaces;")
+
+        for row in cursor:
+            yield row.as_dict()
+
+
+class SQLiteWorkspaceDatabaseHandler(object):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self._connection = sqlite3.connect(self.database_uri)
+
+    def workspaces(self):
+        cursor = self._connection.cursor()
+
+        cursor.execute("SELECT * FROM workspaces;")
+
+        for row in cursor:
+            yield row.as_dict()
+
+
 def get_workspace_directory_handler(directory):
+    if directory.startswith("psql://"):
+        return PostgresWorkspaceDatabaseHandler
+    elif directory.startswith("sqlite://"):
+        return SQLiteWorkspaceDatabaseHandler
     if directory.startswith("s3://"):
         return S3WorkspaceDirectoryHandler
     else:
