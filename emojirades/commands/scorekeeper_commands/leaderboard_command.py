@@ -13,6 +13,7 @@ class LeaderboardCommand(BaseCommand):
     TZ = "Australia/Melbourne"
     description = "Shows all the users scores"
 
+    # pylint: disable=line-too-long
     patterns = (
         r"<@{me}>[\s]+(?:score|leader)[\s]*board(?P<all_boards>s){{0,1}}$",
         r"<@{me}>[\s]+(?:score|leader)[\s]*board (?P<range>weekly|monthly) (?P<user_date>[0-9]{{8}})",
@@ -54,13 +55,13 @@ class LeaderboardCommand(BaseCommand):
         """
         Given a time unit and a date, return the appropriate leaderboard
         """
-        self.logger.debug(f"Getting a {time_unit} leaderboard")
+        self.logger.debug("Getting a %s leaderboard", time_unit)
 
         if time_unit == TimeUnit.ALL_TIME:
             return self.scorekeeper.leaderboard(self.args["channel"]), None
 
         all_history = self.scorekeeper.raw_history(self.args["channel"])
-        lb = LeaderBoard(all_history)
+        leader_board = LeaderBoard(all_history)
 
         mock_date = os.environ.get("EMOJIRADE_MOCK_DATE")
 
@@ -75,7 +76,7 @@ class LeaderboardCommand(BaseCommand):
         parsed_date = pendulum.from_format(date, "YYYYMMDD", tz=self.TZ)
         self.logger.debug("Leaderboard date was set to: {parsed_date}")
 
-        return (lb.get(parsed_date, time_unit), parsed_date)
+        return (leader_board.get(parsed_date, time_unit), parsed_date)
 
     def execute(self):
         yield from super().execute()

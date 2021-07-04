@@ -5,35 +5,16 @@ import sqlite3
 import psycopg2
 import boto3
 
+from emojirades.handlers.base import set_handler_args
 
-class WorkspaceDirectoryHandler:
-    """
-    Workspace Directory Handlers deal with extracting Workspace Configuration from files
-    Implementations iterate through the expected path structure yielding json blobs from the file content
-    """
 
+# pylint: disable=too-few-public-methods
+class S3WorkspaceDirectoryHandler:
     def __init__(self, *args, **kwargs):
         self.workspace_uri = ""
 
-        for pos, arg in [(0, "workspace_uri")]:
-            if pos is not None:
-                if len(args) > pos:
-                    setattr(self, arg, args[pos])
-                else:
-                    raise TypeError(
-                        f"{self} is missing a required positional argument '{arg}' in position {pos}"
-                    )
-            elif arg in kwargs:
-                setattr(self, arg, kwargs[arg])
-            else:
-                raise TypeError(
-                    f"{self} is missing a required keyword argument '{arg}'"
-                )
-
-
-class S3WorkspaceDirectoryHandler(WorkspaceDirectoryHandler):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        params = [("workspace_uri", 0)]
+        set_handler_args(self, *args, handler_params=params, **kwargs)
 
         _, _, self._bucket, self._prefix = self.workspace_uri.split("/", 3)
 
@@ -60,9 +41,13 @@ class S3WorkspaceDirectoryHandler(WorkspaceDirectoryHandler):
                 yield json.load(s3_object["Body"])
 
 
-class LocalWorkspaceDirectoryHandler(WorkspaceDirectoryHandler):
+# pylint: disable=too-few-public-methods
+class LocalWorkspaceDirectoryHandler:
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        self.workspace_uri = ""
+
+        params = [("workspace_uri", 0)]
+        set_handler_args(self, *args, handler_params=params, **kwargs)
 
         self._folder = pathlib.Path(self.workspace_uri[7:])
 
@@ -78,35 +63,14 @@ class LocalWorkspaceDirectoryHandler(WorkspaceDirectoryHandler):
                 yield json.load(workspace_file)
 
 
-class WorkspaceDatabaseHandler:
-    """
-    Workspace Database Handlers deal with extacting Workspace Configuration from databases
-    Implementations load the database and look for a specific table
-    """
-
+# pylint: disable=too-few-public-methods
+class PostgresWorkspaceDatabaseHandler:
     def __init__(self, *args, **kwargs):
         self.database_uri = ""
         self.shard_id = None
 
-        for pos, arg in [(0, "database_uri"), (None, "shard_id")]:
-            if pos is not None:
-                if len(args) > pos:
-                    setattr(self, arg, args[pos])
-                else:
-                    raise TypeError(
-                        f"{self} is missing a required positional argument '{arg}' in position {pos}"
-                    )
-            elif arg in kwargs:
-                setattr(self, arg, kwargs[arg])
-            else:
-                raise TypeError(
-                    f"{self} is missing a required keyword argument '{arg}'"
-                )
-
-
-class PostgresWorkspaceDatabaseHandler(WorkspaceDatabaseHandler):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        params = [("database_uri", 0), (None, "shard_id")]
+        set_handler_args(self, *args, handler_params=params, **kwargs)
 
         self._connection = psycopg2.connect(
             self.database_uri, cursor_factory=psycopg2.extras.DictCursor
@@ -143,12 +107,19 @@ class PostgresWorkspaceDatabaseHandler(WorkspaceDatabaseHandler):
             yield row
 
 
-class SQLiteWorkspaceDatabaseHandler(WorkspaceDatabaseHandler):
+# pylint: disable=too-few-public-methods
+class SQLiteWorkspaceDatabaseHandler:
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        self.database_uri = ""
+        self.shard_id = None
 
+        params = [("database_uri", 0), (None, "shard_id")]
+        set_handler_args(self, *args, handler_params=params, **kwargs)
+
+        # pylint: disable=no-member
         self._connection = sqlite3.connect(self.database_uri[9:], uri=True)
         self._connection.row_factory = sqlite3.Row
+        # pylint: enable=no-member
 
         # Check if we need to bootstrap
         cur = self._connection.cursor()

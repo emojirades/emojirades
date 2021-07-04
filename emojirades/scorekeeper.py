@@ -55,7 +55,7 @@ class ScoreKeeper:
             for config in self.scoreboard.values():
                 config["scores"] = defaultdict(int, config["scores"])
 
-            self.logger.info(f"Loaded scores from {score_uri}")
+            self.logger.info("Loaded scores from %s", score_uri)
 
         self.command_history = []
 

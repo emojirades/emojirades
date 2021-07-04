@@ -29,9 +29,11 @@ class LeaderBoard:
 
         A modified binary search to find a single match of event within the date range.
 
-        - Get an approximate index by comparing requested daterange and the earliest and latest timestamp in history.
-        - If the number of events in history is distributed quiet evenly, this will usually match the first time.
-        - If not matched, jump to the half way point of the remaining events.
+        - Get an approximate index by comparing requested daterange
+          and the earliest and latest timestamp in history
+        - If the number of events in history is distributed quiet evenly,
+          this will usually match the first time
+        - If not matched, jump to the half way point of the remaining events
         """
 
         low = 0
@@ -44,8 +46,11 @@ class LeaderBoard:
         # Out of range
         if end_time < first_time or start_time > last_time:
             self.logger.warning(
-                f"Date is out of range earliest: {first_time}, latest: {last_time},"
-                f" start_time: {start_time}, end_time: {end_time}"
+                "Date is out of range earliest=%s latest=%s start_time=%s end_time=%s",
+                first_time,
+                last_time,
+                start_time,
+                end_time,
             )
             return self.NOT_FOUND
 
@@ -55,11 +60,13 @@ class LeaderBoard:
             return low
 
         # Binary search first guess with ratio to the time range of history
+        # pylint: disable=c-extension-no-member
         guess = math.floor(
             (start_time - first_time) / (last_time - first_time) * (high - low) + low
         )
+        # pylint: enable=c-extension-no-member
 
-        self.logger.debug(f"first_guess: {guess}")
+        self.logger.debug("first_guess=%s", guess)
 
         # Fine tune guess relative to the date range
         while low <= high and low <= guess <= high:
@@ -70,7 +77,9 @@ class LeaderBoard:
             else:
                 return guess
 
+            # pylint: disable=c-extension-no-member
             guess = math.floor((high - low) / 2 + low)
+            # pylint: enable=c-extension-no-member
 
         # if somehow still find nothing
         return self.NOT_FOUND
@@ -91,7 +100,7 @@ class LeaderBoard:
         if affected_row_index == self.NOT_FOUND:
             return results
 
-        self.logger.debug(f"Found a match matched_row: {affected_row_index}")
+        self.logger.debug("matched_row='%s'", affected_row_index)
 
         results.append(self.history[affected_row_index])
 
@@ -109,7 +118,7 @@ class LeaderBoard:
             results.append(self.history[cursor])
             cursor += 1
 
-        self.logger.debug(f"History events matches data: {results}")
+        self.logger.debug("History events matches data: %s", results)
 
         return results
 
@@ -136,9 +145,7 @@ class LeaderBoard:
         start_time = TimeRange.get_start_date(of_date, time_unit).timestamp()
         end_time = TimeRange.get_end_date(of_date, time_unit).timestamp()
 
-        self.logger.debug(
-            f"Getting date range from start_time: {start_time} to end_time: {end_time}"
-        )
+        self.logger.debug("Getting date range from %s => %s", start_time, end_time)
 
         return self.calculate_score(self.get_data(start_time, end_time))
 

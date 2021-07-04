@@ -49,14 +49,19 @@ class EmojiradesBot:
         :param workspace: Workspace object containing state
         :return Command: The matched command to be executed
         """
-        self.logger.debug(f"Handling event: {event.data}")
+        self.logger.debug("Handling event: %s", event.data)
 
+        # pylint: disable=invalid-name
         for GameCommand in workspace["gamestate"].infer_commands(event):
             yield GameCommand(event, workspace)
 
         for Command in self.command_registry.values():
             if Command.match(event.text, me=workspace["slack"].bot_id):
+                if Command.__name__ == "HelpCommand":
+                    yield Command(event, workspace, self.command_registry.command_patterns)
+
                 yield Command(event, workspace)
+        # pylint: enable=invalid-name
 
     @staticmethod
     def decode_channel(channel: str, workspace: dict):
@@ -87,10 +92,10 @@ class EmojiradesBot:
     def handle_event(self, **payload):
         try:
             self._handle_event(**payload)
-        except Exception as e:
+        except Exception as exception:
             if logging.root.level == logging.DEBUG:
                 traceback.print_exc()
-            raise e
+            raise exception
 
     def _handle_event(self, **payload):
         if "team" in payload["data"]:
@@ -114,12 +119,14 @@ class EmojiradesBot:
             return
 
         for command in self.match_event(event, workspace):
-            self.logger.debug(f"Matched {command} for event {event.data}")
+            self.logger.debug("Matched %s for event %s", command, event.data)
 
             for channel, response in command.execute():
                 self.logger.debug("------------------------")
                 self.logger.debug(
-                    f"Command {command} executed with response: {(channel, response)}"
+                    "Command %s executed with response: %s",
+                    command,
+                    (channel, response),
                 )
 
                 if channel is not None:

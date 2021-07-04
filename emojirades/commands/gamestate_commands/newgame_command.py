@@ -20,7 +20,8 @@ class NewGameCommand(BaseCommand):
         if self.args["winner"] == self.args["old_winner"]:
             yield (
                 None,
-                f"Sorry, but the old and current winner cannot be the same person (<@{self.args['winner']}>)...",
+                "Sorry, but the old and current winner " \
+                f"cannot be the same person (<@{self.args['winner']}>)...",
             )
             return
 
@@ -29,11 +30,13 @@ class NewGameCommand(BaseCommand):
         )
         yield (
             None,
-            f"<@{self.args['user']}> has set the old winner to <@{self.args['old_winner']}> and the winner to <@{self.args['winner']}>",
+            f"<@{self.args['user']}> has set the old winner to <@{self.args['old_winner']}> " \
+            f"and the winner to <@{self.args['winner']}>",
         )
         yield (
             None,
-            f"It's now <@{self.args['old_winner']}>'s turn to provide <@{self.args['winner']}> with the next 'rade!",
+            f"It's now <@{self.args['old_winner']}>'s turn " \
+            f"to provide <@{self.args['winner']}> with the next 'rade!",
         )
         yield (
             self.args["old_winner"],
@@ -41,5 +44,6 @@ class NewGameCommand(BaseCommand):
         )
         yield (
             self.args["old_winner"],
-            "Please reply back in the format `emojirade Point Break` if `Point Break` was the new 'rade",
+            "Please reply back in the format `emojirade Point Break` " \
+            "if `Point Break` was the new 'rade",
         )

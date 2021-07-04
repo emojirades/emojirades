@@ -3,7 +3,8 @@ from emojirades.commands import BaseCommand
 
 
 class FixWinnerCommand(BaseCommand):
-    description = "Resets the currently awarded win to another player (in case of a ninja or something)"
+    description = "Resets the currently awarded win to another player " \
+                  "(in case of a ninja or something)"
 
     patterns = (r"<@{me}> fixwinner <@(?P<winner>[0-9A-Z]+)>",)
 
@@ -46,5 +47,6 @@ class FixWinnerCommand(BaseCommand):
 
         yield (
             None,
-            f"Sorry <@{loser}>! <@{self.args['user']}> has decided to award <@{winner}> the win :smiling_imp:",
+            f"Sorry <@{loser}>! <@{self.args['user']}> has decided to award <@{winner}> " \
+             " the win :smiling_imp:",
         )

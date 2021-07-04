@@ -1,5 +1,4 @@
 from emojirades.commands import BaseCommand
-import emojirades.commands.registry
 
 
 class HelpCommand(BaseCommand):
@@ -11,29 +10,18 @@ class HelpCommand(BaseCommand):
         ("<@{me}> help", "Shows this help"),
     ]
 
-    def format_patterns(self, patterns):
-        new_patterns = []
-
-        for pattern in patterns:
-            pattern = pattern.replace("\\", "")
-
-            for i in self.pattern_map:
-                pattern = pattern.replace(i["pattern"], i["replace"])
-
-            new_patterns.append(pattern)
-
-        return tuple(new_patterns)
+    def __init__(self, *args, commands, **kwargs):
+        self.commands = commands
+        super().__init__(*args, **kwargs)
 
     def execute(self):
         yield from super().execute()
-
-        commands = emojirades.commands.registry.CommandRegistry.command_patterns()
 
         # Calculate the longest example & description
         longest_description = 0
         longest_example = 0
 
-        for command in commands.values():
+        for command in self.commands.values():
             for example, description in command.examples:
                 description_length = len(description)
                 example_length = len(example)
@@ -47,7 +35,7 @@ class HelpCommand(BaseCommand):
         yield (None, "Available commands are:\n")
         message = f"```\n{'Example':<{longest_example}} {'Description':<{longest_description}}\n"
 
-        for command in commands.values():
+        for command in self.commands.values():
             for example, description in command.examples:
                 if len(description) > longest_description:
                     description = f"{description[0:longest_description]}..."

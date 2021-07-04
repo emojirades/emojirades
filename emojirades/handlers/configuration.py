@@ -6,35 +6,15 @@ import psycopg2
 import botocore
 import boto3
 
+from emojirades.handlers.base import set_handler_args
 
-class ConfigFileHandler:
-    """
-    Configuration Handlers deal with the transport of bytes to the 'file', wherever that may be
-    They can have .save() and .load() called on them, which take/return bytes
-    """
 
+class S3ConfigFileHandler:
     def __init__(self, *args, **kwargs):
         self.uri = ""
 
-        for arg, pos in [("uri", 0)]:
-            if pos is not None:
-                if len(args) > pos:
-                    setattr(self, arg, args[pos])
-                else:
-                    raise TypeError(
-                        f"{self} is missing a required positional argument '{arg}' in position {pos}"
-                    )
-            elif arg in kwargs:
-                setattr(self, arg, kwargs[arg])
-            else:
-                raise TypeError(
-                    f"{self} is missing a required keyword argument '{arg}'"
-                )
-
-
-class S3ConfigFileHandler(ConfigFileHandler):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        params = [("uri", 0)]
+        set_handler_args(self, *args, handler_params=params, **kwargs)
 
         _, _, self._bucket, self._key = self.uri.split("/", 3)
 
@@ -48,11 +28,11 @@ class S3ConfigFileHandler(ConfigFileHandler):
                 Key=self._key,
             )
             return True
-        except botocore.exceptions.ClientError as e:
-            if e.response["Error"]["Code"] == "404":
+        except botocore.exceptions.ClientError as exception:
+            if exception.response["Error"]["Code"] == "404":
                 return False
 
-            raise e
+            raise exception
 
     def load(self):
         if self.exists:
@@ -78,9 +58,12 @@ class S3ConfigFileHandler(ConfigFileHandler):
         )
 
 
-class LocalConfigFileHandler(ConfigFileHandler):
+class LocalConfigFileHandler:
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        self.uri = ""
+
+        params = [("uri", 0)]
+        set_handler_args(self, *args, handler_params=params, **kwargs)
 
         self._object = pathlib.Path(self.uri[7:])
 
@@ -115,56 +98,17 @@ class LocalConfigFileHandler(ConfigFileHandler):
             local_file.write(json.dumps(content).encode("utf-8"))
 
 
-class ConfigDatabaseHandler:
-    """
-    Configuration Database Handlers deal with extacting Workspace Configuration from databases
-    Implementations load the database and look for a specific table yielding json blobs from the rows
-    """
-
+# pylint: disable=too-few-public-methods
+class PostgresConfigDatabaseHandler:
     def __init__(self, *args, **kwargs):
         self.database_uri = ""
 
-        for pos, arg in [(0, "database_uri")]:
-            if pos is not None:
-                if len(args) > pos:
-                    setattr(self, arg, args[pos])
-                else:
-                    raise TypeError(
-                        f"{self} is missing a required positional argument '{arg}' in position {pos}"
-                    )
-            elif arg in kwargs:
-                setattr(self, arg, kwargs[arg])
-            else:
-                raise TypeError(
-                    f"{self} is missing a required keyword argument '{arg}'"
-                )
-
-
-class PostgresConfigDatabaseHandler(ConfigDatabaseHandler):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        params = [("database_uri", 0)]
+        set_handler_args(self, *args, handler_params=params, **kwargs)
 
         self._connection = psycopg2.connect(
             self.database_uri, cursor_factory=psycopg2.extras.DictCursor
         )
-
-        # Check if we need to bootstrap
-        cur = self._connection.cursor()
-        cur.execute(
-            "SELECT EXISTS(SELECT * FROM information_schema.tables WHERE table_name=%s)",
-            ("workspaces",),
-        )
-
-        if not cur.fetchone()[0]:
-            cur.execute(
-                """
-                CREATE TABLE workspaces (
-                    workspace_id VARCHAR(12) PRIMARY KEY,
-                    shard INT,
-                    -- TODO
-                );
-            """
-            )
 
     def workspace(self, workspace_id):
         cur = self._connection.cursor()
@@ -172,29 +116,18 @@ class PostgresConfigDatabaseHandler(ConfigDatabaseHandler):
         return cur.fetchone()
 
 
-class SQLiteConfigDatabaseHandler(ConfigDatabaseHandler):
+# pylint: disable=too-few-public-methods
+class SQLiteConfigDatabaseHandler:
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        self.database_uri = ""
 
+        params = [("database_uri", 0)]
+        set_handler_args(self, *args, handler_params=params, **kwargs)
+
+        # pylint: disable=no-member
         self._connection = sqlite3.connect(self.database_uri[9:], uri=True)
         self._connection.row_factory = sqlite3.Row
-
-        # Check if we need to bootstrap
-        cur = self._connection.cursor()
-        cur.execute(
-            "SELECT COUNT(name) FROM sqlite_master WHERE type='table' AND name='workspaces'"
-        )
-
-        if cur.fetchone()[0] != 1:
-            cur.execute(
-                """
-                CREATE TABLE workspaces (
-                    workspace_id VARCHAR(12) PRIMARY KEY,
-                    shard INT,
-                    -- TODO
-                );
-            """
-            )
+        # pylint: enable=no-member
 
     def workspace(self, workspace_id):
         cur = self._connection.cursor()

@@ -33,9 +33,11 @@ class GameStatusCommand(BaseCommand):
         # First item is game state (step)
         step_msg = {
             "new_game": "Game has not started yet, please wait for an admin to start it!",
-            "waiting": f"Waiting for <@{args['old_winner']}> to provide a 'rade to {args['winner_name']}",
+            "waiting": f"Waiting for <@{args['old_winner']}> to " \
+                       f"provide a 'rade to {args['winner_name']}",
             "provided": f"Waiting for <@{args['winner']}> to post an emoji to kick off the round!",
-            "guessing": f"Come on, everyone's guessing what {args['winner_name']} has posted! Get to it! :runner::dash:",
+            "guessing": f"Come on, everyone's guessing what {args['winner_name']} has posted! " \
+                         "Get to it! :runner::dash:",
         }
 
         pretty_status.append(("Status", step_msg[status["step"]]))

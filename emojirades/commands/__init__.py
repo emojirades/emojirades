@@ -7,12 +7,14 @@ from emojirades.slack.event import Event
 
 
 class BaseCommand(ABC):
+    # pylint: disable=line-too-long
     user_override_regex = re.compile(
         r".*(?P<override_cmd>[\s]+player=[\s]*(<@(?P<user_override>[0-9A-Z]+)>)).*"
     )
     channel_override_regex = re.compile(
         r".*(?P<override_cmd>[\s]+channel=[\s]*(<#(?P<channel_override>[0-9A-Z]+)\|(?P<channel_name>[0-9A-Za-z_-]+)>)).*"
     )
+    # pylint: enable=line-too-long
 
     def __init__(self, event: Event, workspace: dict):
         self.logger = logging.getLogger("EmojiradesBot.Command")
@@ -71,12 +73,20 @@ class BaseCommand(ABC):
         )
 
         for pattern in patterns:
-            self.logger.debug(f"Matching '{pattern}' against '{event.text}'")
+            self.logger.debug(
+                "Matching '%s' against '%s'",
+                pattern,
+                event.text,
+            )
 
             match = re.compile(pattern).match(event.text)
 
             if not match:
-                self.logger.debug(f"Failed to match '{pattern}' against '{event.text}'")
+                self.logger.debug(
+                    "Failed to match '%s' against '%s'",
+                    pattern,
+                    event.text,
+                )
 
             if hasattr(match, "groupdict"):
                 self.args.update(match.groupdict())

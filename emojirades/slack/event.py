@@ -35,9 +35,11 @@ class Event:
     def channel(self):
         return self.data["channel"]
 
+    # pylint: disable=invalid-name
     @property
     def ts(self):
         return self.data["ts"]
+    # pylint: enable=invalid-name
 
     @property
     def is_edit(self):

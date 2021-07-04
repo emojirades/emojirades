@@ -67,7 +67,7 @@ class GameState:
             self.state = defaultdict(state_factory)
         else:
             self.state = defaultdict(state_factory, existing_state)
-            self.logger.info(f"Loaded game state from {state_uri}")
+            self.logger.info("Loaded game state from %s", state_uri)
 
     def in_progress(self, channel):
         return self.state[channel]["step"] not in ("new_game",)
@@ -132,17 +132,23 @@ class GameState:
             try:
                 if match_emojirade(guess, state["emojirade"]):
                     self.logger.debug(
-                        f"emojirades='{'|'.join(state['emojirade'])}' guess='{guess}' status='correct'"
+                        "emojirades='%s' guess='%s' status='correct'",
+                        '|'.join(state['emojirade']),
+                        guess,
                     )
 
                     yield InferredCorrectGuessCommand
                 else:
                     self.logger.debug(
-                        f"emojirades='{'|'.join(state['emojirade'])}' guess='{guess}' status='incorrect'"
+                        "emojirades='%s' guess='%s' status='incorrect'",
+                        '|'.join(state['emojirade']),
+                        guess,
                     )
             except ScottFactorExceededException:
                 self.logger.debug(
-                    f"emojirade='{'|'.join(state['emojirade'])}' guess='{guess}' status='scott factor exceeded'"
+                    "emojirade='%s' guess='%s' status='scott factor exceeded'",
+                    '|'.join(state['emojirade']),
+                    guess
                 )
 
             if state.get("first_guess", False):
@@ -193,7 +199,8 @@ class GameState:
         """New emojirade word(s), 'emojirade' is a list of accepted answers"""
         if self.state[channel]["step"] not in ("waiting", "provided"):
             raise self.InvalidStateException(
-                f"Expecting {channel}'s state to be 'waiting|provided', it is actually {self.state[channel]['step']}"
+                f"Expecting {channel}'s state to be 'waiting|provided', " \
+                f"it is actually {self.state[channel]['step']}"
             )
 
         self.state[channel]["emojirade"] = [sanitize_text(i) for i in emojirades]
@@ -217,7 +224,8 @@ class GameState:
         """Guesser has guessed the correct emojirade"""
         if self.state[channel]["step"] != "guessing":
             raise self.InvalidStateException(
-                f"Expecting {channel}'s state to be 'guessing', it is actually {self.state[channel]['step']}"
+                f"Expecting {channel}'s state to be 'guessing', " \
+                f"it is actually {self.state[channel]['step']}"
             )
 
         self.state[channel]["old_winner"] = self.state[channel]["winner"]

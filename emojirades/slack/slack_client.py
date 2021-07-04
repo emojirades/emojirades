@@ -1,21 +1,24 @@
 import logging
 
-import slack
-
 from expiringdict import ExpiringDict
+
+import slack
 
 from emojirades.handlers import get_config_handler
 
 
 class SlackClient:
+    # pylint: disable=too-many-instance-attributes
     def __init__(self, auth_uri):
         self.config = get_config_handler(auth_uri).load()
         self.logger = logging.getLogger("EmojiradesBot.slack.SlackClient")
 
+        # pylint: disable=no-member
         self.rtmclient = slack.RTMClient(token=self.config["bot_access_token"])
         self.webclient = slack.WebClient(
             token=self.config["bot_access_token"], timeout=30
         )
+        # pylint: enable=no-member
 
         self.last_ts = float(0)
 

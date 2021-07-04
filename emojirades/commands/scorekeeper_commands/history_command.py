@@ -16,12 +16,13 @@ class HistoryCommand(BaseCommand):
         history = self.scorekeeper.history(self.args["channel"])
 
         if not history:
-            message = "No history available. History is temporary and doesn't persist across bot restarts."
+            message = "No history available." \
+                      "History is temporary and doesn't persist across bot restarts."
             self.logger.debug(message)
             yield (None, message)
             return
 
-        self.logger.debug(f"Printing history: {history}")
+        self.logger.debug("Printing history: %s", history)
 
         history_log = [
             f"{index}. {self.slack.pretty_name(event['user_id'])} > '{event['operation']}'"
