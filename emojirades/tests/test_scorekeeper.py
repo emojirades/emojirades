@@ -3,8 +3,8 @@ from unittest import mock
 
 from emojirades.scorekeeper import ScoreKeeper
 from emojirades.tests.helper import (
-    EmojiradeBotTester,
-)  # TODO: Handle logging level better
+    EmojiradeBotTester
+)
 
 import tempfile
 import json
@@ -78,6 +78,9 @@ class ScoreKeeperIntegrationTest(TestCase):
 
         self.keeper = ScoreKeeper(score_uri=f"file://{self.temp_file.name}")
 
+    def tearDown(self):
+        self.temp_file.close()
+
     def test_score_keeping(self):
         self.assertEqual(len(self.keeper.scoreboard[self.channel]["scores"].keys()), 2)
         self.assertEqual(
@@ -117,6 +120,3 @@ class ScoreKeeperIntegrationTest(TestCase):
                 },
             ],
         )
-
-    def tearDown(self):
-        self.temp_file.close()
