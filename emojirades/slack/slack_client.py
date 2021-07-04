@@ -7,7 +7,6 @@ from expiringdict import ExpiringDict
 from emojirades.handlers import get_config_handler
 
 
-
 class SlackClient:
     def __init__(self, auth_uri):
         self.config = get_config_handler(auth_uri).load()

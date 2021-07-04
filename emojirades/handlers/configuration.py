@@ -7,8 +7,7 @@ import botocore
 import boto3
 
 
-
-class ConfigFileHandler():
+class ConfigFileHandler:
     """
     Configuration Handlers deal with the transport of bytes to the 'file', wherever that may be
     They can have .save() and .load() called on them, which take/return bytes
@@ -116,11 +115,12 @@ class LocalConfigFileHandler(ConfigFileHandler):
             local_file.write(json.dumps(content).encode("utf-8"))
 
 
-class ConfigDatabaseHandler():
+class ConfigDatabaseHandler:
     """
     Configuration Database Handlers deal with extacting Workspace Configuration from databases
     Implementations load the database and look for a specific table yielding json blobs from the rows
     """
+
     def __init__(self, *args, **kwargs):
         self.database_uri = ""
 
@@ -144,24 +144,31 @@ class PostgresConfigDatabaseHandler(ConfigDatabaseHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self._connection = psycopg2.connect(self.database_uri, cursor_factory=psycopg2.extras.DictCursor)
+        self._connection = psycopg2.connect(
+            self.database_uri, cursor_factory=psycopg2.extras.DictCursor
+        )
 
         # Check if we need to bootstrap
         cur = self._connection.cursor()
-        cur.execute("SELECT EXISTS(SELECT * FROM information_schema.tables WHERE table_name=%s)", ('workspaces',))
+        cur.execute(
+            "SELECT EXISTS(SELECT * FROM information_schema.tables WHERE table_name=%s)",
+            ("workspaces",),
+        )
 
         if not cur.fetchone()[0]:
-            cur.execute("""
+            cur.execute(
+                """
                 CREATE TABLE workspaces (
                     workspace_id VARCHAR(12) PRIMARY KEY,
                     shard INT,
                     -- TODO
                 );
-            """)
+            """
+            )
 
     def workspace(self, workspace_id):
         cur = self._connection.cursor()
-        cur.execute("SELECT * FROM workspaces WHERE workspace_id=%s", (workspace_id, ))
+        cur.execute("SELECT * FROM workspaces WHERE workspace_id=%s", (workspace_id,))
         return cur.fetchone()
 
 
@@ -174,20 +181,24 @@ class SQLiteConfigDatabaseHandler(ConfigDatabaseHandler):
 
         # Check if we need to bootstrap
         cur = self._connection.cursor()
-        cur.execute("SELECT COUNT(name) FROM sqlite_master WHERE type='table' AND name='workspaces'")
+        cur.execute(
+            "SELECT COUNT(name) FROM sqlite_master WHERE type='table' AND name='workspaces'"
+        )
 
         if cur.fetchone()[0] != 1:
-            cur.execute("""
+            cur.execute(
+                """
                 CREATE TABLE workspaces (
                     workspace_id VARCHAR(12) PRIMARY KEY,
                     shard INT,
                     -- TODO
                 );
-            """)
+            """
+            )
 
     def workspace(self, workspace_id):
         cur = self._connection.cursor()
-        cur.execute("SELECT * FROM workspaces WHERE workspace_id=%s", (workspace_id, ))
+        cur.execute("SELECT * FROM workspaces WHERE workspace_id=%s", (workspace_id,))
         return cur.fetchone()
 
 

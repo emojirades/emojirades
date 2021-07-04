@@ -11,6 +11,7 @@ class WorkspaceDirectoryHandler:
     Workspace Directory Handlers deal with extracting Workspace Configuration from files
     Implementations iterate through the expected path structure yielding json blobs from the file content
     """
+
     def __init__(self, *args, **kwargs):
         self.workspace_uri = ""
 
@@ -82,6 +83,7 @@ class WorkspaceDatabaseHandler:
     Workspace Database Handlers deal with extacting Workspace Configuration from databases
     Implementations load the database and look for a specific table
     """
+
     def __init__(self, *args, **kwargs):
         self.database_uri = ""
         self.shard_id = None
@@ -106,14 +108,20 @@ class PostgresWorkspaceDatabaseHandler(WorkspaceDatabaseHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self._connection = psycopg2.connect(self.database_uri, cursor_factory=psycopg2.extras.DictCursor)
+        self._connection = psycopg2.connect(
+            self.database_uri, cursor_factory=psycopg2.extras.DictCursor
+        )
 
         # Check if we need to bootstrap
         cur = self._connection.cursor()
-        cur.execute("SELECT EXISTS(SELECT * FROM information_schema.tables WHERE table_name=%s)", ("workspaces",))
+        cur.execute(
+            "SELECT EXISTS(SELECT * FROM information_schema.tables WHERE table_name=%s)",
+            ("workspaces",),
+        )
 
         if not cur.fetchone()[0]:
-            cur.execute("""
+            cur.execute(
+                """
                 CREATE TABLE workspaces (
                     workspace_id TEXT PRIMARY KEY,
                     shard_id INT,
@@ -121,11 +129,15 @@ class PostgresWorkspaceDatabaseHandler(WorkspaceDatabaseHandler):
                     state_uri TEXT,
                     auth_uri TEXT
                 );
-            """)
+            """
+            )
 
     def workspaces(self):
         cur = self._connection.cursor()
-        cur.execute("SELECT score_uri, state_uri, auth_uri, workspace_id FROM workspaces WHERE shard_id=%s", (self.shard_id, ))
+        cur.execute(
+            "SELECT score_uri, state_uri, auth_uri, workspace_id FROM workspaces WHERE shard_id=%s",
+            (self.shard_id,),
+        )
 
         for row in cur:
             yield row
@@ -140,10 +152,13 @@ class SQLiteWorkspaceDatabaseHandler(WorkspaceDatabaseHandler):
 
         # Check if we need to bootstrap
         cur = self._connection.cursor()
-        cur.execute("SELECT COUNT(name) FROM sqlite_master WHERE type='table' AND name='workspaces'")
+        cur.execute(
+            "SELECT COUNT(name) FROM sqlite_master WHERE type='table' AND name='workspaces'"
+        )
 
         if cur.fetchone()[0] != 1:
-            cur.execute("""
+            cur.execute(
+                """
                 CREATE TABLE workspaces (
                     workspace_id TEXT PRIMARY KEY,
                     shard_id INT,
@@ -151,11 +166,15 @@ class SQLiteWorkspaceDatabaseHandler(WorkspaceDatabaseHandler):
                     state_uri TEXT,
                     auth_uri TEXT
                 );
-            """)
+            """
+            )
 
     def workspaces(self):
         cursor = self._connection.cursor()
-        cursor.execute("SELECT score_uri, state_uri, auth_uri, workspace_id FROM workspaces WHERE shard_id=%s", (self.shard_id, ))
+        cursor.execute(
+            "SELECT score_uri, state_uri, auth_uri, workspace_id FROM workspaces WHERE shard_id=%s",
+            (self.shard_id,),
+        )
 
         for row in cursor:
             yield row
