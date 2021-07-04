@@ -16,8 +16,10 @@ class HistoryCommand(BaseCommand):
         history = self.scorekeeper.history(self.args["channel"])
 
         if not history:
-            message = "No history available." \
-                      "History is temporary and doesn't persist across bot restarts."
+            message = (
+                "No history available."
+                "History is temporary and doesn't persist across bot restarts."
+            )
             self.logger.debug(message)
             yield (None, message)
             return

@@ -97,7 +97,9 @@ class CorrectGuessCommand(BaseCommand):
                 },
             )
 
-        emoji = random.choice(self.other_emojis + self.position_emojis.get(position, []))
+        emoji = random.choice(
+            self.other_emojis + self.position_emojis.get(position, [])
+        )
         emoji_text = f" :{emoji}:"
 
         if state.get("first_guess", False):
@@ -113,8 +115,10 @@ class CorrectGuessCommand(BaseCommand):
         if score in self.custom_messages:
             prefix = self.custom_messages[score].format(winnder=state["winner"])
         elif score % 50 == 0:
-            prefix = f"Another day, another 50 point milestone for <@{state['winner']}> " \
-                      ":chart_with_upwards_trend:"
+            prefix = (
+                f"Another day, another 50 point milestone for <@{state['winner']}> "
+                ":chart_with_upwards_trend:"
+            )
         else:
             prefix = f"Congrats <@{state['winner']}>"
 
@@ -131,6 +135,6 @@ class CorrectGuessCommand(BaseCommand):
         )
         yield (
             state["old_winner"],
-            "Please reply back in the format `emojirade Point Break` " \
+            "Please reply back in the format `emojirade Point Break` "
             "if `Point Break` was the new 'rade",
         )

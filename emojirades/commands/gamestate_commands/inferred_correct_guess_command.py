@@ -4,8 +4,10 @@ from emojirades.commands.gamestate_commands.correct_guess_command import (
 
 
 class InferredCorrectGuessCommand(CorrectGuessCommand):
-    description = "Takes the user that send the event as the winner, " \
-                  "this is only ever fired internally"
+    description = (
+        "Takes the user that send the event as the winner, "
+        "this is only ever fired internally"
+    )
 
     patterns = tuple()
 

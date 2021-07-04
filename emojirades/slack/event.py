@@ -39,6 +39,7 @@ class Event:
     @property
     def ts(self):
         return self.data["ts"]
+
     # pylint: enable=invalid-name
 
     @property

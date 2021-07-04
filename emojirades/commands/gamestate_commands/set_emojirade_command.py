@@ -87,7 +87,7 @@ class SetEmojiradeCommand(BaseCommand):
 
         yield (
             winner,
-            f"Hey, <@{self.args['user']}> made the emojirade " \
+            f"Hey, <@{self.args['user']}> made the emojirade "
             f"`{raw_emojirades[0]}`{alternatives}, good luck!",
         )
 

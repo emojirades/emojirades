@@ -133,7 +133,7 @@ class GameState:
                 if match_emojirade(guess, state["emojirade"]):
                     self.logger.debug(
                         "emojirades='%s' guess='%s' status='correct'",
-                        '|'.join(state['emojirade']),
+                        "|".join(state["emojirade"]),
                         guess,
                     )
 
@@ -141,14 +141,14 @@ class GameState:
                 else:
                     self.logger.debug(
                         "emojirades='%s' guess='%s' status='incorrect'",
-                        '|'.join(state['emojirade']),
+                        "|".join(state["emojirade"]),
                         guess,
                     )
             except ScottFactorExceededException:
                 self.logger.debug(
                     "emojirade='%s' guess='%s' status='scott factor exceeded'",
-                    '|'.join(state['emojirade']),
-                    guess
+                    "|".join(state["emojirade"]),
+                    guess,
                 )
 
             if state.get("first_guess", False):
@@ -199,7 +199,7 @@ class GameState:
         """New emojirade word(s), 'emojirade' is a list of accepted answers"""
         if self.state[channel]["step"] not in ("waiting", "provided"):
             raise self.InvalidStateException(
-                f"Expecting {channel}'s state to be 'waiting|provided', " \
+                f"Expecting {channel}'s state to be 'waiting|provided', "
                 f"it is actually {self.state[channel]['step']}"
             )
 
@@ -224,7 +224,7 @@ class GameState:
         """Guesser has guessed the correct emojirade"""
         if self.state[channel]["step"] != "guessing":
             raise self.InvalidStateException(
-                f"Expecting {channel}'s state to be 'guessing', " \
+                f"Expecting {channel}'s state to be 'guessing', "
                 f"it is actually {self.state[channel]['step']}"
             )
 

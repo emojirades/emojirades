@@ -58,7 +58,9 @@ class EmojiradesBot:
         for Command in self.command_registry.values():
             if Command.match(event.text, me=workspace["slack"].bot_id):
                 if Command.__name__ == "HelpCommand":
-                    yield Command(event, workspace, self.command_registry.command_patterns)
+                    yield Command(
+                        event, workspace, self.command_registry.command_patterns
+                    )
 
                 yield Command(event, workspace)
         # pylint: enable=invalid-name
