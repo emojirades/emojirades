@@ -14,7 +14,7 @@ import time
 class ScoreKeeperTester(TestCase):
     def test_new_file_load(self):
         with tempfile.NamedTemporaryFile(mode="wt", newline="") as temp_file:
-            keeper = ScoreKeeper(filename=temp_file.name)
+            keeper = ScoreKeeper(score_uri=f"file://{temp_file.name}")
 
             self.assertEqual(len(keeper.scoreboard.keys()), 0)
 
@@ -37,7 +37,7 @@ class ScoreKeeperTester(TestCase):
             temp_file.write(json.dumps(scoreboard))
             temp_file.flush()
 
-            keeper = ScoreKeeper(filename=temp_file.name)
+            keeper = ScoreKeeper(score_uri=f"file://{temp_file.name}")
 
             self.assertEqual(len(keeper.scoreboard[self.channel]["scores"].keys()), 1)
 
@@ -68,7 +68,7 @@ class ScoreKeeperIntegrationTest(TestCase):
         self.temp_file.write(json.dumps(scoreboard))
         self.temp_file.flush()
 
-        keeper = ScoreKeeper(filename=self.temp_file.name)
+        keeper = ScoreKeeper(score_uri=f"file://{self.temp_file.name}")
         keeper.plusplus(self.channel, self.user_1)
         keeper.plusplus(self.channel, self.user_2)
         keeper.minusminus(self.channel, self.user_2)
@@ -76,7 +76,7 @@ class ScoreKeeperIntegrationTest(TestCase):
         keeper.save()
         del keeper
 
-        self.keeper = ScoreKeeper(filename=self.temp_file.name)
+        self.keeper = ScoreKeeper(score_uri=f"file://{self.temp_file.name}")
 
     def test_score_keeping(self):
         self.assertEqual(len(self.keeper.scoreboard[self.channel]["scores"].keys()), 2)

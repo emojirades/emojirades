@@ -13,12 +13,6 @@ class NewGameCommand(BaseCommand):
         ("<@{me}> new game @old_winner @winner", "Initiates a new game"),
     ]
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def prepare_args(self, event):
-        super().prepare_args(event)
-
     @admin_or_old_winner_set_check
     def execute(self):
         yield from super().execute()

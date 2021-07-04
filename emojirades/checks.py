@@ -2,7 +2,7 @@ import re
 
 # 'rade regexes that are banned
 banned_emojirades = [
-    re.compile(":[a-zA-Z0-9-_\+]+:"),  # User is not allowed to include emojis
+    re.compile(r":[a-zA-Z0-9-_\+]+:"),  # User is not allowed to include emojis
 ]
 
 

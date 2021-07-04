@@ -1,37 +1,17 @@
-from emojirades.handlers import get_configuration_handler
-from expiringdict import ExpiringDict
+import logging
 
 import slack
-import json
+
+from expiringdict import ExpiringDict
+
+from emojirades.handlers import get_config_handler
 
 
-def get_handler(filename):
-    class SlackAuthConfigHandler(get_configuration_handler(filename)):
-        """
-        Handles CRUD of the Slack Auth configuration file
-        """
 
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-
-        def load(self):
-            bytes_content = super().load()
-
-            if bytes_content is None or not bytes_content:
-                return None
-
-            return json.loads(bytes_content.decode("utf-8"))
-
-        def save(self, state):
-            raise RuntimeError("Saving SlackAuth file not implemented")
-
-    return SlackAuthConfigHandler(filename)
-
-
-class SlackClient(object):
-    def __init__(self, filename, logger=None):
-        self.config = get_handler(filename).load()
-        self.logger = logger
+class SlackClient:
+    def __init__(self, auth_uri):
+        self.config = get_config_handler(auth_uri).load()
+        self.logger = logging.getLogger("EmojiradesBot.slack.SlackClient")
 
         self.rtmclient = slack.RTMClient(token=self.config["bot_access_token"])
         self.webclient = slack.WebClient(

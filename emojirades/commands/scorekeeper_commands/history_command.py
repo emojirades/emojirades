@@ -10,9 +10,6 @@ class HistoryCommand(BaseCommand):
         ("<@{me}> history", "Shows history"),
     ]
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
     def execute(self):
         yield from super().execute()
 

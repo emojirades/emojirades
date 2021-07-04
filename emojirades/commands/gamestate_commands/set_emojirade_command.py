@@ -16,9 +16,6 @@ class SetEmojiradeCommand(BaseCommand):
         ),
     ]
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
     def prepare_args(self, event):
         super().prepare_args(event)
 
@@ -36,7 +33,8 @@ class SetEmojiradeCommand(BaseCommand):
                 # First channel that is 'waiting for a rade'
                 self.args["channel"] = channel_name
                 break
-            elif (
+
+            if (
                 channel["step"] == "provided"
                 and channel["old_winner"] == self.args["user"]
             ):

@@ -1,6 +1,4 @@
 import logging
-import json
-import re
 
 from collections import defaultdict
 
@@ -9,7 +7,7 @@ from emojirades.commands.gamestate_commands.inferred_correct_guess_command impor
 )
 from emojirades.helpers import sanitize_text, match_emojirade, match_emoji
 from emojirades.helpers import ScottFactorExceededException
-from emojirades.handlers import get_configuration_handler
+from emojirades.handlers import get_config_handler
 
 from emojirades.commands import BaseCommand
 from emojirades.slack.event import Event
@@ -17,32 +15,7 @@ from emojirades.slack.event import Event
 module_logger = logging.getLogger("EmojiradesBot.gamestate")
 
 
-def get_handler(filename):
-    class GameStateConfigHandler(get_configuration_handler(filename)):
-        """
-        Handles CRUD for the Game State configuration file
-        """
-
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-
-        def load(self):
-            bytes_content = super().load()
-
-            if bytes_content is None or not bytes_content:
-                return None
-
-            return json.loads(bytes_content.decode("utf-8"))
-
-        def save(self, state):
-            bytes_content = json.dumps(state).encode("utf-8")
-
-            super().save(bytes_content)
-
-    return GameStateConfigHandler(filename)
-
-
-class GameState(object):
+class GameState:
     """
     Game State Machine:
     Winner     1: Communicates emojirade with emojis
@@ -74,9 +47,9 @@ class GameState(object):
     class InvalidStateException(Exception):
         pass
 
-    def __init__(self, filename=None):
+    def __init__(self, state_uri):
+        self.config = get_config_handler(state_uri)
         self.logger = logging.getLogger("EmojiradesBot.gamestate.GameState")
-        self.config = get_handler(filename)
 
         def state_factory():
             return {
@@ -88,14 +61,13 @@ class GameState(object):
                 "admins": [],
             }
 
-        self.state = defaultdict(state_factory)
+        existing_state = self.config.load()
 
-        if filename is not None:
-            existing_state = self.config.load()
-
-            if existing_state is not None:
-                self.state.update(existing_state)
-                self.logger.info(f"Loaded game state from {filename}")
+        if not existing_state:
+            self.state = defaultdict(state_factory)
+        else:
+            self.state = defaultdict(state_factory, existing_state)
+            self.logger.info(f"Loaded game state from {state_uri}")
 
     def in_progress(self, channel):
         return self.state[channel]["step"] not in ("new_game",)
@@ -121,7 +93,6 @@ class GameState(object):
             channel_override_match = BaseCommand.channel_override_regex.match(text)
 
             if channel_override_match:
-                original_channel = channel
                 channel = channel_override_match.groupdict()["channel_override"]
 
                 text = text.replace(
@@ -132,7 +103,6 @@ class GameState(object):
             user_override_match = BaseCommand.user_override_regex.match(text)
 
             if user_override_match:
-                original_user = user
                 user = user_override_match.groupdict()["user_override"]
 
                 text = text.replace(user_override_match.groupdict()["override_cmd"], "")
@@ -170,7 +140,7 @@ class GameState(object):
                     self.logger.debug(
                         f"emojirades='{'|'.join(state['emojirade'])}' guess='{guess}' status='incorrect'"
                     )
-            except ScottFactorExceededException as e:
+            except ScottFactorExceededException:
                 self.logger.debug(
                     f"emojirade='{'|'.join(state['emojirade'])}' guess='{guess}' status='scott factor exceeded'"
                 )

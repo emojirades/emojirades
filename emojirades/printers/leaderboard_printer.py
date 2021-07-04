@@ -1,5 +1,6 @@
-import pendulum
 import logging
+
+import pendulum
 
 from emojirades.analytics.time_range import TimeRange
 from emojirades.analytics.time_unit import TimeUnit
@@ -43,7 +44,7 @@ class LeaderboardPrinter:
     def print(self):
         leaderboard = self.data
 
-        self.logger.debug(f"Printing leaderboard: {leaderboard}")
+        self.logger.debug("Printing leaderboard: %s", leaderboard)
 
         if not leaderboard:
             yield None, "Nothing to see here!"
@@ -81,7 +82,8 @@ class LeaderboardPrinter:
             last_score = score
 
             lines.append(
-                f"{index + rank_buffer:>2}. {name:<{longest_name}} [ {score:>{biggest_score}} point{'s' if score > 1 else ' '} ]"
+                f"{index + rank_buffer:>2}. {name:<{longest_name}}"
+                + f" [ {score:>{biggest_score}} point{'s' if score > 1 else ' '} ]"
             )
 
         lines.append("```")

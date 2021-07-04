@@ -1,11 +1,14 @@
 # Thanks to https://github.com/BeheadedKamikaze for his help with the algorithm
-import pendulum
 import logging
 import math
 
+from collections import defaultdict
+
+import pendulum
+
+
 from emojirades.analytics.time_range import TimeRange
 from emojirades.analytics.time_unit import TimeUnit
-from collections import defaultdict
 
 
 class LeaderBoard:
@@ -48,7 +51,7 @@ class LeaderBoard:
 
         # history is empty
         if low == high:
-            self.logger.warning(f"History is empty")
+            self.logger.warning("History is empty")
             return low
 
         # Binary search first guess with ratio to the time range of history

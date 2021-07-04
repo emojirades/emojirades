@@ -1,9 +1,7 @@
-import logging
-import time
-import os
 import traceback
+import logging
 
-from emojirades.handlers import get_workspace_directory_handler
+from emojirades.handlers import get_workspace_handler
 from emojirades.commands.registry import CommandRegistry
 from emojirades.slack.slack_client import SlackClient
 from emojirades.scorekeeper import ScoreKeeper
@@ -12,7 +10,7 @@ from emojirades.gamestate import GameState
 from emojirades.slack.event import Event
 
 
-class EmojiradesBot(object):
+class EmojiradesBot:
     DEFAULT_WORKSPACE = "_default"
 
     def __init__(self):
@@ -23,21 +21,23 @@ class EmojiradesBot(object):
 
         self.command_registry = CommandRegistry.command_patterns()
 
-    def configure_workspace(self, score_file, state_file, auth_file, workspace_id=None):
+    def configure_workspace(self, score_uri, state_uri, auth_uri, workspace_id=None):
         if workspace_id is None:
             workspace_id = EmojiradesBot.DEFAULT_WORKSPACE
 
         self.workspaces[workspace_id] = {
-            "scorekeeper": ScoreKeeper(score_file),
-            "gamestate": GameState(state_file),
-            "slack": SlackClient(auth_file, self.logger),
+            "scorekeeper": ScoreKeeper(score_uri),
+            "gamestate": GameState(state_uri),
+            "slack": SlackClient(auth_uri),
         }
 
-    def configure_workspaces(self, workspaces_dir, workspace_ids, onboarding_queue):
-        WorkspaceHandler = get_workspace_directory_handler(workspaces_dir)
-        handler = WorkspaceHandler(workspaces_dir)
+    def configure_workspaces(self, workspaces_uri, workspace_ids, onboarding_queue):
+        handler = get_workspace_handler(workspaces_uri)
 
         for workspace in handler.workspaces():
+            if workspace["workspace_id"] not in workspace_ids:
+                continue
+
             self.configure_workspace(**workspace)
 
         self.onboarding_queue = onboarding_queue
@@ -58,17 +58,20 @@ class EmojiradesBot(object):
             if Command.match(event.text, me=workspace["slack"].bot_id):
                 yield Command(event, workspace)
 
-    def decode_channel(self, channel: str, workspace: dict):
+    @staticmethod
+    def decode_channel(channel: str, workspace: dict):
         """
         Figures out the channel destination
         """
         if channel.startswith("C"):
             # Plain old channel, just return it
             return channel
-        elif channel.startswith("D"):
+
+        if channel.startswith("D"):
             # Direct message channel, just return it
             return channel
-        elif channel.startswith("U"):
+
+        if channel.startswith("U"):
             # Channel is a User ID, which means the real channel is the DM with that user
             dm_id = workspace["slack"].find_im(channel)
 
@@ -78,8 +81,8 @@ class EmojiradesBot(object):
                 )
 
             return dm_id
-        else:
-            raise NotImplementedError(f"Returned channel '{channel}' wasn't decoded")
+
+        raise NotImplementedError(f"Returned channel '{channel}' wasn't decoded")
 
     def handle_event(self, **payload):
         try:
@@ -95,7 +98,7 @@ class EmojiradesBot(object):
         elif "team" in payload["data"]["message"]:
             workspace_id = payload["data"]["message"]["team"]
         else:
-            raise RuntimeError(f"Unable to run Workspace ID in message event")
+            raise RuntimeError("Unable to run Workspace ID in message event")
 
         if workspace_id not in self.workspaces:
             workspace_id = EmojiradesBot.DEFAULT_WORKSPACE

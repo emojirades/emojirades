@@ -1,7 +1,7 @@
+import random
+
 from emojirades.wrappers import only_guessing
 from emojirades.commands import BaseCommand
-
-import random
 
 
 class CorrectGuessCommand(BaseCommand):
@@ -34,9 +34,6 @@ class CorrectGuessCommand(BaseCommand):
         "ok_hand",
         "champagne",
     ]
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
     def prepare_args(self, event):
         super().prepare_args(event)

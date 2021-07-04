@@ -1,48 +1,18 @@
 import logging
-import json
 import time
 
-from emojirades.handlers import get_configuration_handler
 from collections import defaultdict
+
+from emojirades.handlers import get_config_handler
 
 
 module_logger = logging.getLogger("EmojiradesBot.scorekeeper")
 
-leaderboard_limit = 15
-history_limit = 5
+LEADERBOARD_LIMIT = 15
+HISTORY_LIMIT = 5
 
 
-def get_handler(filename):
-    class ScoreKeeperConfigHandler(get_configuration_handler(filename)):
-        """
-        Handles CRUD for the ScoreKeeper configuration file
-        """
-
-        FILE_ENCODING = "utf-8"
-
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-
-        def load(self):
-            bytes_content = super().load()
-
-            if bytes_content is None or not bytes_content:
-                return None
-
-            conf = json.loads(bytes_content.decode(self.FILE_ENCODING))
-
-            for channel, channel_conf in conf.items():
-                channel_conf["scores"] = defaultdict(int, channel_conf["scores"])
-
-            return conf
-
-        def save(self, scoreboard):
-            super().save(json.dumps(scoreboard).encode(self.FILE_ENCODING))
-
-    return ScoreKeeperConfigHandler(filename)
-
-
-class ScoreKeeper(object):
+class ScoreKeeper:
     """
     self.scoreboard = {
        "channel_a": {
@@ -65,7 +35,8 @@ class ScoreKeeper(object):
     }
     """
 
-    def __init__(self, filename=None):
+    def __init__(self, score_uri):
+        self.config = get_config_handler(score_uri)
         self.logger = logging.getLogger("EmojiradesBot.scorekeeper.ScoreKeeper")
 
         def scoreboard_factory():
@@ -74,17 +45,19 @@ class ScoreKeeper(object):
                 "history": [],
             }
 
-        self.scoreboard = defaultdict(scoreboard_factory)
+        existing_state = self.config.load()
+
+        if not existing_state:
+            self.scoreboard = defaultdict(scoreboard_factory)
+        else:
+            self.scoreboard = defaultdict(scoreboard_factory, existing_state)
+
+            for config in self.scoreboard.values():
+                config["scores"] = defaultdict(int, config["scores"])
+
+            self.logger.info(f"Loaded scores from {score_uri}")
+
         self.command_history = []
-
-        self.config = get_handler(filename)
-
-        if filename is not None:
-            existing_state = self.config.load()
-
-            if existing_state is not None:
-                self.scoreboard = defaultdict(scoreboard_factory, existing_state)
-                self.logger.info(f"Loaded scores from {filename}")
 
     def current_score(self, channel, user):
         leaderboard = list(
@@ -126,17 +99,18 @@ class ScoreKeeper(object):
         self.save()
         return self.current_score(channel, user)
 
-    def history_template(self, user, operation):
+    @staticmethod
+    def history_template(user, operation):
         return {"operation": operation, "timestamp": time.time(), "user_id": user}
 
-    def leaderboard(self, channel, limit=leaderboard_limit):
+    def leaderboard(self, channel, limit=LEADERBOARD_LIMIT):
         return sorted(
             self.scoreboard[channel]["scores"].items(),
             key=lambda i: (i[1], i[0]),
             reverse=True,
         )[:limit]
 
-    def history(self, channel, limit=history_limit):
+    def history(self, channel, limit=HISTORY_LIMIT):
         return self.raw_history(channel)[-limit:][::-1]
 
     def raw_history(self, channel):

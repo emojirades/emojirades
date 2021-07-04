@@ -11,12 +11,6 @@ class FixWinnerCommand(BaseCommand):
         ("<@{me}> fixwinner @other-person", "Award the win to someone else"),
     ]
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def prepare_args(self, event):
-        super().prepare_args(event)
-
     @admin_or_old_winner_check
     @only_not_in_progress
     def execute(self):

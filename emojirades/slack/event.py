@@ -14,12 +14,14 @@ class Event:
     def player_id(self):
         if "user" in self.data:
             return self.data["user"]
-        elif self.data.get("message", {}).get("user"):
+
+        if self.data.get("message", {}).get("user"):
             return self.data["message"]["user"]
-        elif "bot_id" in self.data:
+
+        if "bot_id" in self.data:
             return self.__get_bot_user_id()
-        else:
-            raise InvalidEvent("Can't find user id or bot id")
+
+        raise InvalidEvent("Can't find user id or bot id")
 
     @property
     def text(self):

@@ -11,9 +11,6 @@ class SetCommand(BaseCommand):
         ("@user set 123", "Set a users score"),
     ]
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
     def prepare_args(self, event):
         super().prepare_args(event)
 
@@ -26,7 +23,7 @@ class SetCommand(BaseCommand):
         target_user = self.args["target_user"]
         new_score = self.args["new_score"]
 
-        self.logger.debug(f"Setting {target_user} score to: {new_score}")
+        self.logger.debug("Setting %s score to: %s", target_user, new_score)
         self.scorekeeper.overwrite(self.args["channel"], target_user, new_score)
 
         yield (

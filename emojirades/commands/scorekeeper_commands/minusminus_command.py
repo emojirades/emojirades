@@ -11,12 +11,6 @@ class MinusMinusCommand(BaseCommand):
         ("@user --", "Decrement users score"),
     ]
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def prepare_args(self, event):
-        super().prepare_args(event)
-
     @admin_check
     def execute(self):
         yield from super().execute()

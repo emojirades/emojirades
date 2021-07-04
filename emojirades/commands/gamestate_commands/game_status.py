@@ -1,5 +1,4 @@
 from emojirades.commands import BaseCommand
-from emojirades.wrappers import admin_check
 
 
 class GameStatusCommand(BaseCommand):
@@ -15,9 +14,6 @@ class GameStatusCommand(BaseCommand):
         super().__init__(*args, **kwargs)
 
         self.masked_emojirade = True
-
-    def prepare_args(self, event):
-        super().prepare_args(event)
 
     def execute(self):
         yield from super().execute()
@@ -36,7 +32,7 @@ class GameStatusCommand(BaseCommand):
 
         # First item is game state (step)
         step_msg = {
-            "new_game": f"Game has not started yet, please wait for an admin to start it!",
+            "new_game": "Game has not started yet, please wait for an admin to start it!",
             "waiting": f"Waiting for <@{args['old_winner']}> to provide a 'rade to {args['winner_name']}",
             "provided": f"Waiting for <@{args['winner']}> to post an emoji to kick off the round!",
             "guessing": f"Come on, everyone's guessing what {args['winner_name']} has posted! Get to it! :runner::dash:",

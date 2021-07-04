@@ -89,9 +89,9 @@ class EmojiradeBotTester(unittest.TestCase):
 
         self.bot = EmojiradesBot()
         self.bot.configure_workspace(
-            self.scorefile.name,
-            self.statefile.name,
-            self.authfile.name,
+            f"file://{self.scorefile.name}",
+            f"file://{self.statefile.name}",
+            f"file://{self.authfile.name}",
         )
 
         workspace_id = self.bot.DEFAULT_WORKSPACE
@@ -241,7 +241,7 @@ class EmojiradeBotTester(unittest.TestCase):
             },
         }
 
-        class Foo(object):
+        class Foo:
             pass
 
         events = Foo()

@@ -18,15 +18,15 @@ if __name__ == "__main__":
 
     # Single Workspace
     parser_single = subparsers.add_parser("single", help="Single Workspace")
-    parser_single.add_argument("--score-file", help="JSON file we use to persist scores", required=True)
-    parser_single.add_argument("--state-file", help="JSON file we use to persist game state", required=True)
-    parser_single.add_argument("--auth-file", help="JSON file we use to store auth config", required=True)
+    parser_single.add_argument("--score-uri", help="JSON file we use to persist scores", required=True)
+    parser_single.add_argument("--state-uri", help="JSON file we use to persist game state", required=True)
+    parser_single.add_argument("--auth-uri", help="JSON file we use to store auth config", required=True)
 
     # Multiple Workspaces
     parser_multiple = subparsers.add_parser("multiple", help="Multiple Workspaces")
-    parser_multiple.add_argument("--workspaces-dir", help="Folder path we persist workspaces to", required=True)
+    parser_multiple.add_argument("--workspaces-uri", help="Folder path we persist workspaces to", required=True)
     parser_multiple.add_argument("--workspace-id", dest="workspace_ids", action="append", help="Specific workspace IDs")
-    parser_multiple.add_argument("--onboarding-queue", help="SQS queue containing new workspaces to onboard", required=False)
+    parser_multiple.add_argument("--onboarding-queue", help="SQS queue containing new workspaces to onboard")
 
     args = parser.parse_args()
 
@@ -48,10 +48,10 @@ if __name__ == "__main__":
     # Configure the bot mode
     if args.mode == "single":
         logger.debug("Configurating for Single Workspace mode")
-        bot.configure_workspace(args.score_file, args.state_file, args.auth_file)
+        bot.configure_workspace(args.score_uri, args.state_uri, args.auth_uri)
     elif args.mode == "multiple":
         logger.debug("Configurating for Multiple Workspace mode")
-        bot.configure_workspaces(args.workspaces_dir, args.workspace_ids, args.onboarding_queue)
+        bot.configure_workspaces(args.workspaces_uri, args.workspace_ids, args.onboarding_queue)
     else:
         parser.error("Unknown mode")
 
