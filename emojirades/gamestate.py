@@ -148,7 +148,7 @@ class GameState(object):
         ):
             self.winner_posted(channel)
 
-        # If a user has edited their message, don't check if for a guess
+        # If a user has edited an old (>30s) message, ignore it
         elif event.is_edit and not event.is_recent_edit:
             pass
 
