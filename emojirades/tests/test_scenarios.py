@@ -585,5 +585,5 @@ class TestBotScenarios(EmojiradeBotTester):
             }
         )
 
-        # Edit event should trigger the transition
+        # Edit event should not trigger the transition
         assert self.state["step"] == "guessing"
