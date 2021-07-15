@@ -43,7 +43,7 @@ class Event:
 
     @property
     def is_recent_edit(self):
-        """ Recent is defined as 30 seconds """
+        """Recent is defined as 30 seconds"""
         if not self.is_edit:
             return False
 

@@ -509,34 +509,36 @@ class TestBotScenarios(EmojiradeBotTester):
         edit_ts = "1000000020.000000"
 
         # 'edit' event
-        self.send_event({
-            "subtype": "message_changed",
-            "hidden": True,
-            "message": {
-                "type": "message",
-                "text": self.events.correct_guess["text"],
-                "user": self.events.correct_guess["user"],
-                "team": self.events.correct_guess["team"],
-                "edited": {
+        self.send_event(
+            {
+                "subtype": "message_changed",
+                "hidden": True,
+                "message": {
+                    "type": "message",
+                    "text": self.events.correct_guess["text"],
                     "user": self.events.correct_guess["user"],
+                    "team": self.events.correct_guess["team"],
+                    "edited": {
+                        "user": self.events.correct_guess["user"],
+                        "ts": edit_ts,
+                    },
                     "ts": edit_ts,
+                    "source_team": self.events.correct_guess["team"],
+                    "user_team": self.events.correct_guess["team"],
                 },
+                "channel": self.events.base["channel"],
+                "previous_message": {
+                    "type": "message",
+                    "text": self.events.incorrect_guess["text"],
+                    "user": self.events.incorrect_guess["user"],
+                    "ts": self.events.incorrect_guess["ts"],
+                    "team": self.events.incorrect_guess["team"],
+                },
+                "event_ts": edit_ts,
                 "ts": edit_ts,
-                "source_team": self.events.correct_guess["team"],
-                "user_team": self.events.correct_guess["team"],
-            },
-            "channel": self.events.base["channel"],
-            "previous_message": {
-                "type": "message",
-                "text": self.events.incorrect_guess["text"],
-                "user": self.events.incorrect_guess["user"],
-                "ts": self.events.incorrect_guess["ts"],
-                "team": self.events.incorrect_guess["team"],
-            },
-            "event_ts": edit_ts,
-            "ts": edit_ts,
-            "text": self.events.correct_guess["text"],
-        })
+                "text": self.events.correct_guess["text"],
+            }
+        )
 
         # Edit event should trigger the transition
         assert self.state["step"] == "waiting"
@@ -552,34 +554,36 @@ class TestBotScenarios(EmojiradeBotTester):
         edit_ts = "1000000040.000000"
 
         # 'edit' event
-        self.send_event({
-            "subtype": "message_changed",
-            "hidden": True,
-            "message": {
-                "type": "message",
-                "text": self.events.correct_guess["text"],
-                "user": self.events.correct_guess["user"],
-                "team": self.events.correct_guess["team"],
-                "edited": {
+        self.send_event(
+            {
+                "subtype": "message_changed",
+                "hidden": True,
+                "message": {
+                    "type": "message",
+                    "text": self.events.correct_guess["text"],
                     "user": self.events.correct_guess["user"],
+                    "team": self.events.correct_guess["team"],
+                    "edited": {
+                        "user": self.events.correct_guess["user"],
+                        "ts": edit_ts,
+                    },
                     "ts": edit_ts,
+                    "source_team": self.events.correct_guess["team"],
+                    "user_team": self.events.correct_guess["team"],
                 },
+                "channel": self.events.base["channel"],
+                "previous_message": {
+                    "type": "message",
+                    "text": self.events.incorrect_guess["text"],
+                    "user": self.events.incorrect_guess["user"],
+                    "ts": self.events.incorrect_guess["ts"],
+                    "team": self.events.incorrect_guess["team"],
+                },
+                "event_ts": edit_ts,
                 "ts": edit_ts,
-                "source_team": self.events.correct_guess["team"],
-                "user_team": self.events.correct_guess["team"],
-            },
-            "channel": self.events.base["channel"],
-            "previous_message": {
-                "type": "message",
-                "text": self.events.incorrect_guess["text"],
-                "user": self.events.incorrect_guess["user"],
-                "ts": self.events.incorrect_guess["ts"],
-                "team": self.events.incorrect_guess["team"],
-            },
-            "event_ts": edit_ts,
-            "ts": edit_ts,
-            "text": self.events.correct_guess["text"],
-        })
+                "text": self.events.correct_guess["text"],
+            }
+        )
 
         # Edit event should trigger the transition
         assert self.state["step"] == "guessing"
