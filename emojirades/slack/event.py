@@ -35,7 +35,7 @@ class Event:
 
     @property
     def ts(self):
-        return float(self.data["ts"])
+        return self.data["ts"]
 
     @property
     def is_edit(self):
@@ -47,9 +47,10 @@ class Event:
         if not self.is_edit:
             return False
 
+        current_ts = float(self.ts)
         previous_ts = float(self.data["previous_message"]["ts"])
 
-        if self.ts - previous_ts <= 30:
+        if (current_ts - previous_ts) <= 30:
             return True
 
         return False
