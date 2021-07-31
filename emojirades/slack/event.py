@@ -41,6 +41,20 @@ class Event:
     def is_edit(self):
         return self.data.get("subtype", "") == "message_changed"
 
+    @property
+    def is_recent_edit(self):
+        """Recent is defined as 30 seconds"""
+        if not self.is_edit:
+            return False
+
+        current_ts = float(self.ts)
+        previous_ts = float(self.data["previous_message"]["ts"])
+
+        if (current_ts - previous_ts) <= 30:
+            return True
+
+        return False
+
     def __get_bot_user_id(self):
         return self.slack_client.bot_info(self.data["bot_id"])["user_id"]
 

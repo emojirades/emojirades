@@ -497,3 +497,93 @@ class TestBotScenarios(EmojiradeBotTester):
         assert expected_reaction[0] == self.reactions[1][0]
         assert expected_reaction[1].match(self.reactions[1][1])
         assert expected_reaction[2] == self.reactions[1][2]
+
+    def test_recent_edit_works(self):
+        """Checks that a recent edit is counted as a guess"""
+        self.reset_and_transition_to("guessing")
+
+        self.send_event(self.events.incorrect_guess)
+        assert self.state["step"] == "guessing"
+
+        # This is ~20s 'after' the standard events
+        edit_ts = "1000000020.000000"
+
+        # 'edit' event
+        self.send_event(
+            {
+                "subtype": "message_changed",
+                "hidden": True,
+                "message": {
+                    "type": "message",
+                    "text": self.events.correct_guess["text"],
+                    "user": self.events.correct_guess["user"],
+                    "team": self.events.correct_guess["team"],
+                    "edited": {
+                        "user": self.events.correct_guess["user"],
+                        "ts": edit_ts,
+                    },
+                    "ts": edit_ts,
+                    "source_team": self.events.correct_guess["team"],
+                    "user_team": self.events.correct_guess["team"],
+                },
+                "channel": self.events.base["channel"],
+                "previous_message": {
+                    "type": "message",
+                    "text": self.events.incorrect_guess["text"],
+                    "user": self.events.incorrect_guess["user"],
+                    "ts": self.events.incorrect_guess["ts"],
+                    "team": self.events.incorrect_guess["team"],
+                },
+                "event_ts": edit_ts,
+                "ts": edit_ts,
+                "text": self.events.correct_guess["text"],
+            }
+        )
+
+        # Edit event should trigger the transition
+        assert self.state["step"] == "waiting"
+
+    def test_recent_edit_fails(self):
+        """Checks that a non-recent edit is ignored as a guess"""
+        self.reset_and_transition_to("guessing")
+
+        self.send_event(self.events.incorrect_guess)
+        assert self.state["step"] == "guessing"
+
+        # This is ~40s 'after' the standard events
+        edit_ts = "1000000040.000000"
+
+        # 'edit' event
+        self.send_event(
+            {
+                "subtype": "message_changed",
+                "hidden": True,
+                "message": {
+                    "type": "message",
+                    "text": self.events.correct_guess["text"],
+                    "user": self.events.correct_guess["user"],
+                    "team": self.events.correct_guess["team"],
+                    "edited": {
+                        "user": self.events.correct_guess["user"],
+                        "ts": edit_ts,
+                    },
+                    "ts": edit_ts,
+                    "source_team": self.events.correct_guess["team"],
+                    "user_team": self.events.correct_guess["team"],
+                },
+                "channel": self.events.base["channel"],
+                "previous_message": {
+                    "type": "message",
+                    "text": self.events.incorrect_guess["text"],
+                    "user": self.events.incorrect_guess["user"],
+                    "ts": self.events.incorrect_guess["ts"],
+                    "team": self.events.incorrect_guess["team"],
+                },
+                "event_ts": edit_ts,
+                "ts": edit_ts,
+                "text": self.events.correct_guess["text"],
+            }
+        )
+
+        # Edit event should not trigger the transition
+        assert self.state["step"] == "guessing"
