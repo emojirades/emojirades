@@ -1,2 +1,0 @@
-from emojirades.handlers.workspace import get_workspace_handler
-from emojirades.handlers.configuration import get_config_handler

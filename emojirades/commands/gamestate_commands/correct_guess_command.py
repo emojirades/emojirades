@@ -55,22 +55,23 @@ class CorrectGuessCommand(BaseCommand):
     def execute(self):
         yield from super().execute()
 
-        state = self.gamestate.state[self.args["channel"]]
+        channel = self.args["channel"]
+        (previous_winner, current_winner) = self.gamestate.winners(channel)
 
         if not self.args["inferred"]:
-            if self.args["target_user"] in (state["old_winner"], state["winner"]):
-                yield (None, "You're not allowed to award current players the win >.>")
-                return
-
-            if self.args["user"] != state["winner"]:
+            if self.args["user"] != current_winner:
                 yield (
                     None,
                     "You're not the current winner, stop awarding other people the win >.>",
                 )
                 return
 
+            if self.args["target_user"] in (previous_winner, current_winner):
+                yield (None, "You're not allowed to award current players the win >.>")
+                return
+
         # Save a copy of the emojirade, as below clears it
-        raw_emojirades = [i.replace("`", "") for i in state["emojirade"]]
+        raw_emojirades = [i.replace("`", "") for i in self.gamestate.get_xyz(channel, "emojirade")]
         first_emojirade = raw_emojirades.pop(0)
 
         if raw_emojirades:
@@ -80,10 +81,13 @@ class CorrectGuessCommand(BaseCommand):
         else:
             alternatives = ""
 
-        self.gamestate.correct_guess(self.args["channel"], self.args["target_user"])
+        self.gamestate.correct_guess(channel, self.args["target_user"])
         score, position = self.scorekeeper.plusplus(
-            self.args["channel"], self.args["target_user"]
+            channel, self.args["target_user"]
         )
+
+        # Fetch these again as correct_guess will have rotated them
+        (previous_winner, current_winner) = self.gamestate.winners(channel)
 
         if self.args["inferred"]:
             yield (
@@ -102,25 +106,25 @@ class CorrectGuessCommand(BaseCommand):
         )
         emoji_text = f" :{emoji}:"
 
-        if state.get("first_guess", False):
+        if self.gamestate.handler.is_first_guess:
             yield (
                 None,
                 "Holy bejesus Batman :bat::man:, they guessed it in one go! :clap:",
             )
 
         if self.args["inferred"]:
-            yield (None, f"<@{state['winner']}>++")
+            yield (None, f"<@{current_winner}>++")
 
         # Build the score message
         if score in self.custom_messages:
-            prefix = self.custom_messages[score].format(winnder=state["winner"])
+            prefix = self.custom_messages[score].format(winnder=current_winner)
         elif score % 50 == 0:
             prefix = (
-                f"Another day, another 50 point milestone for <@{state['winner']}> "
+                f"Another day, another 50 point milestone for <@{current_winner}> "
                 ":chart_with_upwards_trend:"
             )
         else:
-            prefix = f"Congrats <@{state['winner']}>"
+            prefix = f"Congrats <@{current_winner}>"
 
         yield (
             None,
@@ -130,11 +134,11 @@ class CorrectGuessCommand(BaseCommand):
         yield (None, f"The correct emojirade was `{first_emojirade}`{alternatives}")
 
         yield (
-            state["old_winner"],
-            f"You'll now need to send me the new 'rade for <@{state['winner']}>",
+            previous_winner,
+            f"You'll now need to send me the new 'rade for <@{current_winner}>",
         )
         yield (
-            state["old_winner"],
+            previous_winner,
             "Please reply back in the format `emojirade Point Break` "
             "if `Point Break` was the new 'rade",
         )

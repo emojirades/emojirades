@@ -78,8 +78,6 @@ class EmojiradeBotTester(unittest.TestCase):
 
         self.config, self.events = self.prepare_event_data()
 
-        self.scorefile = tempfile.NamedTemporaryFile()
-        self.statefile = tempfile.NamedTemporaryFile()
         self.authfile = tempfile.NamedTemporaryFile()
 
         auth_config = {"bot_access_token": "xoxb-000000000000-aaaaaaaaaaaaaaaaaaaaaaaa"}
@@ -87,26 +85,26 @@ class EmojiradeBotTester(unittest.TestCase):
         self.authfile.write(json.dumps(auth_config).encode("utf-8"))
         self.authfile.seek(0)
 
-        self.bot = EmojiradesBot()
-        self.bot.configure_workspace(
-            f"file://{self.scorefile.name}",
-            f"file://{self.statefile.name}",
-            f"file://{self.authfile.name}",
-        )
+        self.db_uri = "sqlite+pysqlite:///:memory:"
+        self.auth_uri = f"file://{self.authfile.name}"
 
-        workspace_id = self.bot.DEFAULT_WORKSPACE
+        workspace_id = "T12345678"
+
+        self.bot = EmojiradesBot()
+        self.bot.configure_workspace(self.db_uri, self.auth_uri, workspace_id=workspace_id)
+
         self.workspace = self.bot.workspaces[workspace_id]
 
         self.workspace["slack"].bot_id = self.config.bot_id
+        self.workspace["slack"].workspace_id = workspace_id
         self.workspace["slack"].find_im = self.find_im
         self.workspace["slack"].pretty_name = self.pretty_name
 
-        self.state = self.workspace["gamestate"].state[self.config.channel]
-        self.scoreboard = self.workspace["scorekeeper"].scoreboard[self.config.channel]
+        self.gamestate = self.workspace["gamestate"]
+        self.scorekeeper = self.workspace["scorekeeper"]
 
     def tearDown(self):
-        self.scorefile.close()
-        self.statefile.close()
+        self.authfile.close()
 
     @staticmethod
     def prepare_event_data():

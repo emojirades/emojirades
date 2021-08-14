@@ -11,18 +11,18 @@ from emojirades.analytics.time_range import TimeRange
 from emojirades.analytics.time_unit import TimeUnit
 
 
-class LeaderBoard:
+class ScoreboardAnalytics:
 
     NOT_FOUND = -1
 
     def __init__(self, history):
         self.history = history
         self.len = len(history)
-        self.logger = logging.getLogger("EmojiradesBot.analytics.LeaderBoard")
+
+        self.logger = logging.getLogger("EmojiradesBot.analytics.ScoreboardAnalytics")
 
     def find_rows_in_range(self, start_time: float, end_time: float) -> int:
         """
-
         :param start_time: timestamp of the start of the date range
         :param end_time: timestamp of the end of the date range
         :return: index of matched event in history
@@ -39,11 +39,11 @@ class LeaderBoard:
         low = 0
         high = self.len - 1
 
-        first_time = self.history[low]["timestamp"]
-        last_time = self.history[high]["timestamp"]
+        first_time = self.history[low][1]
+        last_time = self.history[high][1]
 
         self.logger.debug("Starting binary search")
-        # Out of range
+
         if end_time < first_time or start_time > last_time:
             self.logger.warning(
                 "Date is out of range earliest=%s latest=%s start_time=%s end_time=%s",
@@ -54,7 +54,7 @@ class LeaderBoard:
             )
             return self.NOT_FOUND
 
-        # history is empty
+        # History is empty
         if low == high:
             self.logger.warning("History is empty")
             return low
@@ -70,9 +70,9 @@ class LeaderBoard:
 
         # Fine tune guess relative to the date range
         while low <= high and low <= guess <= high:
-            if self.history[guess]["timestamp"] < start_time:
+            if self.history[guess][1] < start_time:
                 low = guess + 1
-            elif self.history[guess]["timestamp"] > end_time:
+            elif self.history[guess][1] > end_time:
                 high = guess - 1
             else:
                 return guess
@@ -81,12 +81,11 @@ class LeaderBoard:
             guess = math.floor((high - low) / 2 + low)
             # pylint: enable=c-extension-no-member
 
-        # if somehow still find nothing
+        # If somehow still find nothing
         return self.NOT_FOUND
 
     def get_data(self, start_time: float, end_time: float) -> list:
         """
-
         :param start_time: timestamp of the start of the date range
         :param end_time: timestamp of the end of the date range
         :return: a list of events
@@ -104,16 +103,16 @@ class LeaderBoard:
 
         results.append(self.history[affected_row_index])
 
-        # get events from start_time to checkpoint
+        # Get events from start_time to checkpoint
         cursor = affected_row_index - 1
-        while cursor >= 0 and self.history[cursor]["timestamp"] >= start_time:
+        while cursor >= 0 and self.history[cursor][1] >= start_time:
             results.insert(0, self.history[cursor])
             cursor -= 1
 
-        # get events from checkpoint to end_time
+        # Get events from checkpoint to end_time
         cursor = affected_row_index + 1
         while (
-            cursor <= (self.len - 1) and self.history[cursor]["timestamp"] <= end_time
+            cursor <= (self.len - 1) and self.history[cursor][1] <= end_time
         ):
             results.append(self.history[cursor])
             cursor += 1
@@ -124,21 +123,23 @@ class LeaderBoard:
 
     @staticmethod
     def calculate_score(history):
-        leaderboard = defaultdict(int)
+        scoreboard = defaultdict(int)
 
         for item in history:
-            if item["operation"] == "++":
+            operation, _, _ = item[2].split(",")
+
+            if operation == "++":
                 val = 1
-            elif item["operation"] == "--":
+            elif operation == "--":
                 val = -1
             else:
                 continue
 
-            leaderboard[item["user_id"]] += val
+            scoreboard[item[0]] += val
 
         return [
-            (u, leaderboard[u])
-            for u in sorted(leaderboard, key=leaderboard.get, reverse=True)
+            (u, scoreboard[u])
+            for u in sorted(scoreboard, key=scoreboard.get, reverse=True)
         ]
 
     def get_by_range(self, of_date: pendulum.DateTime, time_unit: TimeUnit):

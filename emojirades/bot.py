@@ -1,18 +1,16 @@
 import traceback
 import logging
 
-from emojirades.handlers import get_workspace_handler
+from emojirades.persistence import get_session, get_workspace_handler
 from emojirades.commands.registry import CommandRegistry
 from emojirades.slack.slack_client import SlackClient
-from emojirades.scorekeeper import ScoreKeeper
+from emojirades.scorekeeper import Scorekeeper
 from emojirades.commands import BaseCommand
-from emojirades.gamestate import GameState
+from emojirades.gamestate import Gamestate
 from emojirades.slack.event import Event
 
 
 class EmojiradesBot:
-    DEFAULT_WORKSPACE = "_default"
-
     def __init__(self):
         self.logger = logging.getLogger("Emojirades.Bot")
 
@@ -21,21 +19,25 @@ class EmojiradesBot:
 
         self.command_registry = CommandRegistry.command_patterns()
 
-    def configure_workspace(self, score_uri, state_uri, auth_uri, workspace_id=None):
+    def configure_workspace(self, db_uri, auth_uri, workspace_id=None):
+        slack = SlackClient(auth_uri)
+
         if workspace_id is None:
-            workspace_id = EmojiradesBot.DEFAULT_WORKSPACE
+            workspace_id = slack.workspace_id
+
+        session = get_session(db_uri)
 
         self.workspaces[workspace_id] = {
-            "scorekeeper": ScoreKeeper(score_uri),
-            "gamestate": GameState(state_uri),
-            "slack": SlackClient(auth_uri),
+            "scorekeeper": Scorekeeper(session, workspace_id),
+            "gamestate": Gamestate(session, workspace_id),
+            "slack": slack,
         }
 
     def configure_workspaces(self, workspaces_uri, workspace_ids, onboarding_queue):
         handler = get_workspace_handler(workspaces_uri)
 
         for workspace in handler.workspaces():
-            if workspace["workspace_id"] not in workspace_ids:
+            if workspace_ids and workspace["workspace_id"] not in workspace_ids:
                 continue
 
             self.configure_workspace(**workspace)
@@ -106,7 +108,7 @@ class EmojiradesBot:
             raise RuntimeError("Unable to run Workspace ID in message event")
 
         if workspace_id not in self.workspaces:
-            workspace_id = EmojiradesBot.DEFAULT_WORKSPACE
+            raise RuntimeError(f"Unknown workspace_id {workspace_id}?")
 
         workspace = self.workspaces[workspace_id]
 

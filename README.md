@@ -47,7 +47,7 @@ Here we provide a local folder of workspaces and an optional set of workspace id
 
 Here we provide an S3 path of workspaces and an optional set of workspace ids (will load all in folder by default):
 
-`emojirades multiple --workspaces-dir s3://bucket/path/to/workspaces [--workspace-id A1B2C3D4E]`
+`emojirade multiple --workspaces-dir s3://bucket/path/to/workspaces [--workspace-id A1B2C3D4E]`
 
 Here we provide an S3 path of workspaces and an AWS SQS queue to listen to for new workspaces:
 

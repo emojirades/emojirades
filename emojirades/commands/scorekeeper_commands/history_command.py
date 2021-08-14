@@ -1,3 +1,5 @@
+import datetime
+
 from emojirades.commands import BaseCommand
 
 
@@ -26,12 +28,16 @@ class HistoryCommand(BaseCommand):
 
         self.logger.debug("Printing history: %s", history)
 
-        history_log = [
-            f"{index}. {self.slack.pretty_name(event['user_id'])} > '{event['operation']}'"
-            for index, event in enumerate(history, start=1)
-        ]
-        last_message = [
-            "This is an in-memory log and only up-to-date from the last bot restart."
-        ]
+        now = datetime.datetime.utcnow()
 
-        yield (None, "\n".join(history_log + last_message))
+        history_log = []
+
+        for (user_id, timestamp, operation) in history:
+            ago = (now - timestamp).seconds
+            name = self.slack.pretty_name(user_id)
+            command, prev, curr = operation.split(",")
+
+            line = f"{ago:>4}s ago: {name}: {command} {prev} => {curr}"
+            history_log.append(line)
+
+        yield (None, "\n".join(history_log))

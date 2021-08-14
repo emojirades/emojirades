@@ -4,13 +4,13 @@ from expiringdict import ExpiringDict
 
 import slack
 
-from emojirades.handlers import get_config_handler
+from emojirades.persistence import get_auth_handler
 
 
 class SlackClient:
     # pylint: disable=too-many-instance-attributes
     def __init__(self, auth_uri):
-        self.config = get_config_handler(auth_uri).load()
+        self.config = get_auth_handler(auth_uri).load()
         self.logger = logging.getLogger("EmojiradesBot.slack.SlackClient")
 
         # pylint: disable=no-member
@@ -29,7 +29,11 @@ class SlackClient:
             max_len=100, max_age_seconds=172800
         )  # 2 days
 
-        self.bot_id = self.webclient.auth_test()["user_id"]
+        response = self.webclient.auth_test()
+
+        self.bot_id = response["user_id"]
+        self.workspace_id = response["team_id"]
+
         self.bot_name = self.user_info(self.bot_id)["real_name"]
 
     def start(self):

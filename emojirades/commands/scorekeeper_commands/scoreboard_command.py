@@ -2,13 +2,13 @@ import os
 
 import pendulum
 
-from emojirades.analytics.leaderboard import LeaderBoard
+from emojirades.printers.scoreboard import ScoreboardPrinter
+from emojirades.analytics.scoreboard import ScoreboardAnalytics
 from emojirades.analytics.time_unit import TimeUnit
 from emojirades.commands import BaseCommand
-from emojirades.printers.leaderboard_printer import LeaderboardPrinter
 
 
-class LeaderboardCommand(BaseCommand):
+class ScoreboardCommand(BaseCommand):
 
     TZ = "Australia/Melbourne"
     description = "Shows all the users scores"
@@ -51,17 +51,17 @@ class LeaderboardCommand(BaseCommand):
         else:
             self.time_units = (TimeUnit(self.args.get("range", TimeUnit.WEEKLY.value)),)
 
-    def get_leaderboard(self, time_unit: TimeUnit):
+    def get_scoreboard(self, time_unit: TimeUnit):
         """
-        Given a time unit and a date, return the appropriate leaderboard
+        Given a time unit and a date, return the appropriate scoreboard
         """
-        self.logger.debug("Getting a %s leaderboard", time_unit)
+        self.logger.debug("Getting a %s scoreboard", time_unit)
 
         if time_unit == TimeUnit.ALL_TIME:
-            return self.scorekeeper.leaderboard(self.args["channel"]), None
+            return self.scorekeeper.scoreboard(self.args["channel"]), None
 
-        all_history = self.scorekeeper.raw_history(self.args["channel"])
-        leader_board = LeaderBoard(all_history)
+        history = self.scorekeeper.history_all(self.args["channel"])
+        scoreboard = ScoreboardAnalytics(history)
 
         mock_date = os.environ.get("EMOJIRADE_MOCK_DATE")
 
@@ -74,18 +74,18 @@ class LeaderboardCommand(BaseCommand):
                 date = pendulum.now(tz=self.TZ).strftime("%Y%m%d")
 
         parsed_date = pendulum.from_format(date, "YYYYMMDD", tz=self.TZ)
-        self.logger.debug("Leaderboard date was set to: {parsed_date}")
+        self.logger.debug("Scoreboard date was set to: {parsed_date}")
 
-        return (leader_board.get(parsed_date, time_unit), parsed_date)
+        return (scoreboard.get(parsed_date, time_unit), parsed_date)
 
     def execute(self):
         yield from super().execute()
 
         for time_unit in self.time_units:
-            leaderboard, parsed_date = self.get_leaderboard(time_unit)
+            scoreboard, parsed_date = self.get_scoreboard(time_unit)
 
-            leaderboard_printer = LeaderboardPrinter(
-                leaderboard, self.slack, time_unit, parsed_date
+            printer = ScoreboardPrinter(
+                scoreboard, self.slack, time_unit, parsed_date
             )
 
-            yield from leaderboard_printer.print()
+            yield from printer.print()

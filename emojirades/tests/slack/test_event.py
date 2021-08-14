@@ -8,7 +8,6 @@ from emojirades.tests.FileFixture import FileFixture
 
 
 class TestEvent:
-
     mock_slack_client = Mock()
     mock_slack_client.bot_info = MagicMock(
         return_value={

@@ -14,8 +14,8 @@ from emojirades.commands.gamestate_commands.set_admin_command import SetAdminCom
 from emojirades.commands.gamestate_commands.newgame_command import NewGameCommand
 from emojirades.commands.gamestate_commands.game_status import GameStatusCommand
 
-from emojirades.commands.scorekeeper_commands.leaderboard_command import (
-    LeaderboardCommand,
+from emojirades.commands.scorekeeper_commands.scoreboard_command import (
+    ScoreboardCommand,
 )
 from emojirades.commands.scorekeeper_commands.minusminus_command import (
     MinusMinusCommand,
@@ -34,7 +34,7 @@ class CommandRegistry:
         SetAdminCommand,
         NewGameCommand,
         GameStatusCommand,
-        LeaderboardCommand,
+        ScoreboardCommand,
         MinusMinusCommand,
         HistoryCommand,
         SetCommand,

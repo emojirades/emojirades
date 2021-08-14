@@ -19,20 +19,20 @@ class FixWinnerCommand(BaseCommand):
     def execute(self):
         yield from super().execute()
 
-        if (
-            self.args["winner"]
-            == self.gamestate.state[self.args["channel"]]["old_winner"]
-        ):
+        channel = self.args["channel"]
+        new_winner = self.args["winner"]
+
+        (previous_winner, current_winner) = self.gamestate.winners(channel)
+
+        if new_winner == previous_winner:
             yield (None, ":face_palm: You can't award yourself the win")
             return
 
-        if self.args["winner"] == self.gamestate.state[self.args["channel"]]["winner"]:
+        if new_winner == current_winner:
             yield (None, "This won't actually do anything? :shrug::face_with_monocle:")
             return
 
-        loser, winner = self.gamestate.fixwinner(
-            self.args["channel"], self.args["winner"]
-        )
+        loser, winner = self.gamestate.fixwinner(channel, new_winner)
 
         if loser is None or winner is None:
             yield (
@@ -42,10 +42,10 @@ class FixWinnerCommand(BaseCommand):
             return
 
         yield (None, f"<@{loser}>--")
-        self.scorekeeper.minusminus(self.args["channel"], loser)
+        self.scorekeeper.minusminus(channel, loser)
 
         yield (None, f"<@{winner}>++")
-        self.scorekeeper.plusplus(self.args["channel"], winner)
+        self.scorekeeper.plusplus(channel, winner)
 
         yield (
             None,

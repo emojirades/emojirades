@@ -1,5 +1,7 @@
 from emojirades.commands import BaseCommand
 
+from emojirades.persistence import GamestateStep
+
 
 class GameStatusCommand(BaseCommand):
     description = "Prints out the game status"
@@ -18,28 +20,22 @@ class GameStatusCommand(BaseCommand):
     def execute(self):
         yield from super().execute()
 
-        status = self.gamestate.game_status(self.args["channel"])
-        pretty_status = []
+        channel = self.args["channel"]
+        (previous_winner, current_winner) = self.gamestate.winners(channel)
+        current_winner_name = self.slack.pretty_name(current_winner)
 
-        # self.slack.pretty_name(name)
+        step = self.gamestate.step(channel)
 
-        args = {
-            "old_winner_name": self.slack.pretty_name(status["old_winner"]),
-            "winner_name": self.slack.pretty_name(status["winner"]),
-            "old_winner": status["old_winner"],
-            "winner": status["winner"],
-        }
+        if step == GamestateStep.NEW_GAME:
+            status = "Game has not started yet, please wait for an admin to start it!"
+        elif step == GamestateStep.WAITING:
+            status = f"Waiting for <@{previous_winner}> to provide a 'rade to {current_winner_name}"
+        elif step == GamestateStep.PROVIDED:
+            status = f"Waiting for <@{current_winner}> to post an emoji to kick off the round!"
+        elif step == GamestateStep.GUESSING:
+            status = f"Come on, everyone's guessing what {current_winner_name} has posted! " \
+                     "Get to it! :runner::dash:"
+        else:
+            status = "Not entirely sure what the state of this game is in... :shrug:"
 
-        # First item is game state (step)
-        step_msg = {
-            "new_game": "Game has not started yet, please wait for an admin to start it!",
-            "waiting": f"Waiting for <@{args['old_winner']}> to "
-            f"provide a 'rade to {args['winner_name']}",
-            "provided": f"Waiting for <@{args['winner']}> to post an emoji to kick off the round!",
-            "guessing": f"Come on, everyone's guessing what {args['winner_name']} has posted! "
-            "Get to it! :runner::dash:",
-        }
-
-        pretty_status.append(("Status", step_msg[status["step"]]))
-
-        yield (None, "\n".join(f"{k}: {v}" for k, v in pretty_status))
+        yield (None, f"Status: {status}")

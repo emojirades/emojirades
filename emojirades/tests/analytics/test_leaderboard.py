@@ -42,7 +42,6 @@ class TestLeaderBoard:
         ]
 
     def test_get_historical_month(self, lb, mel_tz):
-
         historical_date = pendulum.datetime(2020, 5, 10, tz=mel_tz)
 
         assert lb.get(historical_date, TimeUnit.MONTHLY) == [

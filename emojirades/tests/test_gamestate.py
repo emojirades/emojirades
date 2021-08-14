@@ -1,7 +1,7 @@
 from unittest import TestCase
 from unittest import mock
 
-from emojirades.gamestate import GameState
+from emojirades.gamestate import Gamestate
 from emojirades.tests.helper import (
     EmojiradeBotTester
 )
@@ -11,10 +11,10 @@ import json
 import time
 
 
-class GameStateTester(TestCase):
+class GamestateTester(TestCase):
     def test_new_file_load(self):
         with tempfile.NamedTemporaryFile(mode="wt", newline="") as temp_file:
-            gamestate = GameState(state_uri=f"file://{temp_file.name}")
+            gamestate = Gamestate(state_uri=f"file://{temp_file.name}")
 
             self.assertEqual(len(gamestate.state.keys()), 0)
 
@@ -37,12 +37,12 @@ class GameStateTester(TestCase):
             temp_file.write(json.dumps(state))
             temp_file.flush()
 
-            gamestate = GameState(state_uri=f"file://{temp_file.name}")
+            gamestate = Gamestate(state_uri=f"file://{temp_file.name}")
 
             self.assertEqual(gamestate.state[self.channel]["winner"], user)
 
 
-class GameStateIntegrationTest(TestCase):
+class GamestateIntegrationTest(TestCase):
     def setUp(self):
         self.channel = "C00001"
         self.user_1 = "U12345"
@@ -64,15 +64,15 @@ class GameStateIntegrationTest(TestCase):
         self.temp_file.write(json.dumps(state))
         self.temp_file.flush()
 
-        gamestate = GameState(state_uri=f"file://{self.temp_file.name}")
+        gamestate = Gamestate(state_uri=f"file://{self.temp_file.name}")
         gamestate.set_admin(self.channel, self.user_1)
         gamestate.new_game(self.channel, self.user_1, self.user_2)
-        gamestate.set_emojirade(self.channel, self.emojirade)
-        gamestate.winner_posted(self.channel)
+        gamestate.set_emojirade(self.channel, self.emojirade, self.user_1)
+        gamestate.winner_posted(self.channel, self.user_1)
         gamestate.save()
         del gamestate
 
-        self.gamestate = GameState(state_uri=f"file://{self.temp_file.name}")
+        self.gamestate = Gamestate(state_uri=f"file://{self.temp_file.name}")
 
     def tearDown(self):
         self.temp_file.close()
