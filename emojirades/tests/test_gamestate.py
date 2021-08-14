@@ -12,11 +12,11 @@ import time
 
 
 class GamestateTester(TestCase):
-    def test_new_file_load(self):
-        with tempfile.NamedTemporaryFile(mode="wt", newline="") as temp_file:
-            gamestate = Gamestate(state_uri=f"file://{temp_file.name}")
+    def setUp(self):
+        self.gamestate = Gamestate(db_uri="sqlite+pysqlite:///:memory:", workspace_id="T12345678")
 
-            self.assertEqual(len(gamestate.state.keys()), 0)
+    def test_new_file_load(self):
+        self.assertEqual(len(gamestate.state.keys()), 0)
 
     def test_existing_file_load(self):
         self.channel = "C00001"

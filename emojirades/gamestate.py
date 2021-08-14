@@ -1,4 +1,5 @@
 import logging
+import json
 
 from emojirades.commands.gamestate_commands.inferred_correct_guess_command import (
     InferredCorrectGuessCommand,
@@ -114,7 +115,7 @@ class Gamestate:
             guess = sanitize_text(text)
 
             try:
-                emojirade = self.handler.get_xyz(channel, "emojirade")
+                emojirade = json.loads(self.handler.get_xyz(channel, "emojirade"))
 
                 if match_emojirade(guess, emojirade):
                     self.logger.debug(
@@ -147,7 +148,7 @@ class Gamestate:
         return self.handler.remove_admin(channel, user_id)
 
     def is_admin(self, channel, user_id):
-        return user_id in self.handler.get_xyz(channel, "admins")
+        return user_id in json.loads(self.handler.get_xyz(channel, "admins"))
 
     def new_game(self, channel, previous_winner, current_winner):
         self.handler.new_game(channel, previous_winner, current_winner)
@@ -162,8 +163,8 @@ class Gamestate:
             )
 
         self.handler.set_many_xyz(channel, user, [
-            ("emojirade", [sanitize_text(i) for i in emojirades]),
-            ("raw_emojirade", emojirades),
+            ("emojirade", json.dumps([sanitize_text(i) for i in emojirades])),
+            ("raw_emojirade", json.dumps(emojirades)),
             ("step", GamestateStep.PROVIDED),
         ])
 

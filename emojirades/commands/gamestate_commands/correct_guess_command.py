@@ -1,4 +1,5 @@
 import random
+import json
 
 from emojirades.wrappers import only_guessing
 from emojirades.commands import BaseCommand
@@ -71,7 +72,8 @@ class CorrectGuessCommand(BaseCommand):
                 return
 
         # Save a copy of the emojirade, as below clears it
-        raw_emojirades = [i.replace("`", "") for i in self.gamestate.get_xyz(channel, "emojirade")]
+        emojirades = json.loads(self.gamestate.get_xyz(channel, "emojirade"))
+        raw_emojirades = [i.replace("`", "") for i in emojirades]
         first_emojirade = raw_emojirades.pop(0)
 
         if raw_emojirades:

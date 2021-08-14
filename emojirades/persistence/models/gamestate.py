@@ -1,7 +1,7 @@
 import datetime
 import enum
 
-from sqlalchemy import Column, Text, Enum, ARRAY, DateTime, Boolean, BigInteger, Index, Identity
+from sqlalchemy import Column, Text, Enum, DateTime, Boolean, BigInteger, Index, Identity
 
 from .base import Base
 
@@ -23,10 +23,10 @@ class Gamestate(Base):
     step = Column(Enum(GamestateStep), nullable=False, default=GamestateStep.NEW_GAME)
     current_winner = Column(Text)
     previous_winner = Column(Text)
-    emojirade = Column(ARRAY(Text))
-    raw_emojirade = Column(ARRAY(Text))
+    emojirade = Column(Text)
+    raw_emojirade = Column(Text)
     first_guess = Column(Boolean)
-    admins = Column(ARRAY(Text), nullable=False, default=list)
+    admins = Column(Text, nullable=False, default="[]")
 
     last_updated = Column(
         DateTime,

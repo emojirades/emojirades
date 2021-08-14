@@ -1,3 +1,5 @@
+import json
+
 from sqlalchemy import select, desc, or_
 
 from ..models import Gamestate, GamestateHistory, GamestateStep
@@ -90,10 +92,13 @@ class GamestateDB():
     def add_admin(self, channel, user):
         gamestate = self.get_gamestate(channel)
 
-        if user in gamestate.admins:
+        admins = json.loads(gamestate.admins)
+
+        if user in admins:
             return False
 
-        gamestate.admins.append(user)
+        admins.append(user)
+        gamestate.admins = json.dumps(admins)
 
         self.session.commit()
         self.clear_cache(channel)
@@ -103,10 +108,13 @@ class GamestateDB():
     def remove_admin(self, channel, user):
         gamestate = self.get_gamestate(channel)
 
-        if user not in gamestate.admins:
+        admins = json.loads(gamestate.admins)
+
+        if user not in admins:
             return False
 
-        gamestate.admins.remove(user)
+        admins.remove(user)
+        gamestate.admins = json.dumps(admins)
 
         self.session.commit()
         self.clear_cache(channel)
@@ -126,7 +134,10 @@ class GamestateDB():
         self.session.commit()
         self.clear_cache(channel)
 
-    def get_history(self, channel, limit=GamestateDB.HISTORY_LIMIT):
+    def get_history(self, channel, limit=None):
+        if limit is None:
+            limit = self.HISTORY_LIMIT
+
         if history := self.history_cache.get(channel):
             return history
 

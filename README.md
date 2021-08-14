@@ -123,3 +123,10 @@ docker run -d \
     --auth-file s3://bucket/path/to/auth.json \
     -vv
 ```
+
+
+## TODO MISC
+emojirades -vv init --db-uri "sqlite:///emojirades.db"
+
+cd persistence/models
+alembic revision --autogenerate --message "Initial models"

@@ -1,7 +1,7 @@
 import traceback
 import logging
 
-from emojirades.persistence import get_session, get_workspace_handler
+from emojirades.persistence import get_session, get_workspace_handler, migrate
 from emojirades.commands.registry import CommandRegistry
 from emojirades.slack.slack_client import SlackClient
 from emojirades.scorekeeper import Scorekeeper
@@ -18,6 +18,9 @@ class EmojiradesBot:
         self.onboarding_queue = None
 
         self.command_registry = CommandRegistry.command_patterns()
+
+    def init_db(self, db_uri):
+        migrate(db_uri)
 
     def configure_workspace(self, db_uri, auth_uri, workspace_id=None):
         slack = SlackClient(auth_uri)

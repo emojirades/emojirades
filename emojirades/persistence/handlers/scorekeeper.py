@@ -99,7 +99,10 @@ class ScorekeeperDB():
 
         return self.position_on_scoreboard(channel, user)
 
-    def get_scoreboard(self, channel, limit=ScorekeeperDB.SCOREBOARD_LIMIT):
+    def get_scoreboard(self, channel, limit=None):
+        if limit is None:
+            limit = self.SCOREBOARD_LIMIT
+
         if scoreboard := self.scoreboard_cache.get(channel):
             return scoreboard
 
@@ -135,7 +138,10 @@ class ScorekeeperDB():
 
         return None, None
 
-    def get_history(self, channel, limit=ScorekeeperDB.HISTORY_LIMIT):
+    def get_history(self, channel, limit=None):
+        if limit is None:
+            limit = self.HISTORY_LIMIT
+
         if history := self.history_cache.get(channel):
             return history
 

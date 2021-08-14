@@ -13,8 +13,12 @@ if __name__ == "__main__":
     parser.add_argument("-v", "--verbose", action="count", default=0, help="Logging level")
     parser.add_argument("--log-file", default=sys.stderr, help="File we will log to")
 
-    subparsers = parser.add_subparsers(help="Workspaces Mode", dest="mode")
+    subparsers = parser.add_subparsers(help="Bot Mode", dest="mode")
     subparsers.required = True
+
+    # Init Database
+    parser_init = subparsers.add_parser("init", help="Init Database")
+    parser_init.add_argument("--db-uri", help="Database URI to init", required=True)
 
     # Single Workspace
     parser_single = subparsers.add_parser("single", help="Single Workspace")
@@ -45,14 +49,18 @@ if __name__ == "__main__":
     slack.RTMClient.on(event="message", callback=bot.handle_event)
 
     # Configure the bot mode
-    if args.mode == "single":
-        logger.debug("Configuring for Single Workspace mode")
-        bot.configure_workspace(args.db_uri, args.auth_uri)
-    elif args.mode == "multiple":
-        logger.debug("Configuring for Multiple Workspace mode")
-        bot.configure_workspaces(args.workspaces_uri, args.workspace_ids, args.onboarding_queue)
+    if args.mode == "init":
+        logger.debug("Running DB migrations")
+        bot.init_db(args.db_uri)
     else:
-        parser.error("Unknown mode")
+        if args.mode == "single":
+            logger.debug("Configuring for Single Workspace mode")
+            bot.configure_workspace(args.db_uri, args.auth_uri)
+        elif args.mode == "multiple":
+            logger.debug("Configuring for Multiple Workspace mode")
+            bot.configure_workspaces(args.workspaces_uri, args.workspace_ids, args.onboarding_queue)
+        else:
+            parser.error("Unknown mode")
 
-    logger.info("Bot is listening for commands")
-    bot.listen_for_commands()
+        logger.info("Bot is listening for commands")
+        bot.listen_for_commands()
