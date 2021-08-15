@@ -92,6 +92,10 @@ Here we provide an S3 path of workspaces and an AWS SQS queue to listen to for n
 
 `emojirades multiple --workspaces-dir s3://bucket/path/to/workspaces --onboarding-queue workspace-onboarding-queue`
 
+Here we provide an S3 path of workspaces and override the db_uri:
+
+`emojirades multiple --workspaces-dir s3://bucket/path/to/workspaces --db-uri sqlite:///emojirades.db
+
 The workspaces directory must be in the following format (local or s3):
 ```
 ./workspaces
@@ -121,7 +125,7 @@ The contents of the shard config (eg. `./workspaces/shards/0/A1B2C3D4E.json`) wi
 
 The concept above with the two different directories is shards to allow for the bot to scale out horizontally. As the bot(s) get busier, the operator can increase the shard count (number of bot instances) and new onboarded workspaces are allocated to the next available shard with capacity.
 
-The emojirades bot will take care of running multiple games across different channels in a single workspace.
+The emojirades bot will take care of running multiple games across different channels in a single workspace. This is a limitation in the design currently where you need a bot-per-workspace.
 
 ## Service configuration
 ```

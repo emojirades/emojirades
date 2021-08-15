@@ -35,6 +35,7 @@ if __name__ == "__main__":
     parser_multiple = subparsers.add_parser("multiple", help="Multiple Workspaces")
     parser_multiple.add_argument("--workspaces-uri", help="URI we persist workspaces to", required=True)
     parser_multiple.add_argument("--workspace-id", dest="workspace_ids", action="append", help="Specific workspace IDs")
+    parser_multiple.add_argument("--db-uri", help="Optionally override the workspace db_uri")
     parser_multiple.add_argument("--onboarding-queue", help="SQS queue containing new workspaces to onboard")
 
     args = parser.parse_args()
@@ -67,7 +68,7 @@ if __name__ == "__main__":
             bot.configure_workspace(args.db_uri, args.auth_uri)
         elif args.mode == "multiple":
             logger.debug("Configuring for Multiple Workspace mode")
-            bot.configure_workspaces(args.workspaces_uri, args.workspace_ids, args.onboarding_queue)
+            bot.configure_workspaces(args.workspaces_uri, args.workspace_ids, args.onboarding_queue, db_uri=args.db_uri)
         else:
             parser.error("Unknown mode")
 
