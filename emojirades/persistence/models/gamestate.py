@@ -15,7 +15,7 @@ class GamestateStep(enum.Enum):
 
 class Gamestate(Base):
     # pylint: disable=too-few-public-methods
-    __tablename__ = "game_state"
+    __tablename__ = "gamestate"
 
     workspace_id = Column(Text, primary_key=True)
     channel_id = Column(Text, primary_key=True)
@@ -55,9 +55,14 @@ class GamestateHistory(Base):
     timestamp = Column(DateTime, nullable=False, default=datetime.datetime.utcnow)
     operation = Column(Text, nullable=False)
 
-    Index("idx_gamestate_history_channel", "workspace_id", "channel_id")
-
     def __repr__(self):
         return f"GamestateHistory(w_id={self.workspace_id!r}, " \
                 "c_id={self.channel_id!r}, u_id={self.user_id!r}, " \
                 "op={self.operation!r})"
+
+
+Index(
+    "idx_gamestate_history_channel",
+    GamestateHistory.workspace_id,
+    GamestateHistory.channel_id,
+)
