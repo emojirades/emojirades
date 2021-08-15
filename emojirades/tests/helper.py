@@ -78,19 +78,19 @@ class EmojiradeBotTester(unittest.TestCase):
 
         self.config, self.events = self.prepare_event_data()
 
+        self.dbfile = templfile.NamedTemporaryFile()
+        self.db_uri = f"sqlite:///{self.dbfile.name}"
+
         self.authfile = tempfile.NamedTemporaryFile()
-
         auth_config = {"bot_access_token": "xoxb-000000000000-aaaaaaaaaaaaaaaaaaaaaaaa"}
-
         self.authfile.write(json.dumps(auth_config).encode("utf-8"))
         self.authfile.seek(0)
-
-        self.db_uri = "sqlite+pysqlite:///:memory:"
         self.auth_uri = f"file://{self.authfile.name}"
 
         workspace_id = "T12345678"
 
         self.bot = EmojiradesBot()
+        self.bot.init_db(self.db_uri)
         self.bot.configure_workspace(self.db_uri, self.auth_uri, workspace_id=workspace_id)
 
         self.workspace = self.bot.workspaces[workspace_id]
@@ -105,6 +105,7 @@ class EmojiradeBotTester(unittest.TestCase):
 
     def tearDown(self):
         self.authfile.close()
+        self.dbfile.close()
 
     @staticmethod
     def prepare_event_data():

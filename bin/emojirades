@@ -20,6 +20,12 @@ if __name__ == "__main__":
     parser_init = subparsers.add_parser("init", help="Init Database")
     parser_init.add_argument("--db-uri", help="Database URI to init", required=True)
 
+    # Populate Database
+    parser_populate = subparsers.add_parser("populate", help="Populate Database")
+    parser_init.add_argument("--db-uri", help="Database URI", required=True)
+    parser_init.add_argument("--table", help="Name of the table", required=True)
+    parser_init.add_argument("--data-file", help="Filename we'll read from", required=True)
+
     # Single Workspace
     parser_single = subparsers.add_parser("single", help="Single Workspace")
     parser_single.add_argument("--db-uri", help="Database URI to store state", required=True)

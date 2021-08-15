@@ -1,10 +1,14 @@
 import os
 
+import json
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 from alembic.config import Config
 from alembic import command
+
+from .models import Gamestate, GamestateHistory, Scoreboard, ScoreboardHistory
 
 
 def get_engine(db_uri):
@@ -36,9 +40,35 @@ def migrate(db_uri, migration_ini=None, migration_dir=None):
         migration_ini = discover_migration_ini()
 
     if migration_dir is None:
-        migration_dir = discover_migration_dir() 
+        migration_dir = discover_migration_dir()
 
     alembic_cfg = Config(migration_ini)
     alembic_cfg.set_main_option("script_location", migration_dir)
     alembic_cfg.set_main_option("sqlalchemy.url", db_uri)
     command.upgrade(alembic_cfg, "head")
+
+def populate(db_uri, table, data_filename, commit_every=100):
+    session = get_session(db_uri)
+
+    if table == "gamestate":
+        Obj = Gamestate
+    elif table == "gamestate_history":
+        Obj = GamestateHistory
+    elif table == "scoreboard":
+        Obj = Scoreboard
+    elif table == "scoreboard_history":
+        Obj = ScoreboardHistory
+    else:
+        raise RuntimeError(f"Unknown table {table}?")
+
+    with open(data_filename) as data_file:
+        data = json.load(data_file)
+
+        for i, row in enumerate(data):
+            obj = Obj(**row)
+            session.add(obj)
+
+            if i % commit_every == 0:
+                session.commit()
+
+    session.commit()
