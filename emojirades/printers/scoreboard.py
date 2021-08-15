@@ -10,7 +10,7 @@ class ScoreboardPrinter:
     def __init__(
         self, data, slack, time_unit: TimeUnit, parsed_date: pendulum.DateTime
     ):
-        self.data = data
+        self.scoreboard = data
         self.slack = slack
         self.time_unit = time_unit
         self.parsed_date = parsed_date
@@ -47,9 +47,9 @@ class ScoreboardPrinter:
         return " ".join(title)
 
     def print(self):
-        self.logger.debug("Printing leaderboard: %s", self.data)
+        self.logger.debug("Printing leaderboard: %s", self.scoreboard)
 
-        if not self.data:
+        if not self.scoreboard:
             yield None, "Nothing to see here!"
             return
 
@@ -59,7 +59,7 @@ class ScoreboardPrinter:
         longest_name = 0
         biggest_score = 0
 
-        for (pos, name, score) in self.data:
+        for (name, score) in self.scoreboard:
             name = self.slack.pretty_name(name)
 
             name_len = len(name)
@@ -74,7 +74,7 @@ class ScoreboardPrinter:
         rank_buffer = 0
         last_score = 0
 
-        for pos, name, score in self.data:
+        for pos, (name, score) in enumerate(self.scoreboard, start=1):
             name = self.slack.pretty_name(name)
             name = name if len(name) < 20 else "{name[0:18]}.."
 

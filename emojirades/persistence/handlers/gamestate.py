@@ -36,7 +36,7 @@ class GamestateDB:
         if gamestate := self.gamestate_cache.get(channel):
             return gamestate
 
-        stmt = select(Gamestate,).where(
+        stmt = select(Gamestate).where(
             Gamestate.workspace_id == self.workspace_id,
             Gamestate.channel_id == channel,
         )

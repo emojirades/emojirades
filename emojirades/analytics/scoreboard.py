@@ -12,7 +12,6 @@ from emojirades.analytics.time_unit import TimeUnit
 
 
 class ScoreboardAnalytics:
-
     NOT_FOUND = -1
 
     def __init__(self, history):
@@ -35,7 +34,6 @@ class ScoreboardAnalytics:
           this will usually match the first time
         - If not matched, jump to the half way point of the remaining events
         """
-
         low = 0
         high = self.len - 1
 
@@ -138,13 +136,13 @@ class ScoreboardAnalytics:
             scoreboard[item["user_id"]] += val
 
         return [
-            (u, scoreboard[u])
-            for u in sorted(scoreboard, key=scoreboard.get, reverse=True)
+            (user_id, scoreboard[user_id])
+            for user_id in sorted(scoreboard, key=scoreboard.get, reverse=True)
         ]
 
     def get_by_range(self, of_date: pendulum.DateTime, time_unit: TimeUnit):
-        start_time = TimeRange.get_start_date(of_date, time_unit).timestamp()
-        end_time = TimeRange.get_end_date(of_date, time_unit).timestamp()
+        start_time = TimeRange.get_start_date(of_date, time_unit)
+        end_time = TimeRange.get_end_date(of_date, time_unit)
 
         self.logger.debug("Getting date range from %s => %s", start_time, end_time)
 

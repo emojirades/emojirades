@@ -58,7 +58,10 @@ class ScoreboardCommand(BaseCommand):
         self.logger.debug("Getting a %s scoreboard", time_unit)
 
         if time_unit == TimeUnit.ALL_TIME:
-            return self.scorekeeper.scoreboard(self.args["channel"]), None
+            return [
+                (b, c)
+                for (a, b, c) in self.scorekeeper.scoreboard(self.args["channel"])
+            ], None
 
         history = self.scorekeeper.history_all(self.args["channel"])
         scoreboard = ScoreboardAnalytics(history)
@@ -74,7 +77,7 @@ class ScoreboardCommand(BaseCommand):
                 date = pendulum.now(tz=self.TZ).strftime("%Y%m%d")
 
         parsed_date = pendulum.from_format(date, "YYYYMMDD", tz=self.TZ)
-        self.logger.debug("Scoreboard date was set to: {parsed_date}")
+        self.logger.debug("Scoreboard date was set to: %s", parsed_date)
 
         return (scoreboard.get(parsed_date, time_unit), parsed_date)
 
@@ -83,7 +86,6 @@ class ScoreboardCommand(BaseCommand):
 
         for time_unit in self.time_units:
             scoreboard, parsed_date = self.get_scoreboard(time_unit)
-
             printer = ScoreboardPrinter(scoreboard, self.slack, time_unit, parsed_date)
 
             yield from printer.print()

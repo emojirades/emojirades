@@ -8,7 +8,13 @@ from sqlalchemy.orm import Session
 from alembic.config import Config
 from alembic import command
 
-from .models import Gamestate, GamestateHistory, Scoreboard, ScoreboardHistory, GamestateStep
+from .models import (
+    Gamestate,
+    GamestateHistory,
+    Scoreboard,
+    ScoreboardHistory,
+    GamestateStep,
+)
 
 
 def get_engine(db_uri):

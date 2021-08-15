@@ -18,16 +18,19 @@ def process_score(workspace_id, score_filename):
             continue
 
         for user_id, user_score in channel_scores["scores"].items():
-            new_scores.append({
-                "workspace_id": workspace_id,
-                "channel_id": channel_id,
-                "user_id": user_id,
-
-                "score": user_score,
-            })
+            new_scores.append(
+                {
+                    "workspace_id": workspace_id,
+                    "channel_id": channel_id,
+                    "user_id": user_id,
+                    "score": user_score,
+                }
+            )
 
         for item in channel_scores["history"]:
-            timestamp = datetime.datetime.fromtimestamp(item["timestamp"], tz=datetime.timezone.utc)
+            timestamp = datetime.datetime.fromtimestamp(
+                item["timestamp"], tz=datetime.timezone.utc
+            )
 
             if item["operation"].startswith("Manually"):
                 operation = "set"
@@ -38,19 +41,22 @@ def process_score(workspace_id, score_filename):
                 before = 0
                 after = 0
 
-            new_score_history.append({
-                "workspace_id": workspace_id,
-                "channel_id": channel_id,
-                "user_id": item["user_id"],
-
-                "timestamp": timestamp.strftime("%Y-%m-%d %H:%M:%S"),
-                "operation": f"{operation},{before},{after}",
-            })
+            new_score_history.append(
+                {
+                    "workspace_id": workspace_id,
+                    "channel_id": channel_id,
+                    "user_id": item["user_id"],
+                    "timestamp": timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+                    "operation": f"{operation},{before},{after}",
+                }
+            )
 
     with open(f"{score_filename}.processed_scores", "wt") as new_scores_file:
         json.dump(new_scores, new_scores_file, indent=4, sort_keys=True)
 
-    with open(f"{score_filename}.processed_score_history", "wt") as new_score_history_file:
+    with open(
+        f"{score_filename}.processed_score_history", "wt"
+    ) as new_score_history_file:
         json.dump(new_score_history, new_score_history_file, indent=4, sort_keys=True)
 
 
@@ -65,18 +71,23 @@ def process_state(workspace_id, state_filename):
             # Weird bug, ignoring for now
             continue
 
-        new_state.append({
-            "workspace_id": workspace_id,
-            "channel_id": channel_id,
-
-            "step": channel_state["step"].upper(),
-            "current_winner": channel_state["winner"],
-            "previous_winner": channel_state["old_winner"],
-            "emojirade": json.dumps(channel_state["emojirade"]) if channel_state["emojirade"] else None,
-            "raw_emojirade": json.dumps(channel_state["raw_emojirade"]) if channel_state["raw_emojirade"] else None,
-            "first_guess": False,
-            "admins": json.dumps(channel_state["admins"]),
-        })
+        new_state.append(
+            {
+                "workspace_id": workspace_id,
+                "channel_id": channel_id,
+                "step": channel_state["step"].upper(),
+                "current_winner": channel_state["winner"],
+                "previous_winner": channel_state["old_winner"],
+                "emojirade": json.dumps(channel_state["emojirade"])
+                if channel_state["emojirade"]
+                else None,
+                "raw_emojirade": json.dumps(channel_state["raw_emojirade"])
+                if channel_state["raw_emojirade"]
+                else None,
+                "first_guess": False,
+                "admins": json.dumps(channel_state["admins"]),
+            }
+        )
 
     with open(f"{state_filename}.processed", "wt") as new_state_file:
         json.dump(new_state, new_state_file, indent=4, sort_keys=True)

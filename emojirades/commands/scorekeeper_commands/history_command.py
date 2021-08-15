@@ -1,4 +1,4 @@
-import datetime
+import pendulum
 
 from emojirades.commands import BaseCommand
 
@@ -18,26 +18,22 @@ class HistoryCommand(BaseCommand):
         history = self.scorekeeper.history(self.args["channel"])
 
         if not history:
-            message = (
-                "No history available."
-                "History is temporary and doesn't persist across bot restarts."
-            )
+            message = "No history available."
             self.logger.debug(message)
             yield (None, message)
             return
 
         self.logger.debug("Printing history: %s", history)
 
-        now = datetime.datetime.utcnow()
-
+        now = pendulum.now(tz=pendulum.UTC)
         history_log = []
 
-        for (user_id, timestamp, operation) in history:
-            ago = (now - timestamp).seconds
-            name = self.slack.pretty_name(user_id)
-            command, prev, curr = operation.split(",")
+        for item in history:
+            ago = item["timestamp"].diff_for_humans(now).replace("before", "ago")
+            name = self.slack.pretty_name(item["user_id"])
+            command, prev, curr = item["operation"].split(",")
 
-            line = f"{ago:>4}s ago: {name}: {command} {prev} => {curr}"
+            line = f"{ago:<15}: {name:<20}: {command:>5} {prev:>5} => {curr:>5}"
             history_log.append(line)
 
-        yield (None, "\n".join(history_log))
+        yield (None, "```" + "\n".join(history_log) + "```")

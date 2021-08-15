@@ -26,7 +26,6 @@ class TestScoreboardAnalytics:
         assert len(lb.history) > 0
 
     def test_get_week(self, lb, current_date):
-        print(lb.get(current_date, TimeUnit.WEEKLY))
         assert lb.get(current_date, TimeUnit.WEEKLY) == [
             ("U985L6R1M", 15),
             ("U0VCW825A", 13),

@@ -1,4 +1,6 @@
-from sqlalchemy import select, desc
+import pendulum
+
+from sqlalchemy import select, asc, desc
 
 from ..models import Scoreboard, ScoreboardHistory
 
@@ -32,7 +34,7 @@ class ScorekeeperDB:
             self.session.commit()
 
     def get_user(self, channel, user):
-        stmt = select(Scoreboard,).where(
+        stmt = select(Scoreboard).where(
             Scoreboard.workspace_id == self.workspace_id,
             Scoreboard.channel_id == channel,
             Scoreboard.user_id == user,
@@ -106,10 +108,7 @@ class ScorekeeperDB:
             return scoreboard
 
         stmt = (
-            select(
-                Scoreboard.user_id,
-                Scoreboard.score,
-            )
+            select(Scoreboard)
             .where(
                 Scoreboard.workspace_id == self.workspace_id,
                 Scoreboard.channel_id == channel,
@@ -124,7 +123,8 @@ class ScorekeeperDB:
 
         result = self.session.execute(stmt).fetchall()
         scoreboard = [
-            (pos, row.user_id, row.score) for pos, row in enumerate(result, start=1)
+            (pos, row[0].user_id, row[0].score)
+            for pos, row in enumerate(result, start=1)
         ]
 
         self.scoreboard_cache[channel] = scoreboard
@@ -140,27 +140,22 @@ class ScorekeeperDB:
 
         return None, None
 
-    def get_history(self, channel, limit=None):
+    def get_history(self, channel, limit=None, order_by="desc"):
         if limit is None:
             limit = self.HISTORY_LIMIT
 
-        if history := self.history_cache.get(channel):
+        if history := self.history_cache.get((channel, limit, order_by)):
             return history
 
-        stmt = (
-            select(
-                ScoreboardHistory.user_id,
-                ScoreboardHistory.timestamp,
-                ScoreboardHistory.operation,
-            )
-            .where(
-                ScoreboardHistory.workspace_id == self.workspace_id,
-                ScoreboardHistory.channel_id == channel,
-            )
-            .order_by(
-                desc(ScoreboardHistory.timestamp),
-            )
+        stmt = select(ScoreboardHistory).where(
+            ScoreboardHistory.workspace_id == self.workspace_id,
+            ScoreboardHistory.channel_id == channel,
         )
+
+        if order_by == "asc":
+            stmt = stmt.order_by(asc(ScoreboardHistory.timestamp))
+        elif order_by == "desc":
+            stmt = stmt.order_by(desc(ScoreboardHistory.timestamp))
 
         if limit:
             stmt = stmt.limit(limit)
@@ -168,9 +163,14 @@ class ScorekeeperDB:
         result = self.session.execute(stmt).fetchall()
 
         scorekeeper_history = [
-            (row.user_id, row.timestamp, row.operation) for row in result
+            {
+                "user_id": row[0].user_id,
+                "timestamp": pendulum.instance(row[0].timestamp),
+                "operation": row[0].operation,
+            }
+            for row in result
         ]
 
-        self.history_cache[channel] = scorekeeper_history
+        self.history_cache[(channel, limit, order_by)] = scorekeeper_history
 
         return scorekeeper_history

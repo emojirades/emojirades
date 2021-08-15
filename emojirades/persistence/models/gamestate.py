@@ -38,7 +38,7 @@ class Gamestate(Base):
     def __repr__(self):
         return (
             f"Gamestate(workspace_id={self.workspace_id!r},"
-            "channel_id={self.channel_id!r}, step={self.step!r})"
+            f"channel_id={self.channel_id!r}, step={self.step!r})"
         )
 
 
@@ -58,8 +58,8 @@ class GamestateHistory(Base):
     def __repr__(self):
         return (
             f"GamestateHistory(w_id={self.workspace_id!r}, "
-            "c_id={self.channel_id!r}, u_id={self.user_id!r}, "
-            "op={self.operation!r})"
+            f"c_id={self.channel_id!r}, u_id={self.user_id!r}, "
+            f"op={self.operation!r})"
         )
 
 

@@ -27,7 +27,7 @@ class Scoreboard(Base):
     def __repr__(self):
         return (
             f"Scoreboard(w_id={self.workspace_id!r}, c_id={self.channel_id!r}, "
-            "u_id={self.user_id!r}, score={self.score!r})"
+            f"u_id={self.user_id!r}, score={self.score!r})"
         )
 
 
@@ -49,6 +49,6 @@ class ScoreboardHistory(Base):
     def __repr__(self):
         return (
             f"ScoreboardHistory(w_id={self.workspace_id!r}, "
-            "c_id={self.channel_id!r}, u_id={self.user_id!r}, "
-            "op={self.operation!r})"
+            f"c_id={self.channel_id!r}, u_id={self.user_id!r}, "
+            f"op={self.operation!r})"
         )

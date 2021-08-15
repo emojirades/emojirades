@@ -28,4 +28,4 @@ class Scorekeeper:
         return self.handler.get_history(channel)
 
     def history_all(self, channel):
-        return self.handler.get_history(channel, limit=None)
+        return self.handler.get_history(channel, limit=0, order_by="asc")
