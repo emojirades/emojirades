@@ -52,8 +52,7 @@ jobs:
           set -e
           python -m pip install --user --upgrade pip wheel
 
-          pip install -r requirements.txt --upgrade
-          pip install -r requirements-dev.txt --upgrade
+          pip install -r requirements.txt -r requirements-dev.txt --upgrade
           pip install -e .
 
       - name: Test with pytest

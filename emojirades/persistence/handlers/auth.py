@@ -33,7 +33,4 @@ def get_auth_handler(uri):
     if uri.startswith("s3://"):
         return S3AuthFileHandler(uri)
 
-    if uri.startswith("file://"):
-        return LocalAuthFileHandler(uri[7:])
-
-    raise RuntimeError(f"Unknown auth uri '{uri}'")
+    return LocalAuthFileHandler(uri)

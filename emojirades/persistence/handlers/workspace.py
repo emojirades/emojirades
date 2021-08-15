@@ -79,7 +79,4 @@ def get_workspace_handler(uri):
     if uri.startswith("s3://"):
         return S3WorkspaceDirectoryHandler(uri)
 
-    if uri.startswith("file://"):
-        return LocalWorkspaceDirectoryHandler(uri)
-
-    raise RuntimeError(f"Unknown workspace uri '{uri}'")
+    return LocalWorkspaceDirectoryHandler(uri)
