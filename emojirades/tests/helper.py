@@ -93,7 +93,7 @@ class EmojiradeBotTester(unittest.TestCase):
         auth_config = {"bot_access_token": "xoxb-000000000000-aaaaaaaaaaaaaaaaaaaaaaaa"}
         self.authfile.write(json.dumps(auth_config).encode("utf-8"))
         self.authfile.seek(0)
-        self.auth_uri = f"file://{self.authfile.name}"
+        self.auth_uri = self.authfile.name
 
         self.bot = EmojiradesBot()
         self.bot.init_db(self.db_uri)

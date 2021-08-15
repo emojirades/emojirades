@@ -10,9 +10,14 @@ from emojirades.tests.FileFixture import FileFixture
 
 class TestScoreboardAnalytics:
     @pytest.fixture
-    def lb(self):
+    def lb(self, mel_tz):
         with FileFixture("history.json").open() as ff:
-            return ScoreboardAnalytics(json.load(ff))
+            history = json.load(ff)
+
+        for item in history:
+            item["timestamp"] = pendulum.parse(item["timestamp"], tz=mel_tz)
+
+        return ScoreboardAnalytics(history)
 
     @pytest.fixture
     def current_date(self, mel_tz):
