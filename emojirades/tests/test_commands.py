@@ -1,6 +1,7 @@
-from emojirades.tests.helper import EmojiradeBotTester
-
 import re
+
+from emojirades.tests.helper import EmojiradeBotTester
+from emojirades.persistence import GamestateStep
 
 
 class TestBotCommands(EmojiradeBotTester):
@@ -10,8 +11,7 @@ class TestBotCommands(EmojiradeBotTester):
 
     def test_plusplus_new_game(self):
         """Cannot ++ someone when the game is not in progress"""
-        state = self.workspace["gamestate"].state[self.config.channel]
-        assert state["step"] == "new_game"
+        assert self.step == GamestateStep.NEW_GAME
 
         self.send_event(self.events.plusplus)
         assert (
@@ -22,42 +22,43 @@ class TestBotCommands(EmojiradeBotTester):
     def test_new_game_by_old_winner(self):
         """The old winner is allowed to 'reset' their rade if the game isn't in progress"""
         self.reset_and_transition_to("provided")
-        state = self.workspace["gamestate"].state[self.config.channel]
-        state["admins"].append(self.config.player_4)
+        self.gamestate.set_admin(self.config.channel, self.config.player_4)
 
         # Should be allowed
         self.send_event(self.events.new_game)
-        assert state["step"] == "waiting"
+        assert self.step == GamestateStep.WAITING
 
         # Reset
         self.reset_and_transition_to("guessing")
-        state = self.workspace["gamestate"].state[self.config.channel]
-        state["admins"].append(self.config.player_4)
+        self.gamestate.set_admin(self.config.channel, self.config.player_4)
 
         # Should not be allowed
         self.send_event(self.events.new_game)
-        assert state["step"] == "guessing"
+        assert self.step == GamestateStep.GUESSING
 
     def test_leaderboard_output(self):
         """Ensure leaderboard output is consistent"""
         self.reset_and_transition_to("waiting")
 
-        self.workspace["scorekeeper"].scoreboard[self.config.channel] = {
-            "scores": {
-                "David Pham": 168,
-                "fendy Haman": 120,
-                "Michael Mitchell": 118,
-                "Timothy Sinclair": 100,
-                "Stephen Verschuren": 81,
-                "Mark Chaves": 81,
-                "Andres Quillian": 81,
-                "Justin Fendi": 24,
-                "Scott Burke": 23,
-                "Steve Robbins": 9,
-                "Agung Alford": 9,
-                "James Gream": 1,
-            },
+        user_scores = {
+            "U00000001": ("David Pham", 168),
+            "U00000002": ("fendy Haman", 120),
+            "U00000003": ("Michael Mitchell", 118),
+            "U00000004": ("Timothy Sinclair", 100),
+            "U00000005": ("Stephen Verschuren", 81),
+            "U00000006": ("Mark Chaves", 81),
+            "U00000007": ("Andres Quillian", 81),
+            "U00000008": ("Justin Fendi", 24),
+            "U00000009": ("Scott Burke", 23),
+            "U00000010": ("Steve Robbins", 9),
+            "U00000011": ("Agung Alford", 9),
+            "U00000012": ("James Gream", 1),
         }
+
+        for user_id, (user_name, score) in user_scores.items():
+            self.scorekeeper.overwrite(self.config.channel, user_id, score)
+
+        self.workspace["slack"].pretty_name = lambda x: user_scores[x][0]
 
         expected = """```
  :: All Time leaderboard ::
@@ -78,28 +79,30 @@ class TestBotCommands(EmojiradeBotTester):
 
         self.send_event(self.events.leaderboard)
 
+        self.workspace["slack"].pretty_name = self.pretty_name
+
         assert (self.config.channel, expected) in self.responses
 
     def test_fixwinner(self):
         """Ensure fixwinner does the right thing"""
         self.reset_and_transition_to("guessed")
-
-        state = self.workspace["gamestate"].state[self.config.channel]
-
         self.send_event(self.events.fixwinner)
-        assert state["old_winner"] == self.config.player_2
-        assert state["winner"] == self.config.player_4
-        assert self.workspace["scorekeeper"].current_score(
-            self.config.channel, self.config.player_3
-        ) == (0, 2)
-        assert self.workspace["scorekeeper"].current_score(
+
+        previous_winner, current_winner = self.gamestate.winners(self.config.channel)
+
+        assert previous_winner == self.config.player_2
+        assert current_winner == self.config.player_4
+
+        # (position, score)
+        assert self.scorekeeper.user_score(
             self.config.channel, self.config.player_4
         ) == (1, 1)
+        assert self.scorekeeper.user_score(
+            self.config.channel, self.config.player_3
+        ) == (2, 0)
 
         # Check the user cannot award to themselves
         self.reset_and_transition_to("guessed")
-
-        state = self.workspace["gamestate"].state[self.config.channel]
 
         override = {
             "text": f"<@{self.config.bot_id}> fixwinner <@{self.config.player_2}>"
@@ -109,19 +112,21 @@ class TestBotCommands(EmojiradeBotTester):
         expected = ":face_palm: You can't award yourself the win"
         assert (self.config.channel, expected) in self.responses
 
-        assert state["old_winner"] == self.config.player_2
-        assert state["winner"] == self.config.player_3
-        assert self.workspace["scorekeeper"].current_score(
+        previous_winner, current_winner = self.gamestate.winners(self.config.channel)
+
+        assert previous_winner == self.config.player_2
+        assert current_winner == self.config.player_3
+
+        # (position, score)
+        assert self.scorekeeper.user_score(
             self.config.channel, self.config.player_3
         ) == (1, 1)
-        assert self.workspace["scorekeeper"].current_score(
+        assert self.scorekeeper.user_score(
             self.config.channel, self.config.player_4
-        ) == (0, -1)
+        ) == (None, None)
 
         # Check the user cannot award to the winner (no-op)
         self.reset_and_transition_to("guessed")
-
-        state = self.workspace["gamestate"].state[self.config.channel]
 
         override = {
             "text": f"<@{self.config.bot_id}> fixwinner <@{self.config.player_3}>"
@@ -131,20 +136,22 @@ class TestBotCommands(EmojiradeBotTester):
         expected = "This won't actually do anything? :shrug::face_with_monocle:"
         assert (self.config.channel, expected) in self.responses
 
-        assert state["old_winner"] == self.config.player_2
-        assert state["winner"] == self.config.player_3
-        assert self.workspace["scorekeeper"].current_score(
+        previous_winner, current_winner = self.gamestate.winners(self.config.channel)
+
+        assert previous_winner == self.config.player_2
+        assert current_winner == self.config.player_3
+
+        # (position, score)
+        assert self.scorekeeper.user_score(
             self.config.channel, self.config.player_3
         ) == (1, 1)
-        assert self.workspace["scorekeeper"].current_score(
+        assert self.scorekeeper.user_score(
             self.config.channel, self.config.player_4
-        ) == (0, -1)
+        ) == (None, None)
 
     def test_set_emojirade_banned_words(self):
         """Ensure that the emojirade can't contain banned words"""
         self.reset_and_transition_to("waiting")
-
-        state = self.workspace["gamestate"].state[self.config.channel]
 
         banned_emojirade = dict(self.events.posted_emojirade)
         banned_emojirade["text"] = "emojirade foo :pie: bar"
@@ -154,7 +161,8 @@ class TestBotCommands(EmojiradeBotTester):
             self.config.bot_channel,
             "Sorry, but that emojirade contained a banned word/phrase :no_good:, try again?",
         ) in self.responses
-        assert state["step"] == "waiting"
+
+        assert self.step == GamestateStep.WAITING
 
         banned_emojirade = dict(self.events.posted_emojirade)
         banned_emojirade["text"] = "emojirade foo :+1: bar"
@@ -164,10 +172,10 @@ class TestBotCommands(EmojiradeBotTester):
             self.config.bot_channel,
             "Sorry, but that emojirade contained a banned word/phrase :no_good:, try again?",
         ) in self.responses
-        assert state["step"] == "waiting"
+        assert self.step == GamestateStep.WAITING
 
         self.send_event(self.events.posted_emojirade)
-        assert state["step"] == "provided"
+        assert self.step == GamestateStep.PROVIDED
 
     def test_set_emojirade_raw_output(self):
         """Ensure that the emojirade passed to the winner isn't sanitized"""
@@ -218,8 +226,6 @@ class TestBotCommands(EmojiradeBotTester):
         override = {"text": f"emojirade {emojirade}"}
         self.send_event({**self.events.posted_emojirade, **override})
 
-        print(self.responses)
-
         assert (
             self.config.player_2_channel,
             f"Hey, <@{self.config.player_1}> made the emojirade `{emojirade}`, good luck!",
@@ -228,8 +234,6 @@ class TestBotCommands(EmojiradeBotTester):
     def test_user_override(self):
         self.reset_and_transition_to("guessing")
 
-        state = self.workspace["gamestate"].state[self.config.channel]
-
         # Player 4 is not involved in this round
         override = {
             "user": self.config.player_4,
@@ -237,13 +241,13 @@ class TestBotCommands(EmojiradeBotTester):
         }
         self.send_event({**self.events.manual_award, **override})
 
-        assert state["step"] == "waiting"
-        assert state["winner"] == self.config.player_3
+        _, current_winner = self.gamestate.winners(self.config.channel)
+
+        assert self.step == GamestateStep.WAITING
+        assert current_winner == self.config.player_3
 
     def test_channel_override(self):
         self.reset_and_transition_to("guessing")
-
-        state = self.workspace["gamestate"].state[self.config.channel]
 
         override = {
             "channel": self.config.bot_channel,
@@ -251,8 +255,10 @@ class TestBotCommands(EmojiradeBotTester):
         }
         self.send_event({**self.events.correct_guess, **override})
 
-        assert state["step"] == "waiting"
-        assert state["winner"] == self.config.player_3
+        _, current_winner = self.gamestate.winners(self.config.channel)
+
+        assert self.step == GamestateStep.WAITING
+        assert current_winner == self.config.player_3
 
     def test_help(self):
         from emojirades.commands.registry import CommandRegistry

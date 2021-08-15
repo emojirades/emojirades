@@ -1,3 +1,4 @@
+from emojirades.persistence import GamestateStep
 from emojirades.bot import EmojiradesBot
 from unittest.mock import patch, Mock
 
@@ -31,7 +32,7 @@ class EmojiradeBotTester(unittest.TestCase):
     def reset_and_transition_to(self, state):
         """From the beginning state, transition to another state the user wants"""
         self.setUp()
-        assert self.state["step"] == "new_game"
+        assert self.step == GamestateStep.NEW_GAME
 
         if state == "waiting":
             events = [self.events.new_game]
@@ -70,6 +71,13 @@ class EmojiradeBotTester(unittest.TestCase):
     def pretty_name(self, user_id):
         return user_id
 
+    @property
+    def step(self):
+        return self.gamestate.step(self.config.channel)
+
+    def get_xyz(self, xyz):
+        return self.gamestate.handler.get_xyz(self.config.channel, xyz)
+
     @patch("slack.RTMClient", autospec=True)
     @patch("slack.WebClient", autospec=True)
     def setUp(self, web_client, rtm_client):
@@ -78,35 +86,34 @@ class EmojiradeBotTester(unittest.TestCase):
 
         self.config, self.events = self.prepare_event_data()
 
-        self.scorefile = tempfile.NamedTemporaryFile()
-        self.statefile = tempfile.NamedTemporaryFile()
+        self.dbfile = tempfile.NamedTemporaryFile()
+        self.db_uri = f"sqlite:///{self.dbfile.name}"
+
         self.authfile = tempfile.NamedTemporaryFile()
-
         auth_config = {"bot_access_token": "xoxb-000000000000-aaaaaaaaaaaaaaaaaaaaaaaa"}
-
         self.authfile.write(json.dumps(auth_config).encode("utf-8"))
         self.authfile.seek(0)
+        self.auth_uri = self.authfile.name
 
         self.bot = EmojiradesBot()
+        self.bot.init_db(self.db_uri)
         self.bot.configure_workspace(
-            self.scorefile.name,
-            self.statefile.name,
-            self.authfile.name,
+            self.db_uri, self.auth_uri, workspace_id=self.config.team
         )
 
-        workspace_id = self.bot.DEFAULT_WORKSPACE
-        self.workspace = self.bot.workspaces[workspace_id]
+        self.workspace = self.bot.workspaces[self.config.team]
 
         self.workspace["slack"].bot_id = self.config.bot_id
+        self.workspace["slack"].workspace_id = self.config.team
         self.workspace["slack"].find_im = self.find_im
         self.workspace["slack"].pretty_name = self.pretty_name
 
-        self.state = self.workspace["gamestate"].state[self.config.channel]
-        self.scoreboard = self.workspace["scorekeeper"].scoreboard[self.config.channel]
+        self.gamestate = self.workspace["gamestate"]
+        self.scorekeeper = self.workspace["scorekeeper"]
 
     def tearDown(self):
-        self.scorefile.close()
-        self.statefile.close()
+        self.authfile.close()
+        self.dbfile.close()
 
     @staticmethod
     def prepare_event_data():
@@ -241,7 +248,7 @@ class EmojiradeBotTester(unittest.TestCase):
             },
         }
 
-        class Foo(object):
+        class Foo:
             pass
 
         events = Foo()

@@ -16,19 +16,23 @@ jobs:
         with:
           python-version: 3.9
 
-      - run: pip3 install --upgrade -r requirements-dev.txt
+      - run: pip3 install --upgrade -r requirements.txt -r requirements-dev.txt
 
       - id: black
         run: black --check .
 
+      - id: pylint
+        run: pylint emojirades
+
     outputs:
-      conclusion: ${{ steps.black.conclusion }}
+      black_conclusion: ${{ steps.black.conclusion }}
+      pylint_conclusion: ${{ steps.pylint.conclusion }}
 
   pytest:
     runs-on: ubuntu-20.04
 
     needs: linter
-    if: ${{ needs.linter.outputs.conclusion == 'success' }}
+    if: ${{ needs.linter.outputs.black_conclusion == 'success' && needs.linter.outputs.pylint_conclusion == 'success' }}
 
     strategy:
       matrix:
@@ -48,8 +52,7 @@ jobs:
           set -e
           python -m pip install --user --upgrade pip wheel
 
-          pip install -r requirements.txt --upgrade
-          pip install -r requirements-dev.txt --upgrade
+          pip install -r requirements.txt -r requirements-dev.txt --upgrade
           pip install -e .
 
       - name: Test with pytest

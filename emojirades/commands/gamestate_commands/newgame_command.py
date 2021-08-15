@@ -13,39 +13,44 @@ class NewGameCommand(BaseCommand):
         ("<@{me}> new game @old_winner @winner", "Initiates a new game"),
     ]
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def prepare_args(self, event):
-        super().prepare_args(event)
-
     @admin_or_old_winner_set_check
     def execute(self):
         yield from super().execute()
 
-        if self.args["winner"] == self.args["old_winner"]:
+        user = self.args["user"]
+
+        previous_winner = self.args["old_winner"]
+        current_winner = self.args["winner"]
+
+        previous_winner_name = self.slack.pretty_name(previous_winner)
+        current_winner_name = self.slack.pretty_name(current_winner)
+
+        if current_winner == previous_winner:
             yield (
                 None,
-                f"Sorry, but the old and current winner cannot be the same person (<@{self.args['winner']}>)...",
+                "Sorry, but the old and current winner "
+                f"cannot be the same person (<@{current_winner}>)...",
             )
             return
 
-        self.gamestate.new_game(
-            self.args["channel"], self.args["old_winner"], self.args["winner"]
+        self.gamestate.new_game(self.args["channel"], previous_winner, current_winner)
+
+        yield (
+            None,
+            f"<@{user}> has set the old winner to {previous_winner_name} "
+            f"and the winner to {current_winner_name}",
         )
         yield (
             None,
-            f"<@{self.args['user']}> has set the old winner to <@{self.args['old_winner']}> and the winner to <@{self.args['winner']}>",
+            f"It's now <@{previous_winner}>'s turn "
+            f"to provide {current_winner_name} with the next 'rade!",
         )
         yield (
-            None,
-            f"It's now <@{self.args['old_winner']}>'s turn to provide <@{self.args['winner']}> with the next 'rade!",
+            previous_winner,
+            f"You'll now need to send me the new 'rade for <@{current_winner}>",
         )
         yield (
-            self.args["old_winner"],
-            f"You'll now need to send me the new 'rade for <@{self.args['winner']}>",
-        )
-        yield (
-            self.args["old_winner"],
-            "Please reply back in the format `emojirade Point Break` if `Point Break` was the new 'rade",
+            previous_winner,
+            "Please reply back in the format `emojirade Point Break` "
+            "if `Point Break` was the new 'rade",
         )

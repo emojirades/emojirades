@@ -1,20 +1,16 @@
-import logging
-import time
-import os
 import traceback
+import logging
 
-from emojirades.handlers import get_workspace_directory_handler
+from emojirades.persistence import get_session, get_workspace_handler, migrate, populate
 from emojirades.commands.registry import CommandRegistry
 from emojirades.slack.slack_client import SlackClient
-from emojirades.scorekeeper import ScoreKeeper
+from emojirades.scorekeeper import Scorekeeper
 from emojirades.commands import BaseCommand
-from emojirades.gamestate import GameState
+from emojirades.gamestate import Gamestate
 from emojirades.slack.event import Event
 
 
-class EmojiradesBot(object):
-    DEFAULT_WORKSPACE = "_default"
-
+class EmojiradesBot:
     def __init__(self):
         self.logger = logging.getLogger("Emojirades.Bot")
 
@@ -23,21 +19,40 @@ class EmojiradesBot(object):
 
         self.command_registry = CommandRegistry.command_patterns()
 
-    def configure_workspace(self, score_file, state_file, auth_file, workspace_id=None):
+    @staticmethod
+    def init_db(db_uri):
+        migrate(db_uri)
+
+    @staticmethod
+    def populate_db(db_uri, table, data_filename):
+        populate(db_uri, table, data_filename)
+
+    def configure_workspace(self, db_uri, auth_uri, workspace_id=None):
+        slack = SlackClient(auth_uri)
+
         if workspace_id is None:
-            workspace_id = EmojiradesBot.DEFAULT_WORKSPACE
+            workspace_id = slack.workspace_id
+
+        session = get_session(db_uri)
 
         self.workspaces[workspace_id] = {
-            "scorekeeper": ScoreKeeper(score_file),
-            "gamestate": GameState(state_file),
-            "slack": SlackClient(auth_file, self.logger),
+            "scorekeeper": Scorekeeper(session, workspace_id),
+            "gamestate": Gamestate(session, workspace_id),
+            "slack": slack,
         }
 
-    def configure_workspaces(self, workspaces_dir, workspace_ids, onboarding_queue):
-        WorkspaceHandler = get_workspace_directory_handler(workspaces_dir)
-        handler = WorkspaceHandler(workspaces_dir)
+    def configure_workspaces(
+        self, workspaces_uri, workspace_ids, onboarding_queue, db_uri=None
+    ):
+        handler = get_workspace_handler(workspaces_uri)
 
         for workspace in handler.workspaces():
+            if workspace_ids and workspace["workspace_id"] not in workspace_ids:
+                continue
+
+            if db_uri is not None:
+                workspace["db_uri"] = db_uri
+
             self.configure_workspace(**workspace)
 
         self.onboarding_queue = onboarding_queue
@@ -49,26 +64,34 @@ class EmojiradesBot(object):
         :param workspace: Workspace object containing state
         :return Command: The matched command to be executed
         """
-        self.logger.debug(f"Handling event: {event.data}")
+        self.logger.debug("Handling event: %s", event.data)
 
+        # pylint: disable=invalid-name
         for GameCommand in workspace["gamestate"].infer_commands(event):
             yield GameCommand(event, workspace)
 
         for Command in self.command_registry.values():
             if Command.match(event.text, me=workspace["slack"].bot_id):
-                yield Command(event, workspace)
+                if Command.__name__ == "HelpCommand":
+                    yield Command(event, workspace, commands=self.command_registry)
+                else:
+                    yield Command(event, workspace)
+        # pylint: enable=invalid-name
 
-    def decode_channel(self, channel: str, workspace: dict):
+    @staticmethod
+    def decode_channel(channel: str, workspace: dict):
         """
         Figures out the channel destination
         """
         if channel.startswith("C"):
             # Plain old channel, just return it
             return channel
-        elif channel.startswith("D"):
+
+        if channel.startswith("D"):
             # Direct message channel, just return it
             return channel
-        elif channel.startswith("U"):
+
+        if channel.startswith("U"):
             # Channel is a User ID, which means the real channel is the DM with that user
             dm_id = workspace["slack"].find_im(channel)
 
@@ -78,16 +101,16 @@ class EmojiradesBot(object):
                 )
 
             return dm_id
-        else:
-            raise NotImplementedError(f"Returned channel '{channel}' wasn't decoded")
+
+        raise NotImplementedError(f"Returned channel '{channel}' wasn't decoded")
 
     def handle_event(self, **payload):
         try:
             self._handle_event(**payload)
-        except Exception as e:
+        except Exception as exception:
             if logging.root.level == logging.DEBUG:
                 traceback.print_exc()
-            raise e
+            raise exception
 
     def _handle_event(self, **payload):
         if "team" in payload["data"]:
@@ -95,10 +118,10 @@ class EmojiradesBot(object):
         elif "team" in payload["data"]["message"]:
             workspace_id = payload["data"]["message"]["team"]
         else:
-            raise RuntimeError(f"Unable to run Workspace ID in message event")
+            raise RuntimeError("Unable to run Workspace ID in message event")
 
         if workspace_id not in self.workspaces:
-            workspace_id = EmojiradesBot.DEFAULT_WORKSPACE
+            raise RuntimeError(f"Unknown workspace_id {workspace_id}?")
 
         workspace = self.workspaces[workspace_id]
 
@@ -111,12 +134,14 @@ class EmojiradesBot(object):
             return
 
         for command in self.match_event(event, workspace):
-            self.logger.debug(f"Matched {command} for event {event.data}")
+            self.logger.debug("Matched %s for event %s", command, event.data)
 
             for channel, response in command.execute():
                 self.logger.debug("------------------------")
                 self.logger.debug(
-                    f"Command {command} executed with response: {(channel, response)}"
+                    "Command %s executed with response: %s",
+                    command,
+                    (channel, response),
                 )
 
                 if channel is not None:

@@ -113,3 +113,5 @@ workspaces/
 scores.csv
 scores.json
 state.json
+auth.json
+emojirades.db

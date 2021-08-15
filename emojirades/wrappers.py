@@ -9,12 +9,11 @@ def admin_check(command):
         if not self.gamestate.is_admin(channel, self.args["user"]):
             yield (
                 None,
-                f"Sorry <@{self.args['user']}> but you need to be a game admin to do that :upside_down_face:",
+                f"Sorry <@{self.args['user']}> but you need to be "
+                "a game admin to do that :upside_down_face:",
             )
 
-            admins = [
-                f"<@{admin}>" for admin in self.gamestate.state[channel]["admins"]
-            ]
+            admins = [f"<@{admin}>" for admin in self.gamestate.get_admins(channel)]
             yield (None, f"Game admins currently are: {', '.join(admins)}")
             return
 
@@ -30,7 +29,9 @@ def admin_or_old_winner_check(command):
         is_old_winner = False
         is_admin = False
 
-        if self.args["user"] == self.gamestate.state[channel]["old_winner"]:
+        previous_winner, _ = self.gamestate.winners(channel)
+
+        if self.args["user"] == previous_winner:
             is_old_winner = True
 
         if self.gamestate.is_admin(channel, self.args["user"]):
@@ -39,12 +40,11 @@ def admin_or_old_winner_check(command):
         if not is_old_winner and not is_admin:
             yield (
                 None,
-                f"Sorry <@{self.args['user']}> but you need to be the old winner (or a game admin) to do that :upside_down_face:",
+                f"Sorry <@{self.args['user']}> but you need to be the old winner "
+                "(or a game admin) to do that :upside_down_face:",
             )
 
-            admins = [
-                f"<@{admin}>" for admin in self.gamestate.state[channel]["admins"]
-            ]
+            admins = [f"<@{admin}>" for admin in self.gamestate.get_admins(channel)]
             yield (None, f"Game admins currently are: {', '.join(admins)}")
             return
 
@@ -60,7 +60,9 @@ def admin_or_old_winner_set_check(command):
         is_old_winner = False
         is_admin = False
 
-        if self.args["user"] == self.gamestate.state[channel]["old_winner"]:
+        previous_winner, _ = self.gamestate.winners(channel)
+
+        if self.args["user"] == previous_winner:
             is_old_winner = True
 
         if self.gamestate.is_admin(channel, self.args["user"]):
@@ -77,12 +79,11 @@ def admin_or_old_winner_set_check(command):
         if not is_old_winner and not is_admin:
             yield (
                 None,
-                f"Sorry <@{self.args['user']}> but you need to be the old winner (or a game admin) to do that :upside_down_face:",
+                f"Sorry <@{self.args['user']}> but you need to be the old winner "
+                "(or a game admin) to do that :upside_down_face:",
             )
 
-            admins = [
-                f"<@{admin}>" for admin in self.gamestate.state[channel]["admins"]
-            ]
+            admins = [f"<@{admin}>" for admin in self.gamestate.get_admins(channel)]
             yield (None, f"Game admins currently are: {', '.join(admins)}")
             return
 
@@ -114,7 +115,8 @@ def only_not_in_progress(command):
         if not self.gamestate.not_in_progress(channel):
             yield (
                 None,
-                "Sorry, but the game cannot be in progress! Wait for the round to finish or manually fix it!",
+                "Sorry, but the game cannot be in progress! "
+                "Wait for the round to finish or manually fix it!",
             )
             return
 
@@ -130,7 +132,8 @@ def only_guessing(command):
         if not self.gamestate.guessing(channel):
             yield (
                 None,
-                "Sorry, but we need to be guessing! Get the winner to start posting the next 'rade!",
+                "Sorry, but we need to be guessing! "
+                "Get the winner to start posting the next 'rade!",
             )
             return
 

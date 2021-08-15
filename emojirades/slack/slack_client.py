@@ -1,42 +1,24 @@
-from emojirades.handlers import get_configuration_handler
+import logging
+
 from expiringdict import ExpiringDict
 
 import slack
-import json
+
+from emojirades.persistence import get_auth_handler
 
 
-def get_handler(filename):
-    class SlackAuthConfigHandler(get_configuration_handler(filename)):
-        """
-        Handles CRUD of the Slack Auth configuration file
-        """
+class SlackClient:
+    # pylint: disable=too-many-instance-attributes
+    def __init__(self, auth_uri):
+        self.config = get_auth_handler(auth_uri).load()
+        self.logger = logging.getLogger("EmojiradesBot.slack.SlackClient")
 
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-
-        def load(self):
-            bytes_content = super().load()
-
-            if bytes_content is None or not bytes_content:
-                return None
-
-            return json.loads(bytes_content.decode("utf-8"))
-
-        def save(self, state):
-            raise RuntimeError("Saving SlackAuth file not implemented")
-
-    return SlackAuthConfigHandler(filename)
-
-
-class SlackClient(object):
-    def __init__(self, filename, logger=None):
-        self.config = get_handler(filename).load()
-        self.logger = logger
-
+        # pylint: disable=no-member
         self.rtmclient = slack.RTMClient(token=self.config["bot_access_token"])
         self.webclient = slack.WebClient(
             token=self.config["bot_access_token"], timeout=30
         )
+        # pylint: enable=no-member
 
         self.last_ts = float(0)
 
@@ -47,7 +29,11 @@ class SlackClient(object):
             max_len=100, max_age_seconds=172800
         )  # 2 days
 
-        self.bot_id = self.webclient.auth_test()["user_id"]
+        response = self.webclient.auth_test()
+
+        self.bot_id = response["user_id"]
+        self.workspace_id = response["team_id"]
+
         self.bot_name = self.user_info(self.bot_id)["real_name"]
 
     def start(self):
