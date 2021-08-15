@@ -39,8 +39,8 @@ class ScoreboardAnalytics:
         low = 0
         high = self.len - 1
 
-        first_time = self.history[low][1]
-        last_time = self.history[high][1]
+        first_time = self.history[low]["timestamp"]
+        last_time = self.history[high]["timestamp"]
 
         self.logger.debug("Starting binary search")
 
@@ -70,9 +70,9 @@ class ScoreboardAnalytics:
 
         # Fine tune guess relative to the date range
         while low <= high and low <= guess <= high:
-            if self.history[guess][1] < start_time:
+            if self.history[guess]["timestamp"] < start_time:
                 low = guess + 1
-            elif self.history[guess][1] > end_time:
+            elif self.history[guess]["timestamp"] > end_time:
                 high = guess - 1
             else:
                 return guess
@@ -105,14 +105,14 @@ class ScoreboardAnalytics:
 
         # Get events from start_time to checkpoint
         cursor = affected_row_index - 1
-        while cursor >= 0 and self.history[cursor][1] >= start_time:
+        while cursor >= 0 and self.history[cursor]["timestamp"] >= start_time:
             results.insert(0, self.history[cursor])
             cursor -= 1
 
         # Get events from checkpoint to end_time
         cursor = affected_row_index + 1
         while (
-            cursor <= (self.len - 1) and self.history[cursor][1] <= end_time
+            cursor <= (self.len - 1) and self.history[cursor]["timestamp"] <= end_time
         ):
             results.append(self.history[cursor])
             cursor += 1
@@ -126,7 +126,7 @@ class ScoreboardAnalytics:
         scoreboard = defaultdict(int)
 
         for item in history:
-            operation, _, _ = item[2].split(",")
+            operation, _, _ = item["operation"].split(",")
 
             if operation == "++":
                 val = 1
@@ -135,7 +135,7 @@ class ScoreboardAnalytics:
             else:
                 continue
 
-            scoreboard[item[0]] += val
+            scoreboard[item["user_id"]] += val
 
         return [
             (u, scoreboard[u])
