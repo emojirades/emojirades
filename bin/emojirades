@@ -22,9 +22,9 @@ if __name__ == "__main__":
 
     # Populate Database
     parser_populate = subparsers.add_parser("populate", help="Populate Database")
-    parser_init.add_argument("--db-uri", help="Database URI", required=True)
-    parser_init.add_argument("--table", help="Name of the table", required=True)
-    parser_init.add_argument("--data-file", help="Filename we'll read from", required=True)
+    parser_populate.add_argument("--db-uri", help="Database URI", required=True)
+    parser_populate.add_argument("--table", help="Name of the table", required=True)
+    parser_populate.add_argument("--data-file", help="Filename we'll read from", required=True)
 
     # Single Workspace
     parser_single = subparsers.add_parser("single", help="Single Workspace")
@@ -58,6 +58,9 @@ if __name__ == "__main__":
     if args.mode == "init":
         logger.debug("Running DB migrations")
         bot.init_db(args.db_uri)
+    elif args.mode == "populate":
+        logger.debug("Running DB population")
+        bot.populate_db(args.db_uri, args.table, args.data_file)
     else:
         if args.mode == "single":
             logger.debug("Configuring for Single Workspace mode")

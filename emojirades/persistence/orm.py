@@ -1,6 +1,6 @@
-import os
-
+import datetime
 import json
+import os
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from alembic.config import Config
 from alembic import command
 
-from .models import Gamestate, GamestateHistory, Scoreboard, ScoreboardHistory
+from .models import Gamestate, GamestateHistory, Scoreboard, ScoreboardHistory, GamestateStep
 
 
 def get_engine(db_uri):
@@ -55,12 +55,20 @@ def populate(db_uri, table, data_filename, commit_every=100):
 
     if table == "gamestate":
         Obj = Gamestate
+        col_funcs = {
+            "step": lambda x: getattr(GamestateStep, x),
+        }
     elif table == "gamestate_history":
         Obj = GamestateHistory
+        col_funcs = {}
     elif table == "scoreboard":
         Obj = Scoreboard
+        col_funcs = {}
     elif table == "scoreboard_history":
         Obj = ScoreboardHistory
+        col_funcs = {
+            "timestamp": lambda x: datetime.datetime.strptime(x, "%Y-%m-%d %H:%M:%S"),
+        }
     else:
         raise RuntimeError(f"Unknown table {table}?")
 
@@ -68,6 +76,9 @@ def populate(db_uri, table, data_filename, commit_every=100):
         data = json.load(data_file)
 
         for i, row in enumerate(data):
+            for key, func in col_funcs.items():
+                row[key] = func(row[key])
+
             obj = Obj(**row)
             session.add(obj)
 
@@ -75,3 +86,4 @@ def populate(db_uri, table, data_filename, commit_every=100):
                 session.commit()
 
     session.commit()
+    session.close()
