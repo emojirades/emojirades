@@ -57,7 +57,9 @@ class TestBotScenarios(EmojiradeBotTester):
         assert self.get_xyz("current_winner") == self.config.player_3
         assert self.get_xyz("emojirade") is None
         assert self.get_xyz("raw_emojirade") is None
-        assert self.scorekeeper.scoreboard(self.config.channel) == [(1, self.config.player_3, 1)]
+        assert self.scorekeeper.scoreboard(self.config.channel) == [
+            (1, self.config.player_3, 1)
+        ]
 
     def test_valid_manually_awarded_complete_game(self):
         """Performs a complete valid round but the win is manually awarded"""
@@ -106,7 +108,9 @@ class TestBotScenarios(EmojiradeBotTester):
         assert self.get_xyz("current_winner") == self.config.player_3
         assert self.get_xyz("emojirade") is None
         assert self.get_xyz("raw_emojirade") is None
-        assert self.scorekeeper.scoreboard(self.config.channel) == [(1, self.config.player_3, 1)]
+        assert self.scorekeeper.scoreboard(self.config.channel) == [
+            (1, self.config.player_3, 1)
+        ]
 
     def test_valid_responses(self):
         """
@@ -457,7 +461,10 @@ class TestBotScenarios(EmojiradeBotTester):
 
         assert self.step == GamestateStep.PROVIDED
         assert self.get_xyz("emojirade") == f'["space the final frontier"]'
-        assert self.get_xyz('raw_emojirade').encode().decode("unicode-escape") == f'["{raw_rade}"]'
+        assert (
+            self.get_xyz("raw_emojirade").encode().decode("unicode-escape")
+            == f'["{raw_rade}"]'
+        )
 
     def test_emoji_detection(self):
         """Performs tests to ensure when an emoji is posted the game progresses in state"""

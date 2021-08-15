@@ -33,9 +33,7 @@ class NewGameCommand(BaseCommand):
             )
             return
 
-        self.gamestate.new_game(
-            self.args["channel"], previous_winner, current_winner
-        )
+        self.gamestate.new_game(self.args["channel"], previous_winner, current_winner)
 
         yield (
             None,

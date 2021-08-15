@@ -94,8 +94,12 @@ class TestBotCommands(EmojiradeBotTester):
         assert current_winner == self.config.player_4
 
         # (position, score)
-        assert self.scorekeeper.user_score(self.config.channel, self.config.player_4) == (1, 1)
-        assert self.scorekeeper.user_score(self.config.channel, self.config.player_3) == (2, 0)
+        assert self.scorekeeper.user_score(
+            self.config.channel, self.config.player_4
+        ) == (1, 1)
+        assert self.scorekeeper.user_score(
+            self.config.channel, self.config.player_3
+        ) == (2, 0)
 
         # Check the user cannot award to themselves
         self.reset_and_transition_to("guessed")
@@ -114,8 +118,12 @@ class TestBotCommands(EmojiradeBotTester):
         assert current_winner == self.config.player_3
 
         # (position, score)
-        assert self.scorekeeper.user_score(self.config.channel, self.config.player_3) == (1, 1)
-        assert self.scorekeeper.user_score(self.config.channel, self.config.player_4) == (None, None)
+        assert self.scorekeeper.user_score(
+            self.config.channel, self.config.player_3
+        ) == (1, 1)
+        assert self.scorekeeper.user_score(
+            self.config.channel, self.config.player_4
+        ) == (None, None)
 
         # Check the user cannot award to the winner (no-op)
         self.reset_and_transition_to("guessed")
@@ -134,8 +142,12 @@ class TestBotCommands(EmojiradeBotTester):
         assert current_winner == self.config.player_3
 
         # (position, score)
-        assert self.scorekeeper.user_score(self.config.channel, self.config.player_3) == (1, 1)
-        assert self.scorekeeper.user_score(self.config.channel, self.config.player_4) == (None, None)
+        assert self.scorekeeper.user_score(
+            self.config.channel, self.config.player_3
+        ) == (1, 1)
+        assert self.scorekeeper.user_score(
+            self.config.channel, self.config.player_4
+        ) == (None, None)
 
     def test_set_emojirade_banned_words(self):
         """Ensure that the emojirade can't contain banned words"""

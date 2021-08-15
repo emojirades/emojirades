@@ -13,9 +13,7 @@ def admin_check(command):
                 "a game admin to do that :upside_down_face:",
             )
 
-            admins = [
-                f"<@{admin}>" for admin in self.gamestate.get_admins(channel)
-            ]
+            admins = [f"<@{admin}>" for admin in self.gamestate.get_admins(channel)]
             yield (None, f"Game admins currently are: {', '.join(admins)}")
             return
 
@@ -46,9 +44,7 @@ def admin_or_old_winner_check(command):
                 "(or a game admin) to do that :upside_down_face:",
             )
 
-            admins = [
-                f"<@{admin}>" for admin in self.gamestate.get_admins(channel)
-            ]
+            admins = [f"<@{admin}>" for admin in self.gamestate.get_admins(channel)]
             yield (None, f"Game admins currently are: {', '.join(admins)}")
             return
 
@@ -87,9 +83,7 @@ def admin_or_old_winner_set_check(command):
                 "(or a game admin) to do that :upside_down_face:",
             )
 
-            admins = [
-                f"<@{admin}>" for admin in self.gamestate.get_admins(channel)
-            ]
+            admins = [f"<@{admin}>" for admin in self.gamestate.get_admins(channel)]
             yield (None, f"Game admins currently are: {', '.join(admins)}")
             return
 

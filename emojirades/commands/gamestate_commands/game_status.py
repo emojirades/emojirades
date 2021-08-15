@@ -33,8 +33,10 @@ class GameStatusCommand(BaseCommand):
         elif step == GamestateStep.PROVIDED:
             status = f"Waiting for <@{current_winner}> to post an emoji to kick off the round!"
         elif step == GamestateStep.GUESSING:
-            status = f"Come on, everyone's guessing what {current_winner_name} has posted! " \
-                     "Get to it! :runner::dash:"
+            status = (
+                f"Come on, everyone's guessing what {current_winner_name} has posted! "
+                "Get to it! :runner::dash:"
+            )
         else:
             status = "Not entirely sure what the state of this game is in... :shrug:"
 

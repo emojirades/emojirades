@@ -3,7 +3,7 @@ from sqlalchemy import select, desc
 from ..models import Scoreboard, ScoreboardHistory
 
 
-class ScorekeeperDB():
+class ScorekeeperDB:
     SCOREBOARD_LIMIT = 15
     HISTORY_LIMIT = 15
 
@@ -32,9 +32,7 @@ class ScorekeeperDB():
             self.session.commit()
 
     def get_user(self, channel, user):
-        stmt = select(
-            Scoreboard,
-        ).where(
+        stmt = select(Scoreboard,).where(
             Scoreboard.workspace_id == self.workspace_id,
             Scoreboard.channel_id == channel,
             Scoreboard.user_id == user,
@@ -107,14 +105,18 @@ class ScorekeeperDB():
         if scoreboard := self.scoreboard_cache.get(channel):
             return scoreboard
 
-        stmt = select(
-            Scoreboard.user_id,
-            Scoreboard.score,
-        ).where(
-            Scoreboard.workspace_id == self.workspace_id,
-            Scoreboard.channel_id == channel,
-        ).order_by(
-            desc(Scoreboard.score),
+        stmt = (
+            select(
+                Scoreboard.user_id,
+                Scoreboard.score,
+            )
+            .where(
+                Scoreboard.workspace_id == self.workspace_id,
+                Scoreboard.channel_id == channel,
+            )
+            .order_by(
+                desc(Scoreboard.score),
+            )
         )
 
         if limit:
@@ -122,8 +124,7 @@ class ScorekeeperDB():
 
         result = self.session.execute(stmt).fetchall()
         scoreboard = [
-            (pos, row.user_id, row.score)
-            for pos, row in enumerate(result, start=1)
+            (pos, row.user_id, row.score) for pos, row in enumerate(result, start=1)
         ]
 
         self.scoreboard_cache[channel] = scoreboard
@@ -146,15 +147,19 @@ class ScorekeeperDB():
         if history := self.history_cache.get(channel):
             return history
 
-        stmt = select(
-            ScoreboardHistory.user_id,
-            ScoreboardHistory.timestamp,
-            ScoreboardHistory.operation,
-        ).where(
-            ScoreboardHistory.workspace_id == self.workspace_id,
-            ScoreboardHistory.channel_id == channel,
-        ).order_by(
-            desc(ScoreboardHistory.timestamp),
+        stmt = (
+            select(
+                ScoreboardHistory.user_id,
+                ScoreboardHistory.timestamp,
+                ScoreboardHistory.operation,
+            )
+            .where(
+                ScoreboardHistory.workspace_id == self.workspace_id,
+                ScoreboardHistory.channel_id == channel,
+            )
+            .order_by(
+                desc(ScoreboardHistory.timestamp),
+            )
         )
 
         if limit:
@@ -163,8 +168,7 @@ class ScorekeeperDB():
         result = self.session.execute(stmt).fetchall()
 
         scorekeeper_history = [
-            (row.user_id, row.timestamp, row.operation)
-            for row in result
+            (row.user_id, row.timestamp, row.operation) for row in result
         ]
 
         self.history_cache[channel] = scorekeeper_history

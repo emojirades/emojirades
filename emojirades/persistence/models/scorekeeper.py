@@ -19,14 +19,16 @@ class Scoreboard(Base):
         DateTime,
         nullable=False,
         default=datetime.datetime.utcnow,
-        onupdate=datetime.datetime.utcnow
+        onupdate=datetime.datetime.utcnow,
     )
 
     Index("idx_scoreboard_channel", "workspace_id", "channel_id", unique=True)
 
     def __repr__(self):
-        return f"Scoreboard(w_id={self.workspace_id!r}, c_id={self.channel_id!r}, " \
-                "u_id={self.user_id!r}, score={self.score!r})"
+        return (
+            f"Scoreboard(w_id={self.workspace_id!r}, c_id={self.channel_id!r}, "
+            "u_id={self.user_id!r}, score={self.score!r})"
+        )
 
 
 class ScoreboardHistory(Base):
@@ -45,6 +47,8 @@ class ScoreboardHistory(Base):
     Index("idx_scoreboard_history_channel", "workspace_id", "channel_id")
 
     def __repr__(self):
-        return f"ScoreboardHistory(w_id={self.workspace_id!r}, " \
-                "c_id={self.channel_id!r}, u_id={self.user_id!r}, " \
-                "op={self.operation!r})"
+        return (
+            f"ScoreboardHistory(w_id={self.workspace_id!r}, "
+            "c_id={self.channel_id!r}, u_id={self.user_id!r}, "
+            "op={self.operation!r})"
+        )

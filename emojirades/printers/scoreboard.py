@@ -53,11 +53,7 @@ class ScoreboardPrinter:
             yield None, "Nothing to see here!"
             return
 
-        lines = [
-            "```",
-            self.print_title(),
-            ""
-        ]
+        lines = ["```", self.print_title(), ""]
 
         # Calculate the max width of the name and score columns
         longest_name = 0

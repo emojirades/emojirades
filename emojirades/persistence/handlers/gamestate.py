@@ -5,8 +5,8 @@ from sqlalchemy import select, desc, or_
 from ..models import Gamestate, GamestateHistory, GamestateStep
 
 
-class GamestateDB():
-    HISTORY_LIMIT=5
+class GamestateDB:
+    HISTORY_LIMIT = 5
 
     def __init__(self, session, workspace_id):
         self.session = session
@@ -36,9 +36,7 @@ class GamestateDB():
         if gamestate := self.gamestate_cache.get(channel):
             return gamestate
 
-        stmt = select(
-            Gamestate,
-        ).where(
+        stmt = select(Gamestate,).where(
             Gamestate.workspace_id == self.workspace_id,
             Gamestate.channel_id == channel,
         )
@@ -141,15 +139,19 @@ class GamestateDB():
         if history := self.history_cache.get(channel):
             return history
 
-        stmt = select(
-            GamestateHistory.user_id,
-            GamestateHistory.timestamp,
-            GamestateHistory.operation,
-        ).where(
-            GamestateHistory.workspace_id == self.workspace_id,
-            GamestateHistory.channel_id == channel,
-        ).order_by(
-            desc(GamestateHistory.timestamp),
+        stmt = (
+            select(
+                GamestateHistory.user_id,
+                GamestateHistory.timestamp,
+                GamestateHistory.operation,
+            )
+            .where(
+                GamestateHistory.workspace_id == self.workspace_id,
+                GamestateHistory.channel_id == channel,
+            )
+            .order_by(
+                desc(GamestateHistory.timestamp),
+            )
         )
 
         if limit:
@@ -158,8 +160,7 @@ class GamestateDB():
         result = self.session.execute(stmt).fetchall()
 
         gamestate_history = [
-            (row.user_id, row.timestamp, row.operation)
-            for row in result
+            (row.user_id, row.timestamp, row.operation) for row in result
         ]
 
         self.history_cache[channel] = gamestate_history
@@ -176,11 +177,12 @@ class GamestateDB():
         return [row.channel_id for row in result]
 
     def get_pending_channel(self, previous_winner):
-        stmt = select(
-            Gamestate.channel_id,
-        ).where(
+        stmt = select(Gamestate.channel_id,).where(
             Gamestate.workspace_id == self.workspace_id,
-            or_(Gamestate.step == GamestateStep.WAITING, Gamestate.step == GamestateStep.PROVIDED),
+            or_(
+                Gamestate.step == GamestateStep.WAITING,
+                Gamestate.step == GamestateStep.PROVIDED,
+            ),
             Gamestate.previous_winner == previous_winner,
         )
 

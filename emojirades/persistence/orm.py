@@ -22,11 +22,13 @@ def get_session(db_uri):
 def discover_base_dir():
     return os.path.join(os.path.dirname(__file__), "models")
 
+
 def discover_migration_ini(base=None):
     if base is None:
         base = discover_base_dir()
 
     return os.path.join(base, "alembic.ini")
+
 
 def discover_migration_dir(base=None):
     if base is None:
@@ -46,6 +48,7 @@ def migrate(db_uri, migration_ini=None, migration_dir=None):
     alembic_cfg.set_main_option("script_location", migration_dir)
     alembic_cfg.set_main_option("sqlalchemy.url", db_uri)
     command.upgrade(alembic_cfg, "head")
+
 
 def populate(db_uri, table, data_filename, commit_every=100):
     session = get_session(db_uri)

@@ -84,8 +84,6 @@ class ScoreboardCommand(BaseCommand):
         for time_unit in self.time_units:
             scoreboard, parsed_date = self.get_scoreboard(time_unit)
 
-            printer = ScoreboardPrinter(
-                scoreboard, self.slack, time_unit, parsed_date
-            )
+            printer = ScoreboardPrinter(scoreboard, self.slack, time_unit, parsed_date)
 
             yield from printer.print()

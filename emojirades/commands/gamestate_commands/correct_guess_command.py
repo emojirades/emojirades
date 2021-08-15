@@ -83,9 +83,7 @@ class CorrectGuessCommand(BaseCommand):
             alternatives = ""
 
         self.gamestate.correct_guess(channel, self.args["target_user"])
-        score, position = self.scorekeeper.plusplus(
-            channel, self.args["target_user"]
-        )
+        score, position = self.scorekeeper.plusplus(channel, self.args["target_user"])
 
         # Fetch these again as correct_guess will have rotated them
         (previous_winner, current_winner) = self.gamestate.winners(channel)

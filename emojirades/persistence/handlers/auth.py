@@ -28,6 +28,7 @@ class LocalAuthFileHandler:
         with open(self.auth_uri, "rt") as auth_file:
             return json.load(auth_file)
 
+
 def get_auth_handler(uri):
     if uri.startswith("s3://"):
         return S3AuthFileHandler(uri)

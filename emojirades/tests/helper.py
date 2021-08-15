@@ -97,7 +97,9 @@ class EmojiradeBotTester(unittest.TestCase):
 
         self.bot = EmojiradesBot()
         self.bot.init_db(self.db_uri)
-        self.bot.configure_workspace(self.db_uri, self.auth_uri, workspace_id=self.config.team)
+        self.bot.configure_workspace(
+            self.db_uri, self.auth_uri, workspace_id=self.config.team
+        )
 
         self.workspace = self.bot.workspaces[self.config.team]
 

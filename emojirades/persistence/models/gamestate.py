@@ -32,7 +32,7 @@ class Gamestate(Base):
         DateTime,
         nullable=False,
         default=datetime.datetime.utcnow,
-        onupdate=datetime.datetime.utcnow
+        onupdate=datetime.datetime.utcnow,
     )
 
     def __repr__(self):
@@ -56,9 +56,11 @@ class GamestateHistory(Base):
     operation = Column(Text, nullable=False)
 
     def __repr__(self):
-        return f"GamestateHistory(w_id={self.workspace_id!r}, " \
-                "c_id={self.channel_id!r}, u_id={self.user_id!r}, " \
-                "op={self.operation!r})"
+        return (
+            f"GamestateHistory(w_id={self.workspace_id!r}, "
+            "c_id={self.channel_id!r}, u_id={self.user_id!r}, "
+            "op={self.operation!r})"
+        )
 
 
 Index(

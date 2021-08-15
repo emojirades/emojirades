@@ -52,7 +52,7 @@ class Gamestate:
         self.logger = logging.getLogger("EmojiradesBot.gamestate.Gamestate")
 
     def in_progress(self, channel):
-        invalid_steps = (GamestateStep.NEW_GAME, )
+        invalid_steps = (GamestateStep.NEW_GAME,)
 
         return self.handler.get_xyz(channel, "step") not in invalid_steps
 
@@ -61,7 +61,7 @@ class Gamestate:
         return self.handler.get_xyz(channel, "step") in valid_steps
 
     def guessing(self, channel):
-        valid_steps = (GamestateStep.GUESSING, )
+        valid_steps = (GamestateStep.GUESSING,)
         return self.handler.get_xyz(channel, "step") in valid_steps
 
     def infer_commands(self, event: Event):
@@ -105,12 +105,11 @@ class Gamestate:
             pass
 
         # Check to see if the users guess is right!
-        elif (
-            self.handler.get_xyz(channel, "step") == GamestateStep.GUESSING
-            and user not in (
-                self.handler.get_xyz(channel, "previous_winner"),
-                self.handler.get_xyz(channel, "current_winner"),
-            )
+        elif self.handler.get_xyz(
+            channel, "step"
+        ) == GamestateStep.GUESSING and user not in (
+            self.handler.get_xyz(channel, "previous_winner"),
+            self.handler.get_xyz(channel, "current_winner"),
         ):
             guess = sanitize_text(text)
 
@@ -174,14 +173,18 @@ class Gamestate:
                 f"Expecting state to be WAITING or PROVIDED, was {step}"
             )
 
-        self.handler.set_many_xyz(channel, user, [
-            ("emojirade", json.dumps([sanitize_text(i) for i in emojirades])),
-            ("raw_emojirade", json.dumps(emojirades)),
-            ("step", GamestateStep.PROVIDED),
-        ])
+        self.handler.set_many_xyz(
+            channel,
+            user,
+            [
+                ("emojirade", json.dumps([sanitize_text(i) for i in emojirades])),
+                ("raw_emojirade", json.dumps(emojirades)),
+                ("step", GamestateStep.PROVIDED),
+            ],
+        )
 
     def winner_posted(self, channel, user):
-        valid_steps = (GamestateStep.PROVIDED, )
+        valid_steps = (GamestateStep.PROVIDED,)
         step = self.handler.get_xyz(channel, "step")
 
         if step not in valid_steps:
@@ -189,13 +192,17 @@ class Gamestate:
                 f"Expecting state to be PROVIDED, was {step}"
             )
 
-        self.handler.set_many_xyz(channel, user, [
-            ("step", GamestateStep.GUESSING),
-            ("first_guess", True),
-        ])
+        self.handler.set_many_xyz(
+            channel,
+            user,
+            [
+                ("step", GamestateStep.GUESSING),
+                ("first_guess", True),
+            ],
+        )
 
     def correct_guess(self, channel, winner):
-        valid_steps = (GamestateStep.GUESSING, )
+        valid_steps = (GamestateStep.GUESSING,)
         step = self.handler.get_xyz(channel, "step")
 
         if step not in valid_steps:
@@ -203,13 +210,17 @@ class Gamestate:
                 f"Expecting state to be GUESSING, was {step}"
             )
 
-        self.handler.set_many_xyz(channel, winner, [
-            ("previous_winner", self.handler.get_xyz(channel, "current_winner")),
-            ("current_winner", winner),
-            ("step", GamestateStep.WAITING),
-            ("emojirade", None),
-            ("raw_emojirade", None),
-        ])
+        self.handler.set_many_xyz(
+            channel,
+            winner,
+            [
+                ("previous_winner", self.handler.get_xyz(channel, "current_winner")),
+                ("current_winner", winner),
+                ("step", GamestateStep.WAITING),
+                ("emojirade", None),
+                ("raw_emojirade", None),
+            ],
+        )
 
     def fixwinner(self, channel, winner):
         loser = self.handler.get_xyz(channel, "current_winner")
