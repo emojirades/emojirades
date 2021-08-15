@@ -1,6 +1,6 @@
 import datetime
 
-from sqlalchemy import Column, Text, Integer, DateTime, Identity, BigInteger, Index
+from sqlalchemy import Column, Text, Integer, DateTime, Identity, Index
 
 from .base import Base
 
@@ -33,7 +33,7 @@ class ScoreboardHistory(Base):
     # pylint: disable=too-few-public-methods
     __tablename__ = "scoreboard_history"
 
-    event_id = Column(BigInteger, Identity(), primary_key=True)
+    event_id = Column(Integer, Identity(), primary_key=True)
 
     workspace_id = Column(Text)
     channel_id = Column(Text)

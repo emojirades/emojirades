@@ -49,16 +49,17 @@ class ScorekeeperDB():
             workspace_id=self.workspace_id,
             channel_id=channel,
             user_id=user,
+            score=0,
         )
 
     def increment_score(self, channel, user, score=1):
-        user = self.get_user(channel, user)
+        entry = self.get_user(channel, user)
 
-        previous_score = int(user.score)
-        user.score += score
-        current_score = int(user.score)
+        previous_score = int(entry.score)
+        entry.score += score
+        current_score = int(entry.score)
 
-        self.session.add(user)
+        self.session.add(entry)
 
         self.record_history(channel, user, f"++,{previous_score},{current_score}")
 
@@ -68,13 +69,13 @@ class ScorekeeperDB():
         return self.position_on_scoreboard(channel, user)
 
     def decrement_score(self, channel, user, score=1):
-        user = self.get_user(channel, user)
+        entry = self.get_user(channel, user)
 
-        previous_score = int(user.score)
-        user.score -= score
-        current_score = int(user.score)
+        previous_score = int(entry.score)
+        entry.score -= score
+        current_score = int(entry.score)
 
-        self.session.add(user)
+        self.session.add(entry)
 
         self.record_history(channel, user, f"--,{previous_score},{current_score}")
 
@@ -84,13 +85,13 @@ class ScorekeeperDB():
         return self.position_on_scoreboard(channel, user)
 
     def set_score(self, channel, user, score):
-        user = self.get_user(channel, user)
+        entry = self.get_user(channel, user)
 
-        previous_score = int(user.score)
-        user.score = score
-        current_score = int(user.score)
+        previous_score = int(entry.score)
+        entry.score = score
+        current_score = int(entry.score)
 
-        self.session.add(user)
+        self.session.add(entry)
 
         self.record_history(channel, user, f"set,{previous_score},{current_score}")
 

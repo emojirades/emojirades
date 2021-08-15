@@ -3,12 +3,12 @@
         "workspace_id": "T00000001",
         "channel_id": "C00000001",
         "user_id": "U00000001",
-        "score": 2,
+        "score": 2
     },
     {
         "workspace_id": "T00000001",
         "channel_id": "C00000001",
         "user_id": "U00000002",
-        "score": 1,
+        "score": 1
     }
 ]

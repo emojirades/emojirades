@@ -166,7 +166,16 @@ class GamestateDB():
 
         return gamestate_history
 
-    def get_pending_channels(self, previous_winner):
+    def get_channels(self):
+        stmt = select(
+            Gamestate.channel_id,
+        )
+
+        result = self.session.execute(stmt).fetchall()
+
+        return [row.channel_id for row in result]
+
+    def get_pending_channel(self, previous_winner):
         stmt = select(
             Gamestate.channel_id,
         ).where(
@@ -175,9 +184,10 @@ class GamestateDB():
             Gamestate.previous_winner == previous_winner,
         )
 
+        # We pick the first
         result = self.session.execute(stmt).first()
 
         if result is None:
-            return []
+            return None
 
-        return [row.channel_id for row in result]
+        return result[0]

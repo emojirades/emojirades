@@ -1,4 +1,5 @@
 from emojirades.tests.helper import EmojiradeBotTester
+from emojirades.persistence import GamestateStep
 
 import time
 import re
@@ -11,45 +12,52 @@ class TestBotScenarios(EmojiradeBotTester):
 
     def test_valid_complete_game(self):
         """Performs a complete valid round"""
-        assert self.state["step"] == "new_game"
-        assert self.state["old_winner"] is None
-        assert self.state["winner"] is None
-        assert self.state["emojirade"] is None
-        assert self.state["raw_emojirade"] is None
-        assert not self.scoreboard["scores"]
+        assert self.step == GamestateStep.NEW_GAME
+        assert self.get_xyz("previous_winner") is None
+        assert self.get_xyz("current_winner") is None
+        assert self.get_xyz("emojirade") is None
+        assert self.get_xyz("raw_emojirade") is None
+        assert len(self.scorekeeper.scoreboard(self.config.channel)) == 0
 
         self.send_event(self.events.new_game)
-        assert self.state["step"] == "waiting"
-        assert self.state["old_winner"] == self.config.player_1
-        assert self.state["winner"] == self.config.player_2
-        assert self.state["emojirade"] is None
-        assert self.state["raw_emojirade"] is None
-        assert not self.scoreboard["scores"]
+        assert self.step == GamestateStep.WAITING
+        assert self.get_xyz("previous_winner") == self.config.player_1
+        assert self.get_xyz("current_winner") == self.config.player_2
+        assert self.get_xyz("emojirade") is None
+        assert self.get_xyz("raw_emojirade") is None
+        assert len(self.scorekeeper.scoreboard(self.config.channel)) == 0
 
         self.send_event(self.events.posted_emojirade)
-        assert self.state["step"] == "provided"
-        assert self.state["old_winner"] == self.config.player_1
-        assert self.state["winner"] == self.config.player_2
-        assert self.state["emojirade"] == [self.config.emojirade]
-        assert self.state["raw_emojirade"] == [self.config.emojirade]
-        assert not self.scoreboard["scores"]
+        assert self.step == GamestateStep.PROVIDED
+        assert self.get_xyz("previous_winner") == self.config.player_1
+        assert self.get_xyz("current_winner") == self.config.player_2
+        assert self.get_xyz("emojirade") == f'["{self.config.emojirade}"]'
+        assert self.get_xyz("raw_emojirade") == f'["{self.config.emojirade}"]'
+        assert len(self.scorekeeper.scoreboard(self.config.channel)) == 0
 
         self.send_event(self.events.posted_emoji)
-        assert self.state["step"] == "guessing"
-        assert self.state["old_winner"] == self.config.player_1
-        assert self.state["winner"] == self.config.player_2
-        assert self.state["emojirade"] == [self.config.emojirade]
-        assert self.state["raw_emojirade"] == [self.config.emojirade]
-        assert not self.scoreboard["scores"]
+        assert self.step == GamestateStep.GUESSING
+        assert self.get_xyz("previous_winner") == self.config.player_1
+        assert self.get_xyz("current_winner") == self.config.player_2
+        assert self.get_xyz("emojirade") == f'["{self.config.emojirade}"]'
+        assert self.get_xyz("raw_emojirade") == f'["{self.config.emojirade}"]'
+        assert len(self.scorekeeper.scoreboard(self.config.channel)) == 0
+
+        self.send_event(self.events.incorrect_guess)
+        assert self.step == GamestateStep.GUESSING
+        assert self.get_xyz("previous_winner") == self.config.player_1
+        assert self.get_xyz("current_winner") == self.config.player_2
+        assert self.get_xyz("emojirade") == f'["{self.config.emojirade}"]'
+        assert self.get_xyz("raw_emojirade") == f'["{self.config.emojirade}"]'
+        assert len(self.scorekeeper.scoreboard(self.config.channel)) == 0
 
         self.send_event(self.events.correct_guess)
-        assert self.state["step"] == "waiting"
-        assert self.state["old_winner"] == self.config.player_2
-        assert self.state["winner"] == self.config.player_3
-        assert self.state["emojirade"] is None
-        assert self.state["raw_emojirade"] is None
-        assert list(self.scoreboard["scores"].keys()) == [self.config.player_3]
-        assert self.scoreboard["scores"][self.config.player_3] == 1
+        assert self.step == GamestateStep.WAITING
+        assert self.get_xyz("previous_winner") == self.config.player_2
+        assert self.get_xyz("current_winner") == self.config.player_3
+        assert self.get_xyz("emojirade") is None
+        assert self.get_xyz("raw_emojirade") is None
+        assert self.scorekeeper.scoreboard(self.config.channel) == [(1, self.config.player_3, 1)]
         assert (self.config.channel, f"<@{self.config.player_3}>++") in self.responses
 
     def test_valid_manually_awarded_complete_game(self):

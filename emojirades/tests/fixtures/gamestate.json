@@ -2,6 +2,6 @@
     {
         "workspace_id": "T00000001",
         "channel_id": "C00000001",
-        "step": "NEW_GAME",
+        "step": "NEW_GAME"
     }
 ]

@@ -1,4 +1,4 @@
-from emojirades.analytics.leaderboard import LeaderBoard
+from emojirades.analytics.scoreboard import ScoreboardAnalytics
 
 import pendulum
 import pytest
@@ -8,11 +8,11 @@ from emojirades.analytics.time_unit import TimeUnit
 from emojirades.tests.FileFixture import FileFixture
 
 
-class TestLeaderBoard:
+class TestScoreboardAnalytics:
     @pytest.fixture
     def lb(self):
         with FileFixture("history.json").open() as ff:
-            return LeaderBoard(json.load(ff))
+            return ScoreboardAnalytics(json.load(ff))
 
     @pytest.fixture
     def current_date(self, mel_tz):

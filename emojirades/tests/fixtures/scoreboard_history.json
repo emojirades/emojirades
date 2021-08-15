@@ -3,18 +3,18 @@
         "workspace_id": "T00000001",
         "channel_id": "C00000001",
         "user_id": "U00000001",
-        "operation": "++,0,1",
+        "operation": "++,0,1"
     },
     {
         "workspace_id": "T00000001",
         "channel_id": "C00000001",
         "user_id": "U00000001",
-        "operation": "++,1,2",
+        "operation": "++,1,2"
     },
     {
         "workspace_id": "T00000001",
         "channel_id": "C00000001",
         "user_id": "U00000002",
-        "operation": "++,0,1",
+        "operation": "++,0,1"
     }
 ]

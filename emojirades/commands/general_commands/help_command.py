@@ -48,7 +48,7 @@ class HelpCommand(BaseCommand):
         message += "```"
         yield (None, message)
 
-        game_admins = self.gamestate.game_status(self.args["channel"])["admins"]
+        game_admins = self.gamestate.get_admins(self.args["channel"])
         admins_names = [self.slack.pretty_name(i) for i in game_admins]
         yield (None, "Game Admins: " + ", ".join(admins_names))
 

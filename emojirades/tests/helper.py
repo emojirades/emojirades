@@ -1,3 +1,4 @@
+from emojirades.persistence import GamestateStep
 from emojirades.bot import EmojiradesBot
 from unittest.mock import patch, Mock
 
@@ -31,7 +32,7 @@ class EmojiradeBotTester(unittest.TestCase):
     def reset_and_transition_to(self, state):
         """From the beginning state, transition to another state the user wants"""
         self.setUp()
-        assert self.state["step"] == "new_game"
+        assert self.step == GamestateStep.NEW_GAME
 
         if state == "waiting":
             events = [self.events.new_game]
@@ -70,6 +71,13 @@ class EmojiradeBotTester(unittest.TestCase):
     def pretty_name(self, user_id):
         return user_id
 
+    @property
+    def step(self):
+        return self.gamestate.step(self.config.channel)
+
+    def get_xyz(self, xyz):
+        return self.gamestate.handler.get_xyz(self.config.channel, xyz)
+
     @patch("slack.RTMClient", autospec=True)
     @patch("slack.WebClient", autospec=True)
     def setUp(self, web_client, rtm_client):
@@ -78,7 +86,7 @@ class EmojiradeBotTester(unittest.TestCase):
 
         self.config, self.events = self.prepare_event_data()
 
-        self.dbfile = templfile.NamedTemporaryFile()
+        self.dbfile = tempfile.NamedTemporaryFile()
         self.db_uri = f"sqlite:///{self.dbfile.name}"
 
         self.authfile = tempfile.NamedTemporaryFile()
@@ -87,16 +95,14 @@ class EmojiradeBotTester(unittest.TestCase):
         self.authfile.seek(0)
         self.auth_uri = f"file://{self.authfile.name}"
 
-        workspace_id = "T12345678"
-
         self.bot = EmojiradesBot()
         self.bot.init_db(self.db_uri)
-        self.bot.configure_workspace(self.db_uri, self.auth_uri, workspace_id=workspace_id)
+        self.bot.configure_workspace(self.db_uri, self.auth_uri, workspace_id=self.config.team)
 
-        self.workspace = self.bot.workspaces[workspace_id]
+        self.workspace = self.bot.workspaces[self.config.team]
 
         self.workspace["slack"].bot_id = self.config.bot_id
-        self.workspace["slack"].workspace_id = workspace_id
+        self.workspace["slack"].workspace_id = self.config.team
         self.workspace["slack"].find_im = self.find_im
         self.workspace["slack"].pretty_name = self.pretty_name
 

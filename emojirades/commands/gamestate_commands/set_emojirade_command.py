@@ -27,7 +27,7 @@ class SetEmojiradeCommand(BaseCommand):
         self.args["original_channel"] = self.args["channel"]
 
         # Figure out the channel to use
-        self.args["channel"] = self.gamestate.get_pending_channels(self.args["user"])
+        self.args["channel"] = self.gamestate.get_pending_channel(self.args["user"])
 
     @only_as_direct_message
     @only_in_progress
@@ -74,7 +74,7 @@ class SetEmojiradeCommand(BaseCommand):
 
         yield (
             current_winner,
-            f"Hey, <@{previous_winner}> made the emojirade `{emojirades}, good luck!",
+            f"Hey, <@{previous_winner}> made the emojirade {emojirades}, good luck!",
         )
 
         # Let the user know their 'rade has been accepted

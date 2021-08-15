@@ -35,7 +35,7 @@ class ScoreboardPrinter:
         title = [
             "",
             "::",
-            f"{self.time_unit.value.title()}"
+            f"{self.time_unit.value.title()}",
             "leaderboard",
         ]
 

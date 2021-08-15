@@ -61,7 +61,7 @@ class Gamestate:
         return self.handler.get_xyz(channel, "step") in valid_steps
 
     def guessing(self, channel):
-        valid_steps = (GamestateStep.GUESSING,)
+        valid_steps = (GamestateStep.GUESSING, )
         return self.handler.get_xyz(channel, "step") in valid_steps
 
     def infer_commands(self, event: Event):
@@ -141,6 +141,9 @@ class Gamestate:
             if self.handler.is_first_guess(channel):
                 self.handler.set_xyz(channel, user, "first_guess", False)
 
+    def get_admins(self, channel):
+        return json.loads(self.handler.get_xyz(channel, "admins"))
+
     def set_admin(self, channel, user_id):
         return self.handler.add_admin(channel, user_id)
 
@@ -148,10 +151,19 @@ class Gamestate:
         return self.handler.remove_admin(channel, user_id)
 
     def is_admin(self, channel, user_id):
-        return user_id in json.loads(self.handler.get_xyz(channel, "admins"))
+        admins = json.loads(self.handler.get_xyz(channel, "admins"))
+
+        if not admins:
+            # If no one is an admin, everyone is an admin!
+            return True
+
+        return user_id in admins
 
     def new_game(self, channel, previous_winner, current_winner):
         self.handler.new_game(channel, previous_winner, current_winner)
+
+    def get_emojirade(self, channel):
+        return json.loads(self.handler.get_xyz(channel, "emojirade"))
 
     def set_emojirade(self, channel, emojirades, user):
         valid_steps = (GamestateStep.WAITING, GamestateStep.PROVIDED)
@@ -169,7 +181,7 @@ class Gamestate:
         ])
 
     def winner_posted(self, channel, user):
-        valid_steps = (GamestateStep.PROVIDED)
+        valid_steps = (GamestateStep.PROVIDED, )
         step = self.handler.get_xyz(channel, "step")
 
         if step not in valid_steps:
@@ -183,7 +195,7 @@ class Gamestate:
         ])
 
     def correct_guess(self, channel, winner):
-        valid_steps = (GamestateStep.GUESSING)
+        valid_steps = (GamestateStep.GUESSING, )
         step = self.handler.get_xyz(channel, "step")
 
         if step not in valid_steps:
@@ -215,8 +227,8 @@ class Gamestate:
     def step(self, channel):
         return self.handler.get_xyz(channel, "step")
 
-    def get_pending_channel(self, user):
-        for channel in self.handler.get_pending_channels(user):
-            return channel
+    def get_channels(self):
+        return self.handler.get_channels()
 
-        return None
+    def get_pending_channel(self, user):
+        return self.handler.get_pending_channel(user)

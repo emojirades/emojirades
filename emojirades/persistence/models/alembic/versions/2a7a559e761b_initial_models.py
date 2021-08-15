@@ -1,8 +1,8 @@
 """Initial models
 
-Revision ID: 5b255e1355ba
+Revision ID: 2a7a559e761b
 Revises: 
-Create Date: 2021-08-15 10:57:51.243513
+Create Date: 2021-08-15 13:34:25.911247
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = "5b255e1355ba"
+revision = "2a7a559e761b"
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -45,10 +45,7 @@ def upgrade():
     op.create_table(
         "gamestate_history",
         sa.Column(
-            "event_id",
-            sa.BigInteger(),
-            sa.Identity(always=False),
-            nullable=False,
+            "event_id", sa.Integer(), sa.Identity(always=False), nullable=False
         ),
         sa.Column("workspace_id", sa.Text(), nullable=True),
         sa.Column("channel_id", sa.Text(), nullable=True),
@@ -75,10 +72,7 @@ def upgrade():
     op.create_table(
         "scoreboard_history",
         sa.Column(
-            "event_id",
-            sa.BigInteger(),
-            sa.Identity(always=False),
-            nullable=False,
+            "event_id", sa.Integer(), sa.Identity(always=False), nullable=False
         ),
         sa.Column("workspace_id", sa.Text(), nullable=True),
         sa.Column("channel_id", sa.Text(), nullable=True),

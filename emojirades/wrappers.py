@@ -14,7 +14,7 @@ def admin_check(command):
             )
 
             admins = [
-                f"<@{admin}>" for admin in self.gamestate.state[channel]["admins"]
+                f"<@{admin}>" for admin in self.gamestate.get_admins(channel)
             ]
             yield (None, f"Game admins currently are: {', '.join(admins)}")
             return
@@ -31,7 +31,9 @@ def admin_or_old_winner_check(command):
         is_old_winner = False
         is_admin = False
 
-        if self.args["user"] == self.gamestate.state[channel]["old_winner"]:
+        previous_winner, _ = self.gamestate.winners(channel)
+
+        if self.args["user"] == previous_winner:
             is_old_winner = True
 
         if self.gamestate.is_admin(channel, self.args["user"]):
@@ -45,7 +47,7 @@ def admin_or_old_winner_check(command):
             )
 
             admins = [
-                f"<@{admin}>" for admin in self.gamestate.state[channel]["admins"]
+                f"<@{admin}>" for admin in self.gamestate.get_admins(channel)
             ]
             yield (None, f"Game admins currently are: {', '.join(admins)}")
             return
@@ -62,7 +64,9 @@ def admin_or_old_winner_set_check(command):
         is_old_winner = False
         is_admin = False
 
-        if self.args["user"] == self.gamestate.state[channel]["old_winner"]:
+        previous_winner, _ = self.gamestate.winners(channel)
+
+        if self.args["user"] == previous_winner:
             is_old_winner = True
 
         if self.gamestate.is_admin(channel, self.args["user"]):
@@ -84,7 +88,7 @@ def admin_or_old_winner_set_check(command):
             )
 
             admins = [
-                f"<@{admin}>" for admin in self.gamestate.state[channel]["admins"]
+                f"<@{admin}>" for admin in self.gamestate.get_admins(channel)
             ]
             yield (None, f"Game admins currently are: {', '.join(admins)}")
             return

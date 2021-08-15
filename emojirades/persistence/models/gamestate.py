@@ -1,7 +1,7 @@
 import datetime
 import enum
 
-from sqlalchemy import Column, Text, Enum, DateTime, Boolean, BigInteger, Index, Identity
+from sqlalchemy import Column, Text, Enum, DateTime, Boolean, Integer, Index, Identity
 
 from .base import Base
 
@@ -46,7 +46,7 @@ class GamestateHistory(Base):
     # pylint: disable=too-few-public-methods
     __tablename__ = "gamestate_history"
 
-    event_id = Column(BigInteger, Identity(), primary_key=True)
+    event_id = Column(Integer, Identity(), primary_key=True)
 
     workspace_id = Column(Text)
     channel_id = Column(Text)

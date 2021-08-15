@@ -72,7 +72,7 @@ class CorrectGuessCommand(BaseCommand):
                 return
 
         # Save a copy of the emojirade, as below clears it
-        emojirades = json.loads(self.gamestate.get_xyz(channel, "emojirade"))
+        emojirades = self.gamestate.get_emojirade(channel)
         raw_emojirades = [i.replace("`", "") for i in emojirades]
         first_emojirade = raw_emojirades.pop(0)
 
