@@ -41,7 +41,9 @@ class EmojiradesBot:
             "slack": slack,
         }
 
-    def configure_workspaces(self, workspaces_uri, workspace_ids, onboarding_queue, db_uri=None):
+    def configure_workspaces(
+        self, workspaces_uri, workspace_ids, onboarding_queue, db_uri=None
+    ):
         handler = get_workspace_handler(workspaces_uri)
 
         for workspace in handler.workspaces():
