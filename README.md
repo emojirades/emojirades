@@ -55,6 +55,21 @@ emojirades -vv populate --db-uri "sqlite:///emojirades.db" --table gamestate --d
 
 The json files must be a list of objects, with each objects `key: value` representing a column in the associated model
 
+If you are coming from the old style of state.json and scores.json you can run the following to produce json files that can be used in the above populate command
+
+```
+./bin/old_to_new_persistence.py --workspace-id TABC123 --state-file state.json --score-file scores.json
+```
+
+This will produce `state.json.processed`, `scores.json.processed_scores` and `scores.json.processed_score_history`
+
+They can be populated by running:
+```
+emojirades -vv populate --db-uri "sqlite:///emojirades.db" --table gamestate --data-file state.json.processed
+emojirades -vv populate --db-uri "sqlite:///emojirades.db" --table scoreboard --data-file scores.json.processed_scores
+emojirades -vv populate --db-uri "sqlite:///emojirades.db" --table scoreboard_history --data-file scores.json.processed_score_history
+```
+
 ## Run the daemon for a single workspace
 This command uses locally stored files to keep the game state:
 
