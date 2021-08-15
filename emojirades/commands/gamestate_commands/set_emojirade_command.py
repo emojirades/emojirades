@@ -8,7 +8,7 @@ from emojirades.commands import BaseCommand
 class SetEmojiradeCommand(BaseCommand):
     description = "Sets the new emojirade to be guessed"
 
-    patterns = (r"^emojirade[s]* (?P<emojirade>.+)",)
+    patterns = (r"^(E|e)mojirade[s]* (?P<emojirade>.+)",)
 
     examples = [
         ("emojirade foo", "Sets the new emojirade to 'foo'"),
