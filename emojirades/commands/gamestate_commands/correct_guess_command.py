@@ -1,5 +1,4 @@
 import random
-import json
 
 from emojirades.wrappers import only_guessing
 from emojirades.commands import BaseCommand
