@@ -30,10 +30,12 @@ def sanitize_text(text):
 
 
 def match_emojirade(guess, emojirades, scott_factor=2):
-    for emojirade in emojirades:
-        if len(guess) > (len(emojirade) * scott_factor):
-            raise ScottFactorExceededException("Guess exceeded the Scott Factor")
+    longest_emojirade = max(len(i) for i in emojirades)
 
+    if len(guess) > (longest_emojirade * scott_factor):
+        raise ScottFactorExceededException("Guess exceeded the Scott Factor")
+
+    for emojirade in emojirades:
         if re.search(fr"\b{re.escape(emojirade)}\b", guess):
             return True
 
