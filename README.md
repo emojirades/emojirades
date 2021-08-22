@@ -48,10 +48,7 @@ If you've just created a fresh DB, you'll need to load the initial database:
 emojirades -vv init --db-uri "sqlite:///emojirades.db"
 ```
 
-After initialising the DB you can load in any optional pre-existing state:
-```
-emojirades -vv populate --db-uri "sqlite:///emojirades.db" --table gamestate --data-file path/to/gamestate.json
-```
+After initialising the DB you can load in any optional pre-existing state.
 
 The json files must be a list of objects, with each objects `key: value` representing a column in the associated model
 
