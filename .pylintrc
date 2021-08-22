@@ -1,3 +1,6 @@
+[MASTER]
+ignore-paths=^emojirades/persistence/models/alembic/
+
 [MESSAGES CONTROL]
 disable=
     missing-module-docstring,
