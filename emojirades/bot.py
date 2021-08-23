@@ -115,7 +115,7 @@ class EmojiradesBot:
     def _handle_event(self, **payload):
         if "team" in payload["data"]:
             workspace_id = payload["data"]["team"]
-        elif "team" in payload["data"]["message"]:
+        elif "team" in payload["data"].get("message", {}):
             workspace_id = payload["data"]["message"]["team"]
         else:
             raise RuntimeError("Unable to run Workspace ID in message event")
