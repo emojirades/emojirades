@@ -105,7 +105,7 @@ class CorrectGuessCommand(BaseCommand):
         )
         emoji_text = f" :{emoji}:"
 
-        if self.gamestate.handler.is_first_guess(guess):
+        if self.gamestate.handler.is_first_guess(channel):
             yield (
                 None,
                 "Holy bejesus Batman :bat::man:, they guessed it in one go! :clap:",
