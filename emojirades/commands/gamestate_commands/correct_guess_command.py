@@ -83,7 +83,7 @@ class CorrectGuessCommand(BaseCommand):
             alternatives = ""
 
         self.gamestate.correct_guess(channel, self.args["target_user"])
-        score, position = self.scorekeeper.plusplus(channel, self.args["target_user"])
+        (position, score) = self.scorekeeper.plusplus(channel, self.args["target_user"])
 
         # Fetch these again as correct_guess will have rotated them
         (previous_winner, current_winner) = self.gamestate.winners(channel)
@@ -105,7 +105,7 @@ class CorrectGuessCommand(BaseCommand):
         )
         emoji_text = f" :{emoji}:"
 
-        if self.gamestate.handler.is_first_guess:
+        if self.gamestate.handler.is_first_guess(guess):
             yield (
                 None,
                 "Holy bejesus Batman :bat::man:, they guessed it in one go! :clap:",
