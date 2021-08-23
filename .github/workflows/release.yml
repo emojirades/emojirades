@@ -3,8 +3,8 @@ name: Release Jobs
 
 on:
   push:
-    branches:
-      - master
+    tags:
+      - "*"
 
 jobs:
   release:
