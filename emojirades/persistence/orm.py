@@ -78,7 +78,7 @@ def populate(db_uri, table, data_filename, commit_every=100):
     else:
         raise RuntimeError(f"Unknown table {table}?")
 
-    with open(data_filename) as data_file:
+    with open(data_filename, "rt", encoding="utf-8") as data_file:
         data = json.load(data_file)
 
         for i, row in enumerate(data):
