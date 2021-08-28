@@ -2,7 +2,7 @@ import logging
 
 from expiringdict import ExpiringDict
 
-import slack
+import slack_sdk
 
 from emojirades.persistence import get_auth_handler
 
@@ -14,8 +14,10 @@ class SlackClient:
         self.logger = logging.getLogger("EmojiradesBot.slack.SlackClient")
 
         # pylint: disable=no-member
-        self.rtmclient = slack.RTMClient(token=self.config["bot_access_token"])
-        self.webclient = slack.WebClient(
+        self.rtmclient = slack_sdk.rtm_v2.RTMClient(
+            token=self.config["bot_access_token"]
+        )
+        self.webclient = slack_sdk.WebClient(
             token=self.config["bot_access_token"], timeout=30
         )
         # pylint: enable=no-member

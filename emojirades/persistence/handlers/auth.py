@@ -25,7 +25,7 @@ class LocalAuthFileHandler:
         self.auth_uri = auth_uri
 
     def load(self):
-        with open(self.auth_uri, "rt") as auth_file:
+        with open(self.auth_uri, "rt", encoding="utf-8") as auth_file:
             return json.load(auth_file)
 
 

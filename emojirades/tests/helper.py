@@ -78,8 +78,8 @@ class EmojiradeBotTester(unittest.TestCase):
     def get_xyz(self, xyz):
         return self.gamestate.handler.get_xyz(self.config.channel, xyz)
 
-    @patch("slack.RTMClient", autospec=True)
-    @patch("slack.WebClient", autospec=True)
+    @patch("slack_sdk.rtm_v2.RTMClient", autospec=True)
+    @patch("slack_sdk.WebClient", autospec=True)
     def setUp(self, web_client, rtm_client):
         self.responses = []
         self.reactions = []

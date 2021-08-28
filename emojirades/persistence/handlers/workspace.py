@@ -71,7 +71,7 @@ class LocalWorkspaceDirectoryHandler:
             if not entry.suffix == ".json":
                 continue
 
-            with open(entry) as workspace_file:
+            with open(entry, "rt", encoding="utf-8") as workspace_file:
                 yield json.load(workspace_file)
 
 
