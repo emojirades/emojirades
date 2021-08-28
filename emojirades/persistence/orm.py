@@ -2,6 +2,8 @@ import datetime
 import json
 import os
 
+from functools import lru_cache
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
@@ -17,6 +19,7 @@ from .models import (
 )
 
 
+@lru_cache
 def get_engine(db_uri):
     return create_engine(db_uri, echo=True, future=True)
 

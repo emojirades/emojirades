@@ -29,6 +29,7 @@ class EmojiradesBot:
 
     def configure_workspace(self, db_uri, auth_uri, workspace_id=None):
         slack = SlackClient(auth_uri)
+        slack.rtmclient.on("message")(self.handle_event)
 
         if workspace_id is None:
             workspace_id = slack.workspace_id
