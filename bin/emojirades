@@ -4,8 +4,6 @@ import argparse
 import logging
 import sys
 
-import slack_sdk
-
 from emojirades.bot import EmojiradesBot
 
 
@@ -52,9 +50,6 @@ if __name__ == "__main__":
     logger = logging.getLogger("Emojirades")
 
     bot = EmojiradesBot()
-
-    # Register the event callback
-    slack_sdk.rtm_v2.RTMClient.on(event="message", callback=bot.handle_event)
 
     # Configure the bot mode
     if args.mode == "init":
