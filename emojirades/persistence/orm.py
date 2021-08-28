@@ -24,6 +24,7 @@ def get_engine(db_uri):
     return create_engine(db_uri, echo=True, future=True)
 
 
+@lru_cache
 def get_session(db_uri):
     return Session(get_engine(db_uri))
 
