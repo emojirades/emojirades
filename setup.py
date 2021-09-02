@@ -27,7 +27,7 @@ setup(
         "": ["*.ini"],
     },
     install_requires=[
-        "slackclient",
+        "slack_sdk",
         "requests",
         "boto3",
         "Unidecode",
@@ -39,7 +39,7 @@ setup(
     ],
     python_requires="~=3.8",
     extras_require={
-        "test": ["boto3", "pytest", "black"],
+        "test": ["boto3", "pytest", "pylint", "black"],
     },
     scripts=["bin/emojirades"],
     author="The Emojirades Team",

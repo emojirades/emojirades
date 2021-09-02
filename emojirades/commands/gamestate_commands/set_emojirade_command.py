@@ -19,6 +19,13 @@ class SetEmojiradeCommand(BaseCommand):
     ]
 
     def prepare_args(self, event):
+        print("PREPARING SET EMOJIRADE")
+        print("PREPARING SET EMOJIRADE")
+        print("PREPARING SET EMOJIRADE")
+        print("PREPARING SET EMOJIRADE")
+        print("PREPARING SET EMOJIRADE")
+        print("PREPARING SET EMOJIRADE")
+        print("PREPARING SET EMOJIRADE")
         super().prepare_args(event)
 
         # No matter what the final channel is, save the original one
@@ -27,7 +34,9 @@ class SetEmojiradeCommand(BaseCommand):
         self.args["original_channel"] = self.args["channel"]
 
         # Figure out the channel to use
+        print(f"BEFORE DECIDE: {self.args['channel']}")
         self.args["channel"] = self.gamestate.get_pending_channel(self.args["user"])
+        print(f"AFTER DECIDE: {self.args['channel']}")
 
     @only_as_direct_message
     @only_in_progress

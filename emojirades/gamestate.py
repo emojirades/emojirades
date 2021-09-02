@@ -165,6 +165,8 @@ class Gamestate:
         return json.loads(self.handler.get_xyz(channel, "emojirade"))
 
     def set_emojirade(self, channel, emojirades, user):
+        print(f"SET EMOJIRADE FIRED WITH {channel}/{emojirades}/{user}")
+
         valid_steps = (GamestateStep.WAITING, GamestateStep.PROVIDED)
         step = self.handler.get_xyz(channel, "step")
 

@@ -1,4 +1,4 @@
-from emojirades.tests.helper import EmojiradeBotTester
+from .helper import EmojiradeBotTester
 from emojirades.persistence import GamestateStep
 
 import time

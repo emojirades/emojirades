@@ -1,6 +1,6 @@
 import os
 
-from emojirades.tests.helper import EmojiradeBotTester
+from .helper import EmojiradeBotTester
 
 
 class ScorekeeperTester(EmojiradeBotTester):

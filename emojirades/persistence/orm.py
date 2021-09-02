@@ -19,7 +19,6 @@ from .models import (
 )
 
 
-@lru_cache
 def get_engine(db_uri):
     return create_engine(db_uri, echo=True, future=True)
 
