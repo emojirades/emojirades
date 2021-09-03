@@ -1,16 +1,14 @@
 import os
 
-from .helper import EmojiradeBotTester
 
+class TestScorekeeper:
+    def test_new_file_load(self, slack_web_api, bot):
+        assert len(bot.scorekeeper.scoreboard(bot.config.channel)) == 0
 
-class ScorekeeperTester(EmojiradeBotTester):
-    def test_new_file_load(self):
-        self.assertEqual(len(self.scorekeeper.scoreboard(self.config.channel)), 0)
-
-    def test_existing_file_load(self):
+    def test_existing_file_load(self, slack_web_api, bot):
         data_filename = os.path.join(
             os.path.dirname(__file__), "fixtures", "scoreboard.json"
         )
-        self.bot.populate_db(self.db_uri, "scoreboard", data_filename)
+        bot.bot.populate_db(bot.db_uri, "scoreboard", data_filename)
 
-        self.assertEqual(len(self.scorekeeper.scoreboard(self.config.channel)), 2)
+        assert len(bot.scorekeeper.scoreboard(bot.config.channel)) == 2

@@ -37,50 +37,46 @@ class TestBotCommands:
         bot.send(bot.events.new_game)
         assert bot.step == GamestateStep.GUESSING
 
-    def test_leaderboard_output(self, slack_web_api, bot):
+    def test_scoreboard_output(self, slack_web_api, bot):
         """Ensure leaderboard output is consistent"""
         bot.reset_and_transition_to("waiting")
 
         user_scores = {
-            "U00000001": ("David Pham", 168),
-            "U00000002": ("fendy Haman", 120),
-            "U00000003": ("Michael Mitchell", 118),
-            "U00000004": ("Timothy Sinclair", 100),
-            "U00000005": ("Stephen Verschuren", 81),
-            "U00000006": ("Mark Chaves", 81),
-            "U00000007": ("Andres Quillian", 81),
-            "U00000008": ("Justin Fendi", 24),
-            "U00000009": ("Scott Burke", 23),
-            "U00000010": ("Steve Robbins", 9),
-            "U00000011": ("Agung Alford", 9),
-            "U00000012": ("James Gream", 1),
+            "U00000001": ("Player 1", 168),
+            "U00000002": ("Player 2", 120),
+            "U00000003": ("Player 3", 118),
+            "U00000004": ("Player 4", 100),
+            "U00000005": ("Generic User", 81),
+            "U00000006": ("Generic User", 81),
+            "U00000007": ("Generic User", 81),
+            "U00000008": ("Generic User", 24),
+            "U00000009": ("Generic User", 23),
+            "U00000010": ("Generic User", 9),
+            "U00000011": ("Generic User", 9),
+            "U00000012": ("Generic User", 1),
         }
 
         for user_id, (user_name, score) in user_scores.items():
             bot.scorekeeper.overwrite(bot.config.channel, user_id, score)
 
-        bot.slack.pretty_name = lambda x: user_scores[x][0]
-
         expected = """```
  :: All Time leaderboard ::
 
- 1. David Pham         [ 168 points ]
- 2. fendy Haman        [ 120 points ]
- 3. Michael Mitchell   [ 118 points ]
- 4. Timothy Sinclair   [ 100 points ]
- 5. Stephen Verschuren [  81 points ]
- 5. Mark Chaves        [  81 points ]
- 5. Andres Quillian    [  81 points ]
- 8. Justin Fendi       [  24 points ]
- 9. Scott Burke        [  23 points ]
-10. Steve Robbins      [   9 points ]
-10. Agung Alford       [   9 points ]
-12. James Gream        [   1 point  ]
+ 1. Player 1     [ 168 points ]
+ 2. Player 2     [ 120 points ]
+ 3. Player 3     [ 118 points ]
+ 4. Player 4     [ 100 points ]
+ 5. Generic User [  81 points ]
+ 5. Generic User [  81 points ]
+ 5. Generic User [  81 points ]
+ 8. Generic User [  24 points ]
+ 9. Generic User [  23 points ]
+10. Generic User [   9 points ]
+10. Generic User [   9 points ]
+12. Generic User [   1 point  ]
 ```"""
 
         bot.send(bot.events.leaderboard)
-
-        #bot.slack.pretty_name = self.pretty_name
 
         assert (bot.config.channel, expected) in slack_web_api.responses
 
@@ -103,6 +99,9 @@ class TestBotCommands:
         ) == (2, 0)
 
         # Check the user cannot award to themselves
+        print("-" * 20)
+        print("Triggering delete and replay")
+        print("-" * 20)
         bot.reset_and_transition_to("guessed", delete=True)
 
         override = {
@@ -127,7 +126,7 @@ class TestBotCommands:
         ) == (None, None)
 
         # Check the user cannot award to the winner (no-op)
-        bot.reset_and_transition_to("guessed")
+        bot.reset_and_transition_to("guessed", delete=True)
 
         override = {
             "text": f"<@{bot.config.bot_id}> fixwinner <@{bot.config.player_3}>"
@@ -278,9 +277,11 @@ class TestBotCommands:
         bot.reset_and_transition_to("waiting")
         bot.send(bot.events.game_status)
 
+        print(slack_web_api.responses)
+
         assert (
             bot.config.channel,
-            f"Status: Waiting for <@{bot.config.player_1}> to provide a 'rade to {bot.config.player_2}",
+            f"Status: Waiting for <@{bot.config.player_1}> to provide a 'rade to {bot.config.player_2_name}",
         ) in slack_web_api.responses
 
         bot.reset_and_transition_to("provided")

@@ -166,6 +166,11 @@ class MockHandler(SimpleHTTPRequestHandler):
 
             message = json.loads(data)
             self.test.responses.append((message["channel"], message["text"]))
+        elif self.path == "/reactions.add":
+            response = responses[self.path]
+
+            message = json.loads(data)
+            self.test.reactions.append((message["channel"], message["name"], message["timestamp"]))
         else:
             response = responses[self.path]
 

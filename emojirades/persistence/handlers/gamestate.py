@@ -24,22 +24,20 @@ class GamestateDB:
         print("AFTER CACHE CLEAR")
         print(self.gamestate_cache)
 
-    def delete(self, channel):
-        print("TRIGGERING DELETE OF GamestateHistory")
-        stmt = delete(GamestateHistory).where(
-            GamestateHistory.workspace_id == self.workspace_id,
-            GamestateHistory.channel_id == channel,
-        )
+    def delete(self, iknowwhatimdoing=False):
+        if not iknowwhatimdoing:
+            return
 
-        result = self.session.execute(stmt)
+        self.gamestate_cache = {}
+        self.history_cache = {}
+
+        print("TRIGGERING DELETE OF GamestateHistory")
+        self.session.execute(delete(GamestateHistory))
 
         print("TRIGGERING DELETE OF Gamestate")
-        stmt = delete(Gamestate).where(
-            Gamestate.workspace_id == self.workspace_id,
-            Gamestate.channel_id == channel,
-        )
+        self.session.execute(delete(Gamestate))
 
-        result = self.session.execute(stmt)
+        self.session.commit()
         print("DELETE DONE")
 
     def record_history(self, channel, user, operation, commit=False):

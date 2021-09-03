@@ -1,16 +1,14 @@
 import os
 
-from .helper import EmojiradeBotTester
 
+class TestGamestate:
+    def test_new_file_load(self, slack_web_api, bot):
+        assert len(bot.gamestate.get_channels()) == 0
 
-class GamestateTester(EmojiradeBotTester):
-    def test_new_file_load(self):
-        self.assertEqual(len(self.gamestate.get_channels()), 0)
-
-    def test_existing_file_load(self):
+    def test_existing_file_load(self, slack_web_api, bot):
         data_filename = os.path.join(
             os.path.dirname(__file__), "fixtures", "gamestate.json"
         )
-        self.bot.populate_db(self.db_uri, "gamestate", data_filename)
+        bot.bot.populate_db(bot.db_uri, "gamestate", data_filename)
 
-        self.assertEqual(len(self.gamestate.get_channels()), 1)
+        assert len(bot.gamestate.get_channels()) == 1

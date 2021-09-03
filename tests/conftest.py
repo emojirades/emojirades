@@ -30,12 +30,26 @@ class TestBot:
 
     def send(self, event):
         self.slack.rtm.send(event)
-        time.sleep(1)
+        time.sleep(0.2)
 
-    def reset_and_transition_to(self, state, delete=False):
+    def debug(self):
+        print("-" * 20)
+        print("DEBUG")
+        print("-" * 20)
+        print(f"Previous Winner: {self.gamestate.winners(self.config.channel)[0]}")
+        print(f"Current Winner: {self.gamestate.winners(self.config.channel)[1]}")
+
+        print(f"Player 1: {self.scorekeeper.user_score(self.config.channel, self.config.player_1)}")
+        print(f"Player 2: {self.scorekeeper.user_score(self.config.channel, self.config.player_2)}")
+        print(f"Player 3: {self.scorekeeper.user_score(self.config.channel, self.config.player_3)}")
+        print(f"Player 4: {self.scorekeeper.user_score(self.config.channel, self.config.player_4)}")
+        print("-" * 20)
+
+    def reset_and_transition_to(self, state, delete=True):
         if delete:
-            self.gamestate.handler.delete(self.config.channel)
-            time.sleep(0.5)
+            self.gamestate.handler.delete(iknowwhatimdoing=True)
+            self.scorekeeper.handler.delete(iknowwhatimdoing=True)
+            time.sleep(0.2)
 
         if state == "waiting":
             events = [self.events.new_game]
@@ -64,7 +78,7 @@ class TestBot:
             self.slack.rtm.send(event)
 
             # Let the threads catch up
-            time.sleep(1)
+            time.sleep(0.2)
 
 
 @pytest.fixture
@@ -75,6 +89,7 @@ def slack_web_api(request, test_data):
         def __init__(self, conf):
             self.config = conf
             self.responses = []
+            self.reactions = []
 
     foo = Foo(config)
     setup_mock_web_api_server(foo)
@@ -120,11 +135,8 @@ def bot(auth_uri, db_uri, test_data):
 
     yield test_bot
 
-    print("CLOSING RTM")
     test_bot.slack.rtm.close()
-    time.sleep(0.5)
     session.close()
-    time.sleep(0.5)
 
 
 @pytest.fixture(scope="session")
