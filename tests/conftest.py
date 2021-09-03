@@ -39,10 +39,18 @@ class TestBot:
         print(f"Previous Winner: {self.gamestate.winners(self.config.channel)[0]}")
         print(f"Current Winner: {self.gamestate.winners(self.config.channel)[1]}")
 
-        print(f"Player 1: {self.scorekeeper.user_score(self.config.channel, self.config.player_1)}")
-        print(f"Player 2: {self.scorekeeper.user_score(self.config.channel, self.config.player_2)}")
-        print(f"Player 3: {self.scorekeeper.user_score(self.config.channel, self.config.player_3)}")
-        print(f"Player 4: {self.scorekeeper.user_score(self.config.channel, self.config.player_4)}")
+        print(
+            f"Player 1: {self.scorekeeper.user_score(self.config.channel, self.config.player_1)}"
+        )
+        print(
+            f"Player 2: {self.scorekeeper.user_score(self.config.channel, self.config.player_2)}"
+        )
+        print(
+            f"Player 3: {self.scorekeeper.user_score(self.config.channel, self.config.player_3)}"
+        )
+        print(
+            f"Player 4: {self.scorekeeper.user_score(self.config.channel, self.config.player_4)}"
+        )
         print("-" * 20)
 
     def reset_and_transition_to(self, state, delete=True):
@@ -118,9 +126,11 @@ def bot(auth_uri, db_uri, test_data):
     bot.listen_for_commands(blocking=False)
 
     from sqlalchemy import create_engine
+
     engine = create_engine(db_uri, future=True)
 
     from sqlalchemy.orm import Session
+
     session = Session(engine)
 
     test_bot = TestBot(
@@ -141,7 +151,7 @@ def bot(auth_uri, db_uri, test_data):
 
 @pytest.fixture(scope="session")
 def bot_token():
-    return {"bot_access_token": "xoxb-000000000000-aaaaaaaaaaaaaaaaaaaaaaaa"} 
+    return {"bot_access_token": "xoxb-000000000000-aaaaaaaaaaaaaaaaaaaaaaaa"}
 
 
 @pytest.fixture

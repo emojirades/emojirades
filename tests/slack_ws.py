@@ -8,16 +8,16 @@ from websockets.exceptions import ConnectionClosed
 from websockets import serve
 
 
-#logger = logging.getLogger("websockets.server")
-#logger.setLevel(logging.DEBUG)
-#logger.addHandler(logging.StreamHandler())
+# logger = logging.getLogger("websockets.server")
+# logger.setLevel(logging.DEBUG)
+# logger.addHandler(logging.StreamHandler())
 
 
 async def echo(websocket, path):
     try:
         async for message in websocket:
             await websocket.send(message)
-            #print(message)
+            # print(message)
     except ConnectionClosed:
         pass
 
@@ -27,5 +27,5 @@ async def main():
         await asyncio.Future()
 
 
-#logger.info("Starting ws://localhost:8765/")
+# logger.info("Starting ws://localhost:8765/")
 asyncio.run(main())

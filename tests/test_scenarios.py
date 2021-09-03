@@ -307,7 +307,10 @@ class TestBotScenarios:
 
         bot.send(bot.events.correct_guess)
         assert bot.step == GamestateStep.WAITING
-        assert (bot.config.channel, f"<@{bot.config.player_3}>++") in slack_web_api.responses
+        assert (
+            bot.config.channel,
+            f"<@{bot.config.player_3}>++",
+        ) in slack_web_api.responses
 
     def test_two_games_in_a_row(self, slack_web_api, bot):
         """Plays 2 games in a row to ensure state is maintained"""
@@ -325,7 +328,10 @@ class TestBotScenarios:
         assert bot.get_xyz("emojirade") is None
         assert bot.get_xyz("raw_emojirade") is None
 
-        assert (bot.config.channel, f"<@{bot.config.player_3}>++") in slack_web_api.responses
+        assert (
+            bot.config.channel,
+            f"<@{bot.config.player_3}>++",
+        ) in slack_web_api.responses
         assert any(
             bot.config.channel == channel
             and f"Congrats <@{bot.config.player_3}>, you're now at 1 point" in msg
@@ -357,7 +363,10 @@ class TestBotScenarios:
         assert bot.get_xyz("emojirade") is None
         assert bot.get_xyz("raw_emojirade") is None
 
-        assert (bot.config.channel, f"<@{bot.config.player_1}>++") in slack_web_api.responses
+        assert (
+            bot.config.channel,
+            f"<@{bot.config.player_1}>++",
+        ) in slack_web_api.responses
         assert any(
             bot.config.channel == channel
             and f"Congrats <@{bot.config.player_1}>, you're now at 1 point" in msg

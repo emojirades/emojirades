@@ -37,7 +37,7 @@ class MockHandler(SimpleHTTPRequestHandler):
 
     def _handle(self):
         print(self.path)
-        data = self.rfile.read(int(self.headers['Content-Length'])).decode("utf-8")
+        data = self.rfile.read(int(self.headers["Content-Length"])).decode("utf-8")
 
         responses = {
             "rtm_start_success": {
@@ -46,7 +46,7 @@ class MockHandler(SimpleHTTPRequestHandler):
                 "self": {
                     "id": self.test.config.bot_id,
                     "name": self.test.config.bot_name,
-                    },
+                },
                 "team": {
                     "domain": self.test.config.team_url,
                     "id": self.test.config.team,
@@ -131,7 +131,7 @@ class MockHandler(SimpleHTTPRequestHandler):
             },
             "/reactions.add": {
                 "ok": True,
-            }
+            },
         }
 
         if self.is_invalid_rtm_start():
@@ -170,7 +170,9 @@ class MockHandler(SimpleHTTPRequestHandler):
             response = responses[self.path]
 
             message = json.loads(data)
-            self.test.reactions.append((message["channel"], message["name"], message["timestamp"]))
+            self.test.reactions.append(
+                (message["channel"], message["name"], message["timestamp"])
+            )
         else:
             response = responses[self.path]
 

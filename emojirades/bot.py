@@ -3,7 +3,13 @@ import logging
 
 from slack_sdk.rtm_v2 import RTMClient
 
-from emojirades.persistence import get_session, get_engine, get_workspace_handler, migrate, populate
+from emojirades.persistence import (
+    get_session,
+    get_engine,
+    get_workspace_handler,
+    migrate,
+    populate,
+)
 from emojirades.commands.registry import CommandRegistry
 from emojirades.slack.slack_client import SlackClient
 from emojirades.scorekeeper import Scorekeeper
@@ -34,7 +40,14 @@ class EmojiradesBot:
     def populate_db(db_uri, table, data_filename):
         populate(db_uri, table, data_filename)
 
-    def configure_workspace(self, db_uri, auth_uri, workspace_id=None, extra_slack_kwargs=None, session_factory=None):
+    def configure_workspace(
+        self,
+        db_uri,
+        auth_uri,
+        workspace_id=None,
+        extra_slack_kwargs=None,
+        session_factory=None,
+    ):
         slack = SlackClient(auth_uri, extra_slack_kwargs=extra_slack_kwargs)
         self.slacks.append(slack)
 
@@ -84,7 +97,9 @@ class EmojiradesBot:
 
                     if isinstance(response, str):
                         # Plain strings are assumed as 'chat_postMessage'
-                        client.web_client.chat_postMessage(channel=channel, text=response)
+                        client.web_client.chat_postMessage(
+                            channel=channel, text=response
+                        )
                         continue
 
                     func = getattr(client.web_client, response["func"], None)

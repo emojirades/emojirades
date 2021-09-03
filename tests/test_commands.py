@@ -91,12 +91,14 @@ class TestBotCommands:
         assert current_winner == bot.config.player_4
 
         # (position, score)
-        assert bot.scorekeeper.user_score(
-            bot.config.channel, bot.config.player_4
-        ) == (1, 1)
-        assert bot.scorekeeper.user_score(
-            bot.config.channel, bot.config.player_3
-        ) == (2, 0)
+        assert bot.scorekeeper.user_score(bot.config.channel, bot.config.player_4) == (
+            1,
+            1,
+        )
+        assert bot.scorekeeper.user_score(bot.config.channel, bot.config.player_3) == (
+            2,
+            0,
+        )
 
         # Check the user cannot award to themselves
         bot.reset_and_transition_to("guessed", delete=True)
@@ -115,12 +117,14 @@ class TestBotCommands:
         assert current_winner == bot.config.player_3
 
         # (position, score)
-        assert bot.scorekeeper.user_score(
-            bot.config.channel, bot.config.player_3
-        ) == (1, 1)
-        assert bot.scorekeeper.user_score(
-            bot.config.channel, bot.config.player_4
-        ) == (None, None)
+        assert bot.scorekeeper.user_score(bot.config.channel, bot.config.player_3) == (
+            1,
+            1,
+        )
+        assert bot.scorekeeper.user_score(bot.config.channel, bot.config.player_4) == (
+            None,
+            None,
+        )
 
         # Check the user cannot award to the winner (no-op)
         bot.reset_and_transition_to("guessed", delete=True)
@@ -139,12 +143,14 @@ class TestBotCommands:
         assert current_winner == bot.config.player_3
 
         # (position, score)
-        assert bot.scorekeeper.user_score(
-            bot.config.channel, bot.config.player_3
-        ) == (1, 1)
-        assert bot.scorekeeper.user_score(
-            bot.config.channel, bot.config.player_4
-        ) == (None, None)
+        assert bot.scorekeeper.user_score(bot.config.channel, bot.config.player_3) == (
+            1,
+            1,
+        )
+        assert bot.scorekeeper.user_score(bot.config.channel, bot.config.player_4) == (
+            None,
+            None,
+        )
 
     def test_set_emojirade_banned_words(self, slack_web_api, bot):
         """Ensure that the emojirade can't contain banned words"""
