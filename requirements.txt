@@ -1,6 +1,6 @@
 slack_sdk~=3.9.1
 requests~=2.26.0
-boto3~=1.18.26
+boto3~=1.18.35
 Unidecode~=1.2.0
 pendulum~=2.1.2
 expiringdict~=1.2.1
