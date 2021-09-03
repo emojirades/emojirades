@@ -1,11 +1,9 @@
-import traceback
 import logging
 
 from slack_sdk.rtm_v2 import RTMClient
 
 from emojirades.persistence import (
-    get_session,
-    get_engine,
+    get_session_factory,
     get_workspace_handler,
     migrate,
     populate,
@@ -16,10 +14,6 @@ from emojirades.scorekeeper import Scorekeeper
 from emojirades.commands import BaseCommand
 from emojirades.gamestate import Gamestate
 from emojirades.slack.event import Event
-
-from sqlalchemy import create_engine
-from sqlalchemy.orm import scoped_session
-from sqlalchemy.orm import sessionmaker
 
 
 command_registry = CommandRegistry.command_patterns()
@@ -44,16 +38,12 @@ class EmojiradesBot:
         self,
         db_uri,
         auth_uri,
-        workspace_id=None,
         extra_slack_kwargs=None,
-        session_factory=None,
     ):
         slack = SlackClient(auth_uri, extra_slack_kwargs=extra_slack_kwargs)
         self.slacks.append(slack)
 
-        if session_factory is None:
-            engine = create_engine(db_uri, future=True)
-            session_factory = scoped_session(sessionmaker(bind=engine))
+        session_factory = get_session_factory(db_uri)
 
         def handle_event(client: RTMClient, event: dict):
             session = session_factory()
@@ -130,6 +120,9 @@ class EmojiradesBot:
 
             if db_uri is not None:
                 workspace["db_uri"] = db_uri
+
+            if "workspace_id" in workspace:
+                workspace.pop("workspace_id")
 
             self.configure_workspace(**workspace)
 

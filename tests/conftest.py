@@ -3,7 +3,7 @@ import types
 import json
 import time
 
-from emojirades.persistence import GamestateStep, get_session, get_engine
+from emojirades.persistence import GamestateStep, get_session_factory
 from emojirades.scorekeeper import Scorekeeper
 from emojirades.gamestate import Gamestate
 from emojirades.bot import EmojiradesBot
@@ -125,18 +125,12 @@ def bot(auth_uri, db_uri, test_data):
 
     bot.listen_for_commands(blocking=False)
 
-    from sqlalchemy import create_engine
-
-    engine = create_engine(db_uri, future=True)
-
-    from sqlalchemy.orm import Session
-
-    session = Session(engine)
+    session_factory = get_session_factory(db_uri)
 
     test_bot = TestBot(
         bot=bot,
-        gamestate=Gamestate(session, config.team),
-        scorekeeper=Scorekeeper(session, config.team),
+        gamestate=Gamestate(session_factory(), config.team),
+        scorekeeper=Scorekeeper(session_factory(), config.team),
         config=config,
         events=events,
         db_uri=db_uri,
