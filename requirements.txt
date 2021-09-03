@@ -1,4 +1,4 @@
-slack_sdk~=3.9.1
+slack_sdk~=3.10.1
 requests~=2.26.0
 boto3~=1.18.35
 Unidecode~=1.2.0
