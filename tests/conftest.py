@@ -115,7 +115,6 @@ def bot(auth_uri, db_uri, test_data):
     bot.configure_workspace(
         db_uri,
         auth_uri,
-        workspace_id=config.team,
         extra_slack_kwargs={
             "base_url": "http://localhost:8888",
             "auto_reconnect_enabled": False,
@@ -126,11 +125,12 @@ def bot(auth_uri, db_uri, test_data):
     bot.listen_for_commands(blocking=False)
 
     session_factory = get_session_factory(db_uri)
+    session = session_factory()
 
     test_bot = TestBot(
         bot=bot,
-        gamestate=Gamestate(session_factory(), config.team),
-        scorekeeper=Scorekeeper(session_factory(), config.team),
+        gamestate=Gamestate(session, config.team),
+        scorekeeper=Scorekeeper(session, config.team),
         config=config,
         events=events,
         db_uri=db_uri,
