@@ -28,14 +28,10 @@ class ScorekeeperDB:
         self.scoreboard_cache = {}
         self.history_cache = {}
 
-        print("TRIGGERING DELETE OF ScoreboardHistory")
         self.session.execute(delete(ScoreboardHistory))
-
-        print("TRIGGERING DELETE OF Scoreboard")
         self.session.execute(delete(Scoreboard))
 
         self.session.commit()
-        print("DELETE DONE")
 
     def record_history(self, channel, user, operation, commit=False):
         self.session.add(

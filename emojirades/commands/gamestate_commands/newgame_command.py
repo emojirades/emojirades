@@ -15,12 +15,6 @@ class NewGameCommand(BaseCommand):
 
     @admin_or_old_winner_set_check
     def execute(self):
-        print("FIRING NEW GAME")
-        print("FIRING NEW GAME")
-        print("FIRING NEW GAME")
-        print("FIRING NEW GAME")
-        print("FIRING NEW GAME")
-        print("FIRING NEW GAME")
         yield from super().execute()
 
         user = self.args["user"]

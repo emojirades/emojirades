@@ -174,7 +174,6 @@ class MockHandler(SimpleHTTPRequestHandler):
         else:
             response = responses[self.path]
 
-
         print(response)
         self.wfile.write(json.dumps(response).encode("utf-8"))
 

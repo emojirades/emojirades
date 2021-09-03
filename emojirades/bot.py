@@ -39,7 +39,6 @@ class EmojiradesBot:
         self.slacks.append(slack)
 
         if session_factory is None:
-            print("CREATING FACTORY")
             engine = create_engine(db_uri, future=True)
             session_factory = scoped_session(sessionmaker(bind=engine))
 
@@ -69,7 +68,6 @@ class EmojiradesBot:
 
             for command in EmojiradesBot.match_event(event, workspace):
                 client.logger.debug("Matched %s for event %s", command, event.data)
-                print(f"Matched {command} for event {event.data}")
 
                 for channel, response in command.execute():
                     client.logger.debug("------------------------")

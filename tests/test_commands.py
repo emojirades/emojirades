@@ -99,9 +99,6 @@ class TestBotCommands:
         ) == (2, 0)
 
         # Check the user cannot award to themselves
-        print("-" * 20)
-        print("Triggering delete and replay")
-        print("-" * 20)
         bot.reset_and_transition_to("guessed", delete=True)
 
         override = {
@@ -276,8 +273,6 @@ class TestBotCommands:
     def test_game_status(self, slack_web_api, bot):
         bot.reset_and_transition_to("waiting")
         bot.send(bot.events.game_status)
-
-        print(slack_web_api.responses)
 
         assert (
             bot.config.channel,
