@@ -5,7 +5,7 @@ import pytest
 import json
 
 from emojirades.analytics.time_unit import TimeUnit
-from emojirades.tests.FileFixture import FileFixture
+from .file_fixture import FileFixture
 
 
 class TestScoreboardAnalytics:

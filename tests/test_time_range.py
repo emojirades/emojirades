@@ -1,5 +1,7 @@
 import pendulum
+
 from unittest import TestCase
+
 from emojirades.analytics.time_range import TimeRange
 from emojirades.analytics.time_unit import TimeUnit
 

@@ -1,6 +1,6 @@
 import pendulum
 
-from sqlalchemy import select, asc, desc
+from sqlalchemy import select, delete, asc, desc
 
 from ..models import Scoreboard, ScoreboardHistory
 
@@ -9,9 +9,10 @@ class ScorekeeperDB:
     SCOREBOARD_LIMIT = 15
     HISTORY_LIMIT = 15
 
-    def __init__(self, session, workspace_id):
+    def __init__(self, session, workspace_id, caching=False):
         self.session = session
         self.workspace_id = workspace_id
+        self.caching = caching
 
         self.scoreboard_cache = {}
         self.history_cache = {}
@@ -19,6 +20,18 @@ class ScorekeeperDB:
     def clear_cache(self, channel):
         self.scoreboard_cache.pop(channel, None)
         self.history_cache.pop(channel, None)
+
+    def delete(self, iknowwhatimdoing=False):
+        if not iknowwhatimdoing:
+            return
+
+        self.scoreboard_cache = {}
+        self.history_cache = {}
+
+        self.session.execute(delete(ScoreboardHistory))
+        self.session.execute(delete(Scoreboard))
+
+        self.session.commit()
 
     def record_history(self, channel, user, operation, commit=False):
         self.session.add(
@@ -127,7 +140,8 @@ class ScorekeeperDB:
             for pos, row in enumerate(result, start=1)
         ]
 
-        self.scoreboard_cache[channel] = scoreboard
+        if self.caching:
+            self.scoreboard_cache[channel] = scoreboard
 
         return scoreboard
 
@@ -171,6 +185,7 @@ class ScorekeeperDB:
             for row in result
         ]
 
-        self.history_cache[(channel, limit, order_by)] = scorekeeper_history
+        if self.caching:
+            self.history_cache[(channel, limit, order_by)] = scorekeeper_history
 
         return scorekeeper_history

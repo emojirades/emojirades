@@ -1,6 +1,6 @@
 import json
 
-from sqlalchemy import select, desc, or_
+from sqlalchemy import select, delete, desc, or_
 
 from ..models import Gamestate, GamestateHistory, GamestateStep
 
@@ -8,9 +8,10 @@ from ..models import Gamestate, GamestateHistory, GamestateStep
 class GamestateDB:
     HISTORY_LIMIT = 5
 
-    def __init__(self, session, workspace_id):
+    def __init__(self, session, workspace_id, caching=False):
         self.session = session
         self.workspace_id = workspace_id
+        self.caching = caching
 
         self.gamestate_cache = {}
         self.history_cache = {}
@@ -18,6 +19,18 @@ class GamestateDB:
     def clear_cache(self, channel):
         self.gamestate_cache.pop(channel, None)
         self.history_cache.pop(channel, None)
+
+    def delete(self, iknowwhatimdoing=False):
+        if not iknowwhatimdoing:
+            return
+
+        self.gamestate_cache = {}
+        self.history_cache = {}
+
+        self.session.execute(delete(GamestateHistory))
+        self.session.execute(delete(Gamestate))
+
+        self.session.commit()
 
     def record_history(self, channel, user, operation, commit=False):
         self.session.add(
@@ -46,7 +59,9 @@ class GamestateDB:
         if result:
             gamestate = result[0]
 
-            self.gamestate_cache[channel] = gamestate
+            if self.caching:
+                self.gamestate_cache[channel] = gamestate
+
             return gamestate
 
         gamestate = Gamestate(
@@ -57,7 +72,9 @@ class GamestateDB:
         self.session.add(gamestate)
         self.session.commit()
 
-        self.gamestate_cache[channel] = gamestate
+        if self.caching:
+            self.gamestate_cache[channel] = gamestate
+
         return gamestate
 
     def get_xyz(self, channel, xyz):
@@ -72,7 +89,9 @@ class GamestateDB:
         self.record_history(channel, user, f"set,{xyz},{value}")
 
         self.session.commit()
-        self.clear_cache(channel)
+
+        if self.caching:
+            self.clear_cache(channel)
 
     def set_many_xyz(self, channel, user, pairs):
         gamestate = self.get_gamestate(channel)
@@ -82,7 +101,9 @@ class GamestateDB:
             self.record_history(channel, user, f"set,{xyz},{value}")
 
         self.session.commit()
-        self.clear_cache(channel)
+
+        if self.caching:
+            self.clear_cache(channel)
 
     def is_first_guess(self, channel):
         return self.get_gamestate(channel).first_guess
@@ -99,7 +120,9 @@ class GamestateDB:
         gamestate.admins = json.dumps(admins)
 
         self.session.commit()
-        self.clear_cache(channel)
+
+        if self.caching:
+            self.clear_cache(channel)
 
         return True
 
@@ -115,7 +138,9 @@ class GamestateDB:
         gamestate.admins = json.dumps(admins)
 
         self.session.commit()
-        self.clear_cache(channel)
+
+        if self.caching:
+            self.clear_cache(channel)
 
         return True
 
@@ -130,7 +155,9 @@ class GamestateDB:
         gamestate.first_guess = True
 
         self.session.commit()
-        self.clear_cache(channel)
+
+        if self.caching:
+            self.clear_cache(channel)
 
     def get_history(self, channel, limit=None):
         if limit is None:

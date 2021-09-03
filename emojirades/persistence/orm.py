@@ -2,10 +2,8 @@ import datetime
 import json
 import os
 
-from functools import lru_cache
-
 from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import scoped_session, sessionmaker
 
 from alembic.config import Config
 from alembic import command
@@ -19,13 +17,12 @@ from .models import (
 )
 
 
-@lru_cache
-def get_engine(db_uri):
-    return create_engine(db_uri, echo=True, future=True)
+def get_engine(db_uri, echo=False):
+    return create_engine(db_uri, echo=echo, future=True)
 
 
-def get_session(db_uri):
-    return Session(get_engine(db_uri))
+def get_session_factory(db_uri):
+    return scoped_session(sessionmaker(bind=get_engine(db_uri)))
 
 
 def discover_base_dir():
@@ -60,7 +57,7 @@ def migrate(db_uri, migration_ini=None, migration_dir=None):
 
 
 def populate(db_uri, table, data_filename, commit_every=100):
-    session = get_session(db_uri)
+    session = get_session_factory(db_uri)()
 
     if table == "gamestate":
         Obj = Gamestate

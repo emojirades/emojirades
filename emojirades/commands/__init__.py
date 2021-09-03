@@ -19,9 +19,9 @@ class BaseCommand(ABC):
     def __init__(self, event: Event, workspace: dict):
         self.logger = logging.getLogger("EmojiradesBot.Command")
 
-        self.slack = workspace["slack"]
         self.scorekeeper = workspace["scorekeeper"]
         self.gamestate = workspace["gamestate"]
+        self.slack = workspace["slack"]
 
         self.args = {}
         self.prepare_args(event)

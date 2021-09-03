@@ -4,7 +4,7 @@ import pytest
 import json
 
 from emojirades.slack.event import Event, InvalidEvent
-from emojirades.tests.FileFixture import FileFixture
+from .file_fixture import FileFixture
 
 
 class TestEvent:

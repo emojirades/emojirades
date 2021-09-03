@@ -1,7 +1,13 @@
-import traceback
 import logging
 
-from emojirades.persistence import get_session, get_workspace_handler, migrate, populate
+from slack_sdk.rtm_v2 import RTMClient
+
+from emojirades.persistence import (
+    get_session_factory,
+    get_workspace_handler,
+    migrate,
+    populate,
+)
 from emojirades.commands.registry import CommandRegistry
 from emojirades.slack.slack_client import SlackClient
 from emojirades.scorekeeper import Scorekeeper
@@ -10,14 +16,15 @@ from emojirades.gamestate import Gamestate
 from emojirades.slack.event import Event
 
 
+command_registry = CommandRegistry.command_patterns()
+
+
 class EmojiradesBot:
     def __init__(self):
         self.logger = logging.getLogger("Emojirades.Bot")
 
-        self.workspaces = {}
+        self.slacks = []
         self.onboarding_queue = None
-
-        self.command_registry = CommandRegistry.command_patterns()
 
     @staticmethod
     def init_db(db_uri):
@@ -27,20 +34,80 @@ class EmojiradesBot:
     def populate_db(db_uri, table, data_filename):
         populate(db_uri, table, data_filename)
 
-    def configure_workspace(self, db_uri, auth_uri, workspace_id=None):
-        slack = SlackClient(auth_uri)
-        slack.rtmclient.on("message")(self.handle_event)
+    def configure_workspace(
+        self,
+        db_uri,
+        auth_uri,
+        extra_slack_kwargs=None,
+    ):
+        slack = SlackClient(auth_uri, extra_slack_kwargs=extra_slack_kwargs)
+        self.slacks.append(slack)
 
-        if workspace_id is None:
-            workspace_id = slack.workspace_id
+        session_factory = get_session_factory(db_uri)
 
-        session = get_session(db_uri)
+        def handle_event(client: RTMClient, event: dict):
+            session = session_factory()
 
-        self.workspaces[workspace_id] = {
-            "scorekeeper": Scorekeeper(session, workspace_id),
-            "gamestate": Gamestate(session, workspace_id),
-            "slack": slack,
-        }
+            if "team" in event:
+                team_id = event["team"]
+            elif "team" in event.get("message", {}):
+                team_id = event["message"]["team"]
+            else:
+                raise RuntimeError("Unable to run Workspace ID in message event")
+
+            event = Event(event, client)
+
+            if not event.valid():
+                client.logger.debug("Skipping event due to being invalid")
+                return
+
+            workspace = {
+                "scorekeeper": Scorekeeper(session, team_id),
+                "gamestate": Gamestate(session, team_id),
+                "slack": SlackClient(None, existing_client=client),
+            }
+
+            client.logger.debug("Handling event: %s", event.data)
+
+            for command in EmojiradesBot.match_event(event, workspace):
+                client.logger.debug("Matched %s for event %s", command, event.data)
+
+                for channel, response in command.execute():
+                    client.logger.debug("------------------------")
+                    client.logger.debug(
+                        "Command %s executed with response: %s",
+                        command,
+                        (channel, response),
+                    )
+
+                    if channel is not None:
+                        channel = EmojiradesBot.decode_channel(channel, workspace)
+                    else:
+                        channel = EmojiradesBot.decode_channel(event.channel, workspace)
+
+                    if isinstance(response, str):
+                        # Plain strings are assumed as 'chat_postMessage'
+                        client.web_client.chat_postMessage(
+                            channel=channel, text=response
+                        )
+                        continue
+
+                    func = getattr(client.web_client, response["func"], None)
+
+                    if func is None:
+                        raise RuntimeError(f"Unmapped function '{response['func']}'")
+
+                    args = response.get("args", [])
+                    kwargs = response.get("kwargs", {})
+
+                    if kwargs.get("channel") is None:
+                        kwargs["channel"] = channel
+
+                    func(*args, **kwargs)
+
+            session.close()
+
+        slack.rtm.on("message")(handle_event)
 
     def configure_workspaces(
         self, workspaces_uri, workspace_ids, onboarding_queue, db_uri=None
@@ -54,27 +121,30 @@ class EmojiradesBot:
             if db_uri is not None:
                 workspace["db_uri"] = db_uri
 
+            if "workspace_id" in workspace:
+                workspace.pop("workspace_id")
+
             self.configure_workspace(**workspace)
 
         self.onboarding_queue = onboarding_queue
 
-    def match_event(self, event: Event, workspace: dict) -> BaseCommand:
+    @staticmethod
+    def match_event(event: Event, workspace: dict) -> BaseCommand:
         """
         If the event is valid and matches a command, yield the instantiated command
         :param event: the event object
         :param workspace: Workspace object containing state
         :return Command: The matched command to be executed
         """
-        self.logger.debug("Handling event: %s", event.data)
 
         # pylint: disable=invalid-name
         for GameCommand in workspace["gamestate"].infer_commands(event):
             yield GameCommand(event, workspace)
 
-        for Command in self.command_registry.values():
+        for Command in command_registry.values():
             if Command.match(event.text, me=workspace["slack"].bot_id):
                 if Command.__name__ == "HelpCommand":
-                    yield Command(event, workspace, commands=self.command_registry)
+                    yield Command(event, workspace, commands=command_registry)
                 else:
                     yield Command(event, workspace)
         # pylint: enable=invalid-name
@@ -105,71 +175,8 @@ class EmojiradesBot:
 
         raise NotImplementedError(f"Returned channel '{channel}' wasn't decoded")
 
-    def handle_event(self, **payload):
-        try:
-            self._handle_event(**payload)
-        except Exception as exception:
-            if logging.root.level == logging.DEBUG:
-                traceback.print_exc()
-            raise exception
-
-    def _handle_event(self, **payload):
-        if "team" in payload["data"]:
-            workspace_id = payload["data"]["team"]
-        elif "team" in payload["data"].get("message", {}):
-            workspace_id = payload["data"]["message"]["team"]
-        else:
-            raise RuntimeError("Unable to run Workspace ID in message event")
-
-        if workspace_id not in self.workspaces:
-            raise RuntimeError(f"Unknown workspace_id {workspace_id}?")
-
-        workspace = self.workspaces[workspace_id]
-
-        event = Event(payload["data"], workspace["slack"])
-        webclient = payload["web_client"]
-        workspace["slack"].set_webclient(webclient)
-
-        if not event.valid():
-            self.logger.debug("Skipping event due to being invalid")
-            return
-
-        for command in self.match_event(event, workspace):
-            self.logger.debug("Matched %s for event %s", command, event.data)
-
-            for channel, response in command.execute():
-                self.logger.debug("------------------------")
-                self.logger.debug(
-                    "Command %s executed with response: %s",
-                    command,
-                    (channel, response),
-                )
-
-                if channel is not None:
-                    channel = self.decode_channel(channel, workspace)
-                else:
-                    channel = self.decode_channel(event.channel, workspace)
-
-                if isinstance(response, str):
-                    # Plain strings are assumed as 'chat_postMessage'
-                    webclient.chat_postMessage(channel=channel, text=response)
-                    continue
-
-                func = getattr(webclient, response["func"], None)
-
-                if func is None:
-                    raise RuntimeError(f"Unmapped function '{response['func']}'")
-
-                args = response.get("args", [])
-                kwargs = response.get("kwargs", {})
-
-                if kwargs.get("channel") is None:
-                    kwargs["channel"] = channel
-
-                func(*args, **kwargs)
-
-    def listen_for_commands(self):
+    def listen_for_commands(self, blocking=True):
         self.logger.info("Starting Slack monitor(s)")
 
-        for workspace in self.workspaces.values():
-            workspace["slack"].start()
+        for slack in self.slacks:
+            slack.start(blocking)
