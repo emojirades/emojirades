@@ -4,6 +4,7 @@ import logging
 
 import asyncio
 
+from websockets.exceptions import ConnectionClosed
 from websockets import serve
 
 
@@ -13,13 +14,16 @@ from websockets import serve
 
 
 async def echo(websocket, path):
-    async for message in websocket:
-        await websocket.send(message)
-        #print(message)
+    try:
+        async for message in websocket:
+            await websocket.send(message)
+            #print(message)
+    except ConnectionClosed:
+        pass
 
 
 async def main():
-    async with serve(echo, "localhost", 8765):
+    async with serve(echo, host="localhost", port=8765, compression=None):
         await asyncio.Future()
 
 
