@@ -47,7 +47,7 @@ class EmojiradesBot:
         slack = SlackClient(auth_uri, extra_slack_kwargs=extra_slack_kwargs)
 
         if slack.workspace_id in self.workspaces:
-            self.logger.info(f"Deleting previous workspace {slack.workspace_id}")
+            self.logger.info("Deleting previous workspace: %s", slack.workspace_id)
 
             self.workspaces[slack.workspace_id].rtm.close()
             time.sleep(1)
@@ -215,16 +215,14 @@ class EmojiradesBot:
                 try:
                     body = json.loads(message["Body"])
                 except json.JSONDecodeError:
-                    self.logger.debug(
-                        f"Onboarding message not JSON: '{message['Body']}'"
-                    )
+                    self.logger.debug("Onboarding message not JSON: %s", message["Body"])
                     continue
 
                 if "workspace_id" not in body:
-                    self.logger.debug(f"Unable to parse onboarding payload: {body}")
+                    self.logger.debug("Unable to parse onboarding payload: %s", body)
                     continue
 
-                self.logger.debug(f"Bot received onboarding for {body['workspace_id']}")
+                self.logger.debug("Bot received onboarding for %s", body["workspace_id"])
 
                 workspace = handler.workspace(body["workspace_id"])
 
@@ -236,7 +234,7 @@ class EmojiradesBot:
 
                 slack = self.configure_workspace(**workspace)
                 self.workspaces[slack.workspace_id].start(blocking=False)
-                self.logger.info(f"Bot has onboarded workspace {slack.workspace_id}")
+                self.logger.info("Bot has onboarded workspace %s", slack.workspace_id)
 
                 # Onboarding was successful, clean up the workspace
                 sqs.delete_message(
