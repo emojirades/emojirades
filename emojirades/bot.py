@@ -215,7 +215,9 @@ class EmojiradesBot:
                 try:
                     body = json.loads(message["Body"])
                 except json.JSONDecodeError:
-                    self.logger.debug(f"Onboarding message not JSON: '{message['Body']}'")
+                    self.logger.debug(
+                        f"Onboarding message not JSON: '{message['Body']}'"
+                    )
                     continue
 
                 if "workspace_id" not in body:
