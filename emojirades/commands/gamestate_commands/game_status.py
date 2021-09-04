@@ -22,6 +22,11 @@ class GameStatusCommand(BaseCommand):
 
         channel = self.args["channel"]
         (previous_winner, current_winner) = self.gamestate.winners(channel)
+
+        if current_winner is None:
+            yield (None, "No game currently active, start a new one!")
+            return
+
         current_winner_name = self.slack.pretty_name(current_winner)
 
         step = self.gamestate.step(channel)

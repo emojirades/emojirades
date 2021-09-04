@@ -19,7 +19,7 @@ class TestBot:
         for k, v in kwargs.items():
             setattr(self, k, v)
 
-        self.slack = self.bot.slacks[0]
+        self.slack = self.bot.workspaces[self.config.team]
 
     @property
     def step(self):

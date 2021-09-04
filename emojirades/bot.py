@@ -1,4 +1,8 @@
 import logging
+import time
+import json
+
+import boto3
 
 from slack_sdk.rtm_v2 import RTMClient
 
@@ -23,7 +27,7 @@ class EmojiradesBot:
     def __init__(self):
         self.logger = logging.getLogger("Emojirades.Bot")
 
-        self.slacks = []
+        self.workspaces = {}
         self.onboarding_queue = None
 
     @staticmethod
@@ -41,7 +45,15 @@ class EmojiradesBot:
         extra_slack_kwargs=None,
     ):
         slack = SlackClient(auth_uri, extra_slack_kwargs=extra_slack_kwargs)
-        self.slacks.append(slack)
+
+        if slack.workspace_id in self.workspaces:
+            self.logger.info("Deleting previous workspace: %s", slack.workspace_id)
+
+            self.workspaces[slack.workspace_id].rtm.close()
+            time.sleep(1)
+            del self.workspaces[slack.workspace_id]
+
+        self.workspaces[slack.workspace_id] = slack
 
         session_factory = get_session_factory(db_uri)
 
@@ -108,6 +120,8 @@ class EmojiradesBot:
             session.close()
 
         slack.rtm.on("message")(handle_event)
+
+        return slack
 
     def configure_workspaces(
         self, workspaces_uri, workspace_ids, onboarding_queue, db_uri=None
@@ -178,5 +192,59 @@ class EmojiradesBot:
     def listen_for_commands(self, blocking=True):
         self.logger.info("Starting Slack monitor(s)")
 
-        for slack in self.slacks:
-            slack.start(blocking)
+        for slack in self.workspaces.values():
+            slack.start(blocking=blocking)
+
+    def listen_for_onboarding(self, workspaces_uri, db_uri=None, blocking=True):
+        sqs = boto3.client("sqs")
+
+        response = sqs.get_queue_url(QueueName=self.onboarding_queue)
+        queue_url = response["QueueUrl"]
+
+        handler = get_workspace_handler(workspaces_uri)
+
+        if blocking:
+            oneshot = False
+        else:
+            oneshot = True
+
+        while not oneshot:
+            response = sqs.receive_message(QueueUrl=queue_url)
+
+            for message in response.get("Messages", []):
+                try:
+                    body = json.loads(message["Body"])
+                except json.JSONDecodeError:
+                    self.logger.debug(
+                        "Onboarding message not JSON: %s", message["Body"]
+                    )
+                    continue
+
+                if "workspace_id" not in body:
+                    self.logger.debug("Unable to parse onboarding payload: %s", body)
+                    continue
+
+                self.logger.debug(
+                    "Bot received onboarding for %s", body["workspace_id"]
+                )
+
+                workspace = handler.workspace(body["workspace_id"])
+
+                if db_uri is not None:
+                    workspace["db_uri"] = db_uri
+
+                if "workspace_id" in workspace:
+                    workspace.pop("workspace_id")
+
+                slack = self.configure_workspace(**workspace)
+                self.workspaces[slack.workspace_id].start(blocking=False)
+                self.logger.info("Bot has onboarded workspace %s", slack.workspace_id)
+
+                # Onboarding was successful, clean up the workspace
+                sqs.delete_message(
+                    QueueUrl=queue_url,
+                    ReceiptHandle=message["ReceiptHandle"],
+                )
+                self.logger.debug("Deleted onboarding request from SQS Queue")
+
+            time.sleep(60)

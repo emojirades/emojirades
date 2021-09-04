@@ -59,4 +59,4 @@ jobs:
           pip install -e .
 
       - name: Test with pytest
-        run: ./tests/slack_ws.py & pytest; kill $(jobs -p)
+        run: ./tests/slack_ws.py & pytest; kill %1 %2 %3

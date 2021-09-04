@@ -2,6 +2,7 @@
 
 import argparse
 import logging
+import time
 import sys
 
 from emojirades.bot import EmojiradesBot
@@ -69,4 +70,10 @@ if __name__ == "__main__":
             parser.error("Unknown mode")
 
         logger.info("Bot is listening for commands")
-        bot.listen_for_commands()
+        bot.listen_for_commands(blocking=False)
+
+        if args.onboarding_queue is not None:
+            bot.listen_for_onboarding(args.workspaces_uri, db_uri=args.db_uri)
+        else:
+            while True:
+                time.sleep(60)

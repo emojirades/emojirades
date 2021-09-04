@@ -87,7 +87,7 @@ class ScoreboardPrinter:
 
             lines.append(
                 f"{pos + rank_buffer:>2}. {name:<{longest_name}}"
-                + f" [ {score:>{biggest_score}} point{'s' if score > 1 else ' '} ]"
+                + f" [ {score:>{biggest_score}} point{'s' if score > 1 or score < 0 else ' '} ]"
             )
 
         lines.append("```")
