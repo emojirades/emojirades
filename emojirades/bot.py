@@ -215,14 +215,18 @@ class EmojiradesBot:
                 try:
                     body = json.loads(message["Body"])
                 except json.JSONDecodeError:
-                    self.logger.debug("Onboarding message not JSON: %s", message["Body"])
+                    self.logger.debug(
+                        "Onboarding message not JSON: %s", message["Body"]
+                    )
                     continue
 
                 if "workspace_id" not in body:
                     self.logger.debug("Unable to parse onboarding payload: %s", body)
                     continue
 
-                self.logger.debug("Bot received onboarding for %s", body["workspace_id"])
+                self.logger.debug(
+                    "Bot received onboarding for %s", body["workspace_id"]
+                )
 
                 workspace = handler.workspace(body["workspace_id"])
 
