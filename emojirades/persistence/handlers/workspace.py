@@ -1,5 +1,6 @@
 import pathlib
 import json
+import os
 
 import boto3
 
@@ -51,6 +52,16 @@ class S3WorkspaceDirectoryHandler:
                 )
 
                 yield json.load(s3_object["Body"])
+
+    def workspace(self, workspace_id):
+        s3_key = os.path.join(self._prefix, f"{workspace_id}.json")
+
+        s3_object = self._s3.get_object(
+            Bucket=self._bucket,
+            Key=s3_key,
+        )
+
+        return json.load(s3_object["Body"])
 
 
 # pylint: disable=too-few-public-methods
