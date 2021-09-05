@@ -5,6 +5,7 @@ from emojirades.commands import BaseCommand
 
 class HistoryCommand(BaseCommand):
     description = "Shows the latest few actions performed"
+    max_history = 50
 
     patterns = (
         r"<@{me}> history (?P<limit>[0-9]+)",
@@ -22,6 +23,9 @@ class HistoryCommand(BaseCommand):
         if "limit" in self.args:
             try:
                 self.args["limit"] = int(self.args["limit"])
+
+                if self.args["limit"] > self.max_history:
+                    self.args["limit"] = self.max_history
             except ValueError:
                 self.args.pop("limit")
 
