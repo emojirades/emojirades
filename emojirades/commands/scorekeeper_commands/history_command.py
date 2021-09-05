@@ -6,16 +6,34 @@ from emojirades.commands import BaseCommand
 class HistoryCommand(BaseCommand):
     description = "Shows the latest few actions performed"
 
-    patterns = (r"<@{me}> history",)
+    patterns = (
+        r"<@{me}> history",
+        r"<@{me}> history (?P<limit>[0-9]+)",
+    )
 
     examples = [
-        ("<@{me}> history", "Shows history"),
+        ("<@{me}> history", "Shows scoreboard history"),
+        ("<@{me}> history 20", "Shows last 20 history events"),
     ]
+
+    def prepare_args(self, event):
+        super().prepare_args(event)
+
+        if "limit" in self.args:
+            try:
+                self.args["limit"] = int(self.args["limit"])
+            except ValueError:
+                self.args.pop("limit")
 
     def execute(self):
         yield from super().execute()
 
-        history = self.scorekeeper.history(self.args["channel"])
+        kwargs = {}
+
+        if "limit" in self.args:
+            kwargs["limit"] = self.args["limit"]
+
+        history = self.scorekeeper.history(self.args["channel"], **kwargs)
 
         if not history:
             message = "No history available."
