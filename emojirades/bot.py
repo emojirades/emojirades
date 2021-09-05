@@ -150,7 +150,6 @@ class EmojiradesBot:
         :param workspace: Workspace object containing state
         :return Command: The matched command to be executed
         """
-
         # pylint: disable=invalid-name
         for GameCommand in workspace["gamestate"].infer_commands(event):
             yield GameCommand(event, workspace)

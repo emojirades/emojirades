@@ -45,6 +45,15 @@ class GamestateDB:
         if commit:
             self.session.commit()
 
+    def get_gamestates(self, current_workspace=True):
+
+        stmt = select(Gamestate)
+
+        if current_workspace:
+            stmt.where(Gamestate.workspace_id == self.workspace_id)
+
+        return self.session.execute(stmt)
+
     def get_gamestate(self, channel):
         if gamestate := self.gamestate_cache.get(channel):
             return gamestate

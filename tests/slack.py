@@ -2,6 +2,7 @@
 # https://github.com/slackapi/python-slack-sdk/blob/main/tests/rtm/test_rtm_client_functional.py
 # https://github.com/slackapi/python-slack-sdk/blob/main/tests/rtm/mock_web_api_server.py
 
+import urllib.parse
 import threading
 import logging
 import json
@@ -157,19 +158,40 @@ class MockHandler(SimpleHTTPRequestHandler):
         elif self.path == "/conversations.open":
             response = responses["/conversations.open"]
 
-            user_id = json.loads(data)["users"][0]
+            try:
+                user_id = json.loads(data)["users"][0]
+            except json.JSONDecodeError:
+                user_id = data.split("=")[1]
+
             channel_id = "D" + user_id[1:]
 
             response["channel"]["id"] = channel_id
         elif self.path == "/chat.postMessage":
             response = responses[self.path]
 
-            message = json.loads(data)
+            try:
+                message = json.loads(data)
+            except json.JSONDecodeError:
+                parsed = urllib.parse.parse_qs(data)
+                message = {
+                    "channel": parsed["channel"][0],
+                    "text": parsed["text"][0],
+                }
+
             self.test.responses.append((message["channel"], message["text"]))
         elif self.path == "/reactions.add":
             response = responses[self.path]
 
-            message = json.loads(data)
+            try:
+                message = json.loads(data)
+            except json.JSONDecodeError:
+                parsed = urllib.parse.parse_qs(data)
+                message = {
+                    "channel": parsed["channel"][0],
+                    "name": parsed["name"][0],
+                    "timestamp": parsed["timestamp"][0],
+                }
+
             self.test.reactions.append(
                 (message["channel"], message["name"], message["timestamp"])
             )
