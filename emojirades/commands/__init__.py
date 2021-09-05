@@ -39,23 +39,40 @@ class BaseCommand(ABC):
         self.args["user"] = event.player_id
         self.args["ts"] = event.ts
 
-        # Only check for overrides if admin
-        if self.gamestate.is_admin(self.args["channel"], self.args["user"]):
-            # Perform the channel override if it matches
-            channel_override_match = BaseCommand.channel_override_regex.match(
-                event.text
-            )
+        # Perform the channel override if it matches
+        channel_override_match = BaseCommand.channel_override_regex.match(
+            event.text
+        )
 
-            if channel_override_match:
-                self.args["original_channel"] = self.args["channel"]
-                self.args["channel"] = channel_override_match.groupdict()[
-                    "channel_override"
-                ]
+        if channel_override_match:
+            new_channel =  channel_override_match.groupdict()[
+                "channel_override"
+            ]
 
-                event.text = event.text.replace(
-                    channel_override_match.groupdict()["override_cmd"], ""
-                )
+            event.channel = new_channel
 
+            if event.is_game_channel:
+                # Verify that the user is an admin of the target channel
+                if self.gamestate.is_admin(event.channel, self.args["user"]):
+                    # User is an admin, allow the override
+                    self.args["original_channel"] = self.args["channel"]
+                    self.args["channel"] = event.channel
+
+                    event.text = event.text.replace(
+                        channel_override_match.groupdict()["override_cmd"], ""
+                    )
+                else:
+                    # User is not an admin, roll back and ignore override
+                    event.channel = self.args["channel"]
+            else:
+                # We cannot verify admin status of the target channel
+                # Roll back and ignore the override
+                event.channel = self.args["channel"]
+
+        # Only check for user override if admin
+        # The event will be set to the desired channel above if needed, so the is_game_channel
+        # should pass if overridden
+        if event.is_game_channel and self.gamestate.is_admin(self.args["channel"], self.args["user"]):
             # Perform the user override if it matches
             user_override_match = BaseCommand.user_override_regex.match(event.text)
 

@@ -35,6 +35,15 @@ class Event:
     def channel(self):
         return self.data["channel"]
 
+    @channel.setter
+    def channel(self, value):
+        self.data["channel"] = value
+
+    @property
+    def is_game_channel(self):
+        """ Game channels are non-DM channels """
+        return isinstance(self.data["channel"], str) and self.data["channel"][0] in ("G", "C")
+
     # pylint: disable=invalid-name
     @property
     def ts(self):

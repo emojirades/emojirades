@@ -36,6 +36,12 @@ class TestBot:
         print("-" * 20)
         print("DEBUG")
         print("-" * 20)
+        print(f"Gamestates:")
+        gamestates = self.gamestate.handler.get_gamestates(current_workspace=False)
+
+        for gamestate in gamestates:
+            print(f"- {gamestate}")
+
         print(f"Previous Winner: {self.gamestate.winners(self.config.channel)[0]}")
         print(f"Current Winner: {self.gamestate.winners(self.config.channel)[1]}")
 
@@ -87,6 +93,12 @@ class TestBot:
 
             # Let the threads catch up
             time.sleep(0.2)
+
+        # Verify after fast forward there's no dodgy channels
+        gamestates = self.gamestate.handler.get_gamestates(current_workspace=False)
+
+        for gamestate in gamestates:
+            assert gamestate[0].channel_id[0] in ("C", "G")
 
 
 @pytest.fixture
