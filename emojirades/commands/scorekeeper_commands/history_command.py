@@ -7,8 +7,8 @@ class HistoryCommand(BaseCommand):
     description = "Shows the latest few actions performed"
 
     patterns = (
-        r"<@{me}> history",
         r"<@{me}> history (?P<limit>[0-9]+)",
+        r"<@{me}> history",
     )
 
     examples = [
