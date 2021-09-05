@@ -58,9 +58,9 @@ jobs:
         with:
           python-version: 3.9
 
-      - run: pip install wheel
+      - run: pip install build setuptools wheel
 
-      - run: python setup.py sdist bdist_wheel
+      - run: python3 -m build
 
       - name: upload sdist
         if: ${{ success() }}
@@ -70,8 +70,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.release.outputs.release_upload_url }}
-          asset_path: ./dist/Emojirades-${{ needs.release.outputs.version }}.tar.gz
-          asset_name: Emojirades-${{ needs.release.outputs.version }}.tar.gz
+          asset_path: ./dist/emojirades-${{ needs.release.outputs.version }}.tar.gz
+          asset_name: emojirades-${{ needs.release.outputs.version }}.tar.gz
           asset_content_type: application/tar+gzip
 
       - name: upload bdist_wheel
@@ -82,8 +82,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.release.outputs.release_upload_url }}
-          asset_path: ./dist/Emojirades-${{ needs.release.outputs.version }}-py3-none-any.whl
-          asset_name: Emojirades-${{ needs.release.outputs.version }}-py3-none-any.whl
+          asset_path: ./dist/emojirades-${{ needs.release.outputs.version }}-py3-none-any.whl
+          asset_name: emojirades-${{ needs.release.outputs.version }}-py3-none-any.whl
           asset_content_type: application/x-pywheel+zip
 
       - uses: pypa/gh-action-pypi-publish@v1.4.2
