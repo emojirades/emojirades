@@ -73,17 +73,27 @@ class Gamestate:
         user = str(event.player_id)
         text = str(event.text)
 
-        if self.is_admin(channel, user):
-            # Double check if we're overriding the channel
-            channel_override_match = BaseCommand.channel_override_regex.match(text)
+        # Double check if we're overriding the channel
+        channel_override_match = BaseCommand.channel_override_regex.match(text)
 
-            if channel_override_match:
-                channel = channel_override_match.groupdict()["channel_override"]
+        if channel_override_match:
+            new_channel = channel_override_match.groupdict()["channel_override"]
+
+            if (
+                isinstance(new_channel, str)
+                and new_channel[0] in ("G", "C")
+                and self.is_admin(new_channel, user)
+            ):
+                channel = new_channel
 
                 text = text.replace(
                     channel_override_match.groupdict()["override_cmd"], ""
                 )
 
+        if not (isinstance(channel, str) and channel[0] in ("G", "C")):
+            return
+
+        if self.is_admin(channel, user):
             # Double check if we're overriding the user
             user_override_match = BaseCommand.user_override_regex.match(text)
 
