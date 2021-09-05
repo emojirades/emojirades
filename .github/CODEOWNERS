@@ -1,8 +1,9 @@
 # Developer Team
-/emojirades/     @emojirades/developers
-requirements.txt @emojirades/developers
+/emojirades/   @emojirades/developers
 
 # Platform Team
-Dockerfile   @emojirades/platform
-setup.py     @emojirades/platform
-/.github/    @emojirades/platform
+/.github/      @emojirades/platform
+README.md      @emojirades/platform
+Dockerfile     @emojirades/platform
+setup.cfg      @emojirades/platform
+pyproject.toml @emojirades/platform

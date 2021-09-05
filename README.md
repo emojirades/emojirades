@@ -7,14 +7,11 @@ Slack bot that understands the emojirades game and handles score keeping.
 ## Install the dependencies
 ```bash
 pip3 install --upgrade pip wheel
-
-pip3 install -r requirements.txt --upgrade
-pip3 install -r test_requirements.txt --upgrade
 ```
 
-## Install the module
+## Install the module & dependencies
 ```bash
-pip3 install -e .
+pip3 install -e .[dev]
 ```
 
 ## Run the tests
@@ -142,7 +139,7 @@ sudo systemctl start emojirades
 
 ```
 # Release process (for master branch)
-1. Update `setup.py` with the new version (vX.Y.Z)
+1. Update `emojirades/__init__.py` with the new version (vX.Y.Z)
 2. Commit into the master branch
 3. Tag the commit with vX.Y.Z
 4. Github Actions will trigger the Release Job when a tagged commit to master is detected
