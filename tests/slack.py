@@ -157,6 +157,8 @@ class MockHandler(SimpleHTTPRequestHandler):
         elif self.path == "/conversations.open":
             response = responses["/conversations.open"]
 
+            print("CONVERSATIONS.OPEN DATA")
+            print(data)
             user_id = json.loads(data)["users"][0]
             channel_id = "D" + user_id[1:]
 
