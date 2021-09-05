@@ -40,14 +40,10 @@ class BaseCommand(ABC):
         self.args["ts"] = event.ts
 
         # Perform the channel override if it matches
-        channel_override_match = BaseCommand.channel_override_regex.match(
-            event.text
-        )
+        channel_override_match = BaseCommand.channel_override_regex.match(event.text)
 
         if channel_override_match:
-            new_channel =  channel_override_match.groupdict()[
-                "channel_override"
-            ]
+            new_channel = channel_override_match.groupdict()["channel_override"]
 
             event.channel = new_channel
 
@@ -72,7 +68,9 @@ class BaseCommand(ABC):
         # Only check for user override if admin
         # The event will be set to the desired channel above if needed, so the is_game_channel
         # should pass if overridden
-        if event.is_game_channel and self.gamestate.is_admin(self.args["channel"], self.args["user"]):
+        if event.is_game_channel and self.gamestate.is_admin(
+            self.args["channel"], self.args["user"]
+        ):
             # Perform the user override if it matches
             user_override_match = BaseCommand.user_override_regex.match(event.text)
 

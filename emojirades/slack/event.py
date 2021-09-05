@@ -41,8 +41,11 @@ class Event:
 
     @property
     def is_game_channel(self):
-        """ Game channels are non-DM channels """
-        return isinstance(self.data["channel"], str) and self.data["channel"][0] in ("G", "C")
+        """Game channels are non-DM channels"""
+        return isinstance(self.data["channel"], str) and self.data["channel"][0] in (
+            "G",
+            "C",
+        )
 
     # pylint: disable=invalid-name
     @property
