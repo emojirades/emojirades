@@ -1,7 +1,9 @@
 # Emojirades
 Slack bot that understands the emojirades game and handles score keeping.
 
-[![Build Status](https://travis-ci.com/emojirades/emojirades.svg?branch=master)](https://travis-ci.org/emojirades/emojirades) [![PyPI version](https://badge.fury.io/py/Emojirades.svg)](https://badge.fury.io/py/Emojirades)
+[![Build Status](https://travis-ci.com/emojirades/emojirades.svg?branch=master)](https://travis-ci.org/emojirades/emojirades) [![PyPI version](https://badge.fury.io/py/emojirades.svg)](https://badge.fury.io/py/emojirades)
+
+![CI Status](https://github.com/emojirades/emojirades/actions/workflows/ci.yml/badge.svg)
 
 # Developing
 ## Install the dependencies
