@@ -19,6 +19,7 @@ jobs:
         with:
           python-version: 3.9
 
+      - run: pip3 install --upgrade wheel
       - run: pip3 install -e .[dev]
 
       - id: black
@@ -50,6 +51,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - run: pip3 install --upgrade wheel
       - run: pip3 install -e .[dev]
 
       - run: ./scripts/run_tests.sh
