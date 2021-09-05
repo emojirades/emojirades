@@ -59,8 +59,4 @@ jobs:
           pip install -e .
 
       - name: Test with pytest
-        run: |
-          ./tests/slack_ws.py &
-          WS_PID=$!
-          pytest
-          kill -9 $WS_PID
+        run: ./scripts/run_tests.sh
