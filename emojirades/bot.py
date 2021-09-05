@@ -64,6 +64,8 @@ class EmojiradesBot:
                 team_id = event["team"]
             elif "team" in event.get("message", {}):
                 team_id = event["message"]["team"]
+            elif "team" in event.get("previous_message", {}):
+                team_id = event["previous_message"]["team"]
             else:
                 raise RuntimeError(
                     f"Unable to find Workspace ID in message event: {event}"
