@@ -65,7 +65,7 @@ class EmojiradesBot:
             elif "team" in event.get("message", {}):
                 team_id = event["message"]["team"]
             else:
-                raise RuntimeError("Unable to run Workspace ID in message event")
+                raise RuntimeError(f"Unable to find Workspace ID in message event: {event}")
 
             event = Event(event, client)
 
