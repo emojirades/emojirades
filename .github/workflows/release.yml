@@ -16,11 +16,11 @@ jobs:
 
       - id: version
         run: |
-          echo "::set-output name=version::$(python3 -c 'import emojirades; print(emojirades.VERSION)')"
+          echo "::set-output name=version::$(python3 -c 'import emojirades; print(emojirades.VERSION[1:])')"
 
       - id: tag_check
         run: |
-          [[ $(git tag | grep "${{ steps.version.outputs.version }}") == '${{ steps.version.outputs.version }}' ]]
+          [[ $(git tag | grep "v${{ steps.version.outputs.version }}") == 'v${{ steps.version.outputs.version }}' ]]
 
       - id: changelog
         if: ${{ success() }}
