@@ -79,13 +79,16 @@ class Gamestate:
         if channel_override_match:
             new_channel = channel_override_match.groupdict()["channel_override"]
 
-            if isinstance(new_channel, str) and new_channel[0] in ("G", "C"):
-                if self.is_admin(new_channel, user):
-                    channel = new_channel
+            if (
+                isinstance(new_channel, str)
+                and new_channel[0] in ("G", "C")
+                and self.is_admin(new_channel, user)
+            ):
+                channel = new_channel
 
-                    text = text.replace(
-                        channel_override_match.groupdict()["override_cmd"], ""
-                    )
+                text = text.replace(
+                    channel_override_match.groupdict()["override_cmd"], ""
+                )
 
         if not (isinstance(channel, str) and channel[0] in ("G", "C")):
             return
