@@ -112,7 +112,7 @@ The contents of the shard config (eg. `./workspaces/shards/0/A1B2C3D4E.json`) wi
 ```
 {
   "workspace_id": "A1B2C3D4E",
-  "db_uri": "sqlite:////data/emojirades.db",
+  "db_uri": "sqlite:////data/emojirades.db",  # Optional, needed if you do not specify one with the bot itself
   "auth_uri": "s3://bucket/workspaces/directory/A1B2C3D4E/auth.json",
 }
 ```
@@ -138,18 +138,20 @@ sudo systemctl enable emojirades
 sudo systemctl start emojirades
 
 ```
-# Release process (for master branch)
-1. Update `emojirades/__init__.py` with the new version (vX.Y.Z)
-2. Commit into the master branch
-3. Tag the commit with vX.Y.Z
+# Release process
+1. Checkout master branch
+2. Update `emojirades/__init__.py` with the new version (vX.Y.Z)
+3. Commit
+4. Tag the commit with vX.Y.Z
+5. `git push; git push --tags` together
 4. Github Actions will trigger the Release Job when a tagged commit to master is detected
     1. Changelog will be generated and a Github Release as well with the changelog
     2. New python wheel will be built and published to PyPI and attached to the Release
-    3. New container image will be built and published to Docker Hub
+    3. New container image will be built and published to Github Container Registry
 
 ## Building the Container Image
 ```
-docker build --pull --no-cache -t emojirades/emojirades:X.Y.Z -t emojirades/emojirades:latest .
+docker build --pull --no-cache -t ghcr.io/emojirades/emojirades:X.Y.Z -t ghcr.io/emojirades/emojirades:latest .
 ```
 
 ## Running the Container
@@ -162,7 +164,7 @@ docker run -d \
   -v "/path/to/your/.aws/:/root/.aws/:ro" \
   -v "emojirades-data:/data" \
   -e "AWS_PROFILE=emojirades" \
-  emojirades/emojirades:X.Y.Z \
+  ghcr.io/emojirades/emojirades:X.Y.X \
     --db-uri sqlite:////data/emojirades.db \
     --auth-uri s3://bucket/path/to/auth.json \
     -vv
