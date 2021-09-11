@@ -60,6 +60,9 @@ class EmojiradesBot:
         def handle_event(client: RTMClient, event: dict):
             session = session_factory()
 
+            if getattr(client, "workspace_id", None):
+                client.logger.debug("Found workspace_id in client")
+                team_id = client.workspace_id
             if "team" in event:
                 team_id = event["team"]
             elif "team" in event.get("message", {}):

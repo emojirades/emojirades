@@ -41,6 +41,7 @@ class SlackClient:
 
         self.bot_id = response["user_id"]
         self.workspace_id = response["team_id"]
+        self.rtm.workspace_id = response["team_id"]
 
         self.bot_name = self.user_info(self.bot_id)["real_name"]
 
