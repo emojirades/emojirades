@@ -58,31 +58,18 @@ class EmojiradesBot:
         session_factory = get_session_factory(db_uri)
 
         def handle_event(client: RTMClient, event: dict):
-            session = session_factory()
-
-            if getattr(client, "workspace_id", None):
-                client.logger.debug("Found workspace_id in client")
-                team_id = client.workspace_id
-            if "team" in event:
-                team_id = event["team"]
-            elif "team" in event.get("message", {}):
-                team_id = event["message"]["team"]
-            elif "team" in event.get("previous_message", {}):
-                team_id = event["previous_message"]["team"]
-            else:
-                raise RuntimeError(
-                    f"Unable to find Workspace ID in message event: {event}"
-                )
-
             event = Event(event, client)
 
             if not event.valid():
                 client.logger.debug("Skipping event due to being invalid")
                 return
 
+            # Get a per-thread session
+            session = session_factory()
+
             workspace = {
-                "scorekeeper": Scorekeeper(session, team_id),
-                "gamestate": Gamestate(session, team_id),
+                "scorekeeper": Scorekeeper(session, client.workspace_id),
+                "gamestate": Gamestate(session, client.workspace_id),
                 "slack": SlackClient(None, existing_client=client),
             }
 
