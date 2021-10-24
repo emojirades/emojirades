@@ -116,7 +116,7 @@ class CorrectGuessCommand(BaseCommand):
 
         # Build the score message
         if score in self.custom_messages:
-            prefix = self.custom_messages[score].format(winnder=current_winner)
+            prefix = self.custom_messages[score].format(winner=current_winner)
         elif score % 50 == 0:
             prefix = (
                 f"Another day, another 50 point milestone for <@{current_winner}> "
