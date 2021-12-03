@@ -169,3 +169,18 @@ docker run -d \
     --auth-uri s3://bucket/path/to/auth.json \
     -vv
 ```
+
+## Migrating from SQLite to Postgres
+This assumes you have a local copy of your sqlite DB file and already setup and can access your postgres DB.
+
+```bash
+# Sourced venv/etc
+
+# Init the DB to setup the table structure
+./bin/emojirades init --db-uri 'postgresql+psycopg2://user:password@host:port/dbname'
+
+# Run the migration script
+./bin/sqlite_to_postgres.py \
+    --source-db-uri 'sqlite+pysqlite:///relative/path/to/emojirades.db' \
+    --target-db-uri 'postgresql+psycopg2://user:password@host:port/dbname'
+```
