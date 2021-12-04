@@ -183,4 +183,23 @@ This assumes you have a local copy of your sqlite DB file and already setup and 
 ./bin/sqlite_to_postgres.py \
     --source-db-uri 'sqlite+pysqlite:///relative/path/to/emojirades.db' \
     --target-db-uri 'postgresql+psycopg2://user:password@host:port/dbname'
+
+# Update the sequences by logging into postgres
+emojirades=# select max(event_id) from gamestate_history;
+ max
+------
+ 3086
+(1 row)
+
+emojirades=# ALTER SEQUENCE gamestate_history_event_id_seq RESTART WITH 3086;
+ALTER SEQUENCE
+
+emojirades=# select max(event_id) from scoreboard_history;
+ max
+------
+ 1622
+(1 row)
+
+emojirades=# ALTER SEQUENCE scoreboard_history_event_id_seq RESTART WITH 1622;
+ALTER SEQUENCE
 ```
