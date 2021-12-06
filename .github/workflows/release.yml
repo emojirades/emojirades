@@ -24,7 +24,7 @@ jobs:
 
       - id: create_release
         if: ${{ success() }}
-        uses: softprops/action-gh-release@v0.1.14
+        uses: softprops/action-gh-release@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: v${{ steps.version.outputs.version }}
