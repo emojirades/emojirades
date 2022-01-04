@@ -4,6 +4,7 @@ import json
 
 import boto3
 
+from pythonjsonlogger import jsonlogger
 from slack_sdk.rtm_v2 import RTMClient
 
 from emojirades.persistence import (
@@ -21,6 +22,31 @@ from emojirades.slack.event import Event
 
 
 command_registry = CommandRegistry.command_patterns()
+
+
+def configure_parent_logger(level, name="Emojirades"):
+    logger = logging.getLogger(name)
+    logger.propagate = False
+
+    field_keys = [
+        "asctime",
+        "name",
+        "levelname",
+        "filename",
+        "module",
+        "threadName",
+        "message",
+    ]
+
+    handler = logging.StreamHandler()
+    formatter = jsonlogger.JsonFormatter(
+        " ".join("%({0})s".format(i) for i in field_keys)
+    )
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.setLevel(level)
+
+    return logger
 
 
 class EmojiradesBot:
