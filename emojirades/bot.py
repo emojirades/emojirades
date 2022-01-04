@@ -40,7 +40,7 @@ def configure_parent_logger(level, name="Emojirades"):
 
     handler = logging.StreamHandler()
     formatter = jsonlogger.JsonFormatter(
-        " ".join("%({0})s".format(i) for i in field_keys)
+        " ".join(f"%({i})s" for i in field_keys)
     )
     handler.setFormatter(formatter)
     logger.addHandler(handler)
