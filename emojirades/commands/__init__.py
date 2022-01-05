@@ -94,7 +94,7 @@ class BaseCommand(ABC):
                 event.text,
             )
 
-            match = re.compile(pattern).match(event.text)
+            match = re.compile(pattern, re.DOTALL).match(event.text)
 
             if not match:
                 self.logger.debug(

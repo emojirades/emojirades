@@ -220,6 +220,20 @@ class TestBotCommands:
             "Sorry, but this command can only be sent as a direct message!",
         ) in slack_web_api.responses
 
+    def test_set_emojirade_linebreaks(self, slack_web_api, bot):
+        """Ensure an emojirade can contain linebreaks"""
+        bot.reset_and_transition_to("waiting")
+
+        emojirade = "foo\nbar"
+
+        override = {"text": f"emojirade {emojirade}"}
+        bot.send({**bot.events.posted_emojirade, **override})
+
+        assert (
+            bot.config.player_2_channel,
+            f"Hey, <@{bot.config.player_1}> made the emojirade `foo bar`, good luck!",
+        ) in slack_web_api.responses
+
     def test_redo_emojirade(self, slack_web_api, bot):
         """Ensure that a user can 'redo' an emojirade eg. typo"""
         bot.reset_and_transition_to("provided")
