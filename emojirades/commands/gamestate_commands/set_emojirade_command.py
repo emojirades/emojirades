@@ -50,6 +50,10 @@ class SetEmojiradeCommand(BaseCommand):
             )
             return
 
+        # Remove any linebreaks from the 'rade
+        self.args["emojirade"] = self.args["emojirade"].replace("\n", " ")
+
+        # Verify nothing is banned
         if emojirade_is_banned(self.args["emojirade"]):
             yield (
                 None,
