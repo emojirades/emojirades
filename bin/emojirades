@@ -5,7 +5,7 @@ import logging
 import time
 import sys
 
-from emojirades.bot import EmojiradesBot
+from emojirades.bot import EmojiradesBot, configure_parent_logger
 
 
 if __name__ == "__main__":
@@ -47,8 +47,7 @@ if __name__ == "__main__":
     else:
         log_level = logging.WARNING
 
-    logging.basicConfig(level=log_level)
-    logger = logging.getLogger("Emojirades")
+    logger = configure_parent_logger(log_level, "Emojirades")
 
     bot = EmojiradesBot()
 

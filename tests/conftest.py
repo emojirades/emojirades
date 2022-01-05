@@ -1,3 +1,4 @@
+import logging
 import pytest
 import types
 import json
@@ -6,7 +7,7 @@ import time
 from emojirades.persistence import GamestateStep, get_session_factory
 from emojirades.scorekeeper import Scorekeeper
 from emojirades.gamestate import Gamestate
-from emojirades.bot import EmojiradesBot
+from emojirades.bot import EmojiradesBot, configure_parent_logger
 
 from tests.slack import (
     setup_mock_web_api_server,
@@ -122,6 +123,9 @@ def slack_web_api(request, test_data):
 @pytest.fixture
 def bot(auth_uri, db_uri, test_data):
     config, events = test_data
+
+    logger = configure_parent_logger(logging.DEBUG, "Emojirades")
+    logger.debug("Setup bot fixture")
 
     bot = EmojiradesBot()
     bot.configure_workspace(
