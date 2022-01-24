@@ -44,6 +44,8 @@ class CorrectGuessCommand(BaseCommand):
         "Must have been the :art::frame_with_picture:!",
         "You're a mastermind for deciphering that :sleuth_or_spy:!",
         "Batman may be getting old, but you're just getting warmed up! :fire::fire:",
+        ":cow::cow::eye: Bullseye! Got it in one!",
+        "Nailed it first guess! :hammer::clock1:",
     ]
 
     custom_messages = {
