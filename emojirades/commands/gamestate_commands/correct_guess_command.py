@@ -37,6 +37,17 @@ class CorrectGuessCommand(BaseCommand):
         "champagne",
     ]
 
+    # Not currently formatted
+    first_guess_messages = [
+        "Holy bejesus Batman :bat::man:, they guessed it in one go! :clap:",
+        "Faster than a speeding bullet! :bullettrain_front: :dash:",
+        "Must have been the :art::frame_with_picture:!",
+        "You're a mastermind for deciphering that :sleuth_or_spy:!",
+        "Batman may be getting old, but you're just getting warmed up! :fire::fire:",
+        ":cow::cow::eye: Bullseye! Got it in one!",
+        "Nailed it first guess! :hammer::clock1:",
+    ]
+
     custom_messages = {
         1000: "Ok {winner} just give up already, you've won the game",
         500: ":tada::tada: Ladies and gentlemen {winner} has daym done it again :tada::tada:",
@@ -108,7 +119,7 @@ class CorrectGuessCommand(BaseCommand):
         if self.gamestate.handler.is_first_guess(channel):
             yield (
                 None,
-                "Holy bejesus Batman :bat::man:, they guessed it in one go! :clap:",
+                random.choice(self.first_guess_messages),
             )
 
         if self.args["inferred"]:
