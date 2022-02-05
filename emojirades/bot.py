@@ -80,6 +80,7 @@ class EmojiradesBot:
         self.workspaces[slack.workspace_id] = slack
 
         session_factory = get_session_factory(db_uri)
+        logger = self.logger
 
         def handle_event(client: RTMClient, event: dict):
             event = Event(event, client)
@@ -97,7 +98,7 @@ class EmojiradesBot:
                 "slack": SlackClient(None, existing_client=client),
             }
 
-            client.logger.debug("Handling event: %s", event.data)
+            logger.debug("Handling event: %s", event.data)
 
             for command in EmojiradesBot.match_event(event, workspace):
                 client.logger.debug("Matched %s for event %s", command, event.data)
