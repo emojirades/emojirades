@@ -8,12 +8,15 @@ class HistoryCommand(BaseCommand):
     max_history = 50
 
     patterns = (
+        r"<@{me}> history <@(?P<target_user>[0-9A-Z]+)> (?P<limit>[0-9]+)",
+        r"<@{me}> history <@(?P<target_user>[0-9A-Z]+)>",
         r"<@{me}> history (?P<limit>[0-9]+)",
         r"<@{me}> history",
     )
 
     examples = [
         ("<@{me}> history", "Shows scoreboard history"),
+        ("<@{me}> history @user", "Shows scoreboard history for a specific user"),
         ("<@{me}> history 20", "Shows last 20 history events"),
     ]
 
@@ -33,6 +36,9 @@ class HistoryCommand(BaseCommand):
         yield from super().execute()
 
         kwargs = {}
+
+        if "target_user" in self.args:
+            kwargs["user"] = self.args["target_user"]
 
         if "limit" in self.args:
             kwargs["limit"] = self.args["limit"]
