@@ -36,7 +36,7 @@ def match_emojirade(guess, emojirades, scott_factor=2):
         raise ScottFactorExceededException("Guess exceeded the Scott Factor")
 
     for emojirade in emojirades:
-        if re.search(fr"\b{re.escape(emojirade)}\b", guess):
+        if re.search(rf"\b{re.escape(emojirade)}\b", guess):
             return True
 
     return False
