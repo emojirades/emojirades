@@ -287,7 +287,7 @@ class TestBotCommands:
         for command in commands.values():
             for example, description in command.examples:
                 assert re.compile(
-                    fr"{re.escape(example)}\s+{re.escape(description)}"
+                    rf"{re.escape(example)}\s+{re.escape(description)}"
                 ).search(slack_web_api.responses[-2][1])
 
     def test_game_status(self, slack_web_api, bot):
