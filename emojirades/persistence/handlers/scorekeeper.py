@@ -170,7 +170,7 @@ class ScorekeeperDB:
 
         if user is not None:
             stmt = stmt.where(
-                ScoreboardHistory.user_id = user,
+                ScoreboardHistory.user_id == user,
             )
 
         if order_by == "asc":
