@@ -154,17 +154,24 @@ class ScorekeeperDB:
 
         return None, None
 
-    def get_history(self, channel, limit=None, order_by="desc"):
+    def get_history(self, channel, limit=None, user=None, order_by="desc"):
         if limit is None:
             limit = self.HISTORY_LIMIT
 
-        if history := self.history_cache.get((channel, limit, order_by)):
+        cache_key = (channel, user, limit, order_by)
+
+        if history := self.history_cache.get(cache_key):
             return history
 
         stmt = select(ScoreboardHistory).where(
             ScoreboardHistory.workspace_id == self.workspace_id,
             ScoreboardHistory.channel_id == channel,
         )
+
+        if user is not None:
+            stmt = stmt.where(
+                ScoreboardHistory.user_id = user,
+            )
 
         if order_by == "asc":
             stmt = stmt.order_by(asc(ScoreboardHistory.timestamp))
@@ -186,6 +193,6 @@ class ScorekeeperDB:
         ]
 
         if self.caching:
-            self.history_cache[(channel, limit, order_by)] = scorekeeper_history
+            self.history_cache[cache_key] = scorekeeper_history
 
         return scorekeeper_history
