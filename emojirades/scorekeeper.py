@@ -24,8 +24,8 @@ class Scorekeeper:
     def user_score(self, channel, user):
         return self.handler.position_on_scoreboard(channel, user)
 
-    def history(self, channel, limit=None):
-        return self.handler.get_history(channel, limit=limit)
+    def history(self, channel, user=None, limit=None):
+        return self.handler.get_history(channel, user=user, limit=limit)
 
     def history_all(self, channel):
         return self.handler.get_history(channel, limit=0, order_by="asc")
