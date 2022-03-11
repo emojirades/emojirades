@@ -88,7 +88,7 @@ Here we provide an S3 path of workspaces and an AWS SQS queue to listen to for n
 
 Here we provide an S3 path of workspaces and override the db_uri:
 
-`emojirades multiple --workspaces-dir s3://bucket/path/to/workspaces --db-uri sqlite:///emojirades.db
+`emojirades multiple --workspaces-dir s3://bucket/path/to/workspaces --db-uri sqlite:///emojirades.db`
 
 The workspaces directory must be in the following format (local or s3):
 ```
