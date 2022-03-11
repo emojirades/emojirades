@@ -71,7 +71,7 @@ This command uses locally stored files to keep the game state:
 
 This command uses a separate PostgreSQL DB and an auth file from AWS S3:
 
-`emojirades single --db-uri postgresql://user:pass@hostname/database --auth-uri s3://bucket/auth.json
+`emojirades single --db-uri postgresql://user:pass@hostname/database --auth-uri s3://bucket/auth.json`
 
 ## Run the daemon for multiple workspaces
 Here we provide a local folder of workspaces and an optional set of workspace ids (will load all in folder by default):
