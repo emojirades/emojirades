@@ -61,7 +61,7 @@ class HistoryCommand(BaseCommand):
             name = self.slack.pretty_name(item["user_id"])
             command, prev, curr = item["operation"].split(",")
 
-            line = f"{ago:<15}: {name:<20}: {command:>5} {prev:>5} => {curr:>5}"
+            line = f"{ago:<18}: {name:<20}: {command:>5} {prev:>5} => {curr:>5}"
             history_log.append(line)
 
         yield (None, "```" + "\n".join(history_log) + "```")
