@@ -20,7 +20,7 @@ class MinusMinusCommand(BaseCommand):
         self.logger.debug("Decrementing user's score: %s", target_user)
         self.scorekeeper.minusminus(self.args["channel"], target_user)
 
-        _, score = self.scorekeeper.position_on_scoreboard(
+        _, score = self.scorekeeper.user_score(
             self.args["channel"], target_user
         )
 
