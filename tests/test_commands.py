@@ -208,6 +208,20 @@ class TestBotCommands:
             f"Hey, <@{bot.config.player_1}> made the emojirade `foo`, with alternatives `bar`, good luck!",
         ) in slack_web_api.responses
 
+    def test_set_emojirade_alternatives_empty_variant(self, slack_web_api, bot):
+        """Ensure that the emojirade alternatives cannot have an 'empty' variant"""
+        bot.reset_and_transition_to("waiting")
+
+        emojirade = "foo | | bar"
+
+        override = {"text": f"emojirade {emojirade}"}
+        bot.send({**bot.events.posted_emojirade, **override})
+
+        assert (
+            bot.config.player_2_channel,
+            f"Hey, <@{bot.config.player_1}> made the emojirade `foo`, with alternatives `bar`, good luck!",
+        ) in slack_web_api.responses
+
     def test_set_emojirade_public_channel(self, slack_web_api, bot):
         """Ensure that the emojirade can only be set in a DM channel"""
         bot.reset_and_transition_to("waiting")
