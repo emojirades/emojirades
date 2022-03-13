@@ -2,6 +2,7 @@ import time
 import re
 
 from emojirades.persistence import GamestateStep
+from emojirades.commands.gamestate_commands.correct_guess_command import CorrectGuessCommand
 
 
 class TestBotScenarios:
@@ -118,6 +119,9 @@ class TestBotScenarios:
         """
 
         def response(dst, msg):
+            if isinstance(msg, list):
+                return (dst, [re.compile(i) for i in msg])
+
             return (dst, re.compile(msg))
 
         def reaction(dst, emoji, ts):
@@ -219,7 +223,7 @@ class TestBotScenarios:
         responses = [
             response(
                 bot.config.channel,
-                "Holy bejesus Batman :bat::man:, they guessed it in one go! :clap:",
+                CorrectGuessCommand.first_guess_messages
             ),
             response(bot.config.channel, f"<@{bot.config.player_3}>\\+\\+"),
             response(
@@ -243,7 +247,11 @@ class TestBotScenarios:
         # Ensure each expected response exists in actual responses
         for i, (channel, msg) in enumerate(responses):
             assert channel == slack_web_api.responses[total_responses + i][0]
-            assert msg.match(slack_web_api.responses[total_responses + i][1])
+
+            if isinstance(msg, list):
+                assert any(j.match(slack_web_api.responses[total_responses + i][1]) for j in msg)
+            else:
+                assert msg.match(slack_web_api.responses[total_responses + i][1])
 
         # Ensure total volume is as expected
         total_responses += len(responses)
