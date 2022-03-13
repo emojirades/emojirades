@@ -2,7 +2,9 @@ import time
 import re
 
 from emojirades.persistence import GamestateStep
-from emojirades.commands.gamestate_commands.correct_guess_command import CorrectGuessCommand
+from emojirades.commands.gamestate_commands.correct_guess_command import (
+    CorrectGuessCommand,
+)
 
 
 class TestBotScenarios:
@@ -221,10 +223,7 @@ class TestBotScenarios:
 
         # Expected *new* responses
         responses = [
-            response(
-                bot.config.channel,
-                CorrectGuessCommand.first_guess_messages
-            ),
+            response(bot.config.channel, CorrectGuessCommand.first_guess_messages),
             response(bot.config.channel, f"<@{bot.config.player_3}>\\+\\+"),
             response(
                 bot.config.channel,
@@ -249,7 +248,10 @@ class TestBotScenarios:
             assert channel == slack_web_api.responses[total_responses + i][0]
 
             if isinstance(msg, list):
-                assert any(j.match(slack_web_api.responses[total_responses + i][1]) for j in msg)
+                assert any(
+                    j.match(slack_web_api.responses[total_responses + i][1])
+                    for j in msg
+                )
             else:
                 assert msg.match(slack_web_api.responses[total_responses + i][1])
 

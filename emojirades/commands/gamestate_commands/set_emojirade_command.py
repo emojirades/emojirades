@@ -62,7 +62,9 @@ class SetEmojiradeCommand(BaseCommand):
             return
 
         # Break the alternatives out, ignoring non-truthy items (empty)
-        raw_emojirades = [i.strip() for i in self.args["emojirade"].split("|") if i.strip()]
+        raw_emojirades = [
+            i.strip() for i in self.args["emojirade"].split("|") if i.strip()
+        ]
 
         self.gamestate.set_emojirade(channel, raw_emojirades, user)
 
