@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 ./tests/slack_ws.py &
 WS_PID=$!
