@@ -54,6 +54,7 @@ class TestBotCommands:
             "U00000010": ("Generic User", 9),
             "U00000011": ("Generic User", 9),
             "U00000012": ("Generic User", 1),
+            "U00000013": ("Last Player", 0),  # Should be ignored as it's <= 0
         }
 
         for user_id, (user_name, score) in user_scores.items():
@@ -199,6 +200,20 @@ class TestBotCommands:
         bot.reset_and_transition_to("waiting")
 
         emojirade = "foo | bar"
+
+        override = {"text": f"emojirade {emojirade}"}
+        bot.send({**bot.events.posted_emojirade, **override})
+
+        assert (
+            bot.config.player_2_channel,
+            f"Hey, <@{bot.config.player_1}> made the emojirade `foo`, with alternatives `bar`, good luck!",
+        ) in slack_web_api.responses
+
+    def test_set_emojirade_alternatives_empty_variant(self, slack_web_api, bot):
+        """Ensure that the emojirade alternatives cannot have an 'empty' variant"""
+        bot.reset_and_transition_to("waiting")
+
+        emojirade = "foo | | bar"
 
         override = {"text": f"emojirade {emojirade}"}
         bot.send({**bot.events.posted_emojirade, **override})
