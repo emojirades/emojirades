@@ -60,6 +60,9 @@ class ScoreboardPrinter:
         biggest_score = 0
 
         for (name, score) in self.scoreboard:
+            if score <= 0:
+                continue
+
             name = self.slack.pretty_name(name)
 
             name_len = len(name)
@@ -75,6 +78,9 @@ class ScoreboardPrinter:
         last_score = 0
 
         for pos, (name, score) in enumerate(self.scoreboard, start=1):
+            if score <= 0:
+                continue
+
             name = self.slack.pretty_name(name)
             name = name if len(name) < 20 else "{name[0:18]}.."
 

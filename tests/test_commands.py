@@ -54,6 +54,7 @@ class TestBotCommands:
             "U00000010": ("Generic User", 9),
             "U00000011": ("Generic User", 9),
             "U00000012": ("Generic User", 1),
+            "U00000013": ("Last Player", 0), # Should be ignored as it's <= 0
         }
 
         for user_id, (user_name, score) in user_scores.items():
