@@ -36,7 +36,7 @@ class HelpCommand(BaseCommand):
             None,
             {
                 "func": "chat_postEphemeral",
-                kwargs: {"text": "Available commands are:\n"},
+                "kwargs": {"text": "Available commands are:\n"},
             },
         )
         message = f"```\n{'Example':<{longest_example}} {'Description':<{longest_description}}\n"
