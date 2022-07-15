@@ -52,11 +52,17 @@ class HelpCommand(BaseCommand):
                 message += f"{example:<{longest_example}} {description:<{longest_description}}\n"
 
         message += "```"
-        yield (None, message)
+        yield (None, {"func": "chat_postEphemeral", "kwargs": {"text": message}})
 
         game_admins = self.gamestate.get_admins(self.args["channel"])
         admins_names = [self.slack.pretty_name(i) for i in game_admins]
-        yield (None, "Game Admins: " + ", ".join(admins_names))
+        yield (
+            None,
+            {
+                "func": "chat_postEphemeral",
+                "kwargs": {"text": "Game Admins: " + ", ".join(admins_names)},
+            },
+        )
 
     def __str__(self):
         return "HelpCommand"
