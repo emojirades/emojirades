@@ -1,4 +1,4 @@
-FROM python:3.8-buster
+FROM python:3.10-buster
 
 WORKDIR /build
 
@@ -10,7 +10,7 @@ RUN pip3 install --upgrade setuptools wheel build
 RUN python3 -m build
 
 
-FROM python:3.8-buster
+FROM python:3.10-buster
 
 COPY --from=0 /build/dist/emojirades-*-py3-none-any.whl /tmp/
 RUN pip3 install /tmp/emojirades-*-py3-none-any.whl && rm /tmp/emojirades-*-py3-none-any.whl
