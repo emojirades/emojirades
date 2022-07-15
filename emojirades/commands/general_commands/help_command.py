@@ -32,7 +32,7 @@ class HelpCommand(BaseCommand):
                 if example_length > longest_example:
                     longest_example = example_length
 
-        yield (None, "Available commands are:\n")
+        yield (None, {"func": "chat_postEphemeral", kwargs: {"text": "Available commands are:\n"}})
         message = f"```\n{'Example':<{longest_example}} {'Description':<{longest_description}}\n"
 
         for command in self.commands.values():
