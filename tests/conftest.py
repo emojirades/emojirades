@@ -111,6 +111,7 @@ def slack_web_api(request, test_data):
             self.config = conf
             self.responses = []
             self.reactions = []
+            self.ephemeral_responses = []
 
     foo = Foo(config)
     setup_mock_web_api_server(foo)

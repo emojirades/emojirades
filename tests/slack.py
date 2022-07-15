@@ -124,6 +124,9 @@ class MockHandler(SimpleHTTPRequestHandler):
             "/chat.postMessage": {
                 "ok": True,
             },
+            "/chat.postEphemeral": {
+                "ok": True,
+            },
             "/conversations.open": {
                 "ok": True,
                 "channel": {
@@ -179,6 +182,23 @@ class MockHandler(SimpleHTTPRequestHandler):
                 }
 
             self.test.responses.append((message["channel"], message["text"]))
+        elif self.path == "/chat.postEphemeral":
+            response = responses[self.path]
+
+            try:
+                message = json.loads(data)
+            except json.JSONDecodeError:
+                parsed = urllib.parse.parse_qs(data)
+                message = {
+                    "channel": parsed["channel"][0],
+                    "text": parsed["text"][0],
+                    "user": parsed["user"][0],
+                }
+
+            self.test.ephemeral_responses.append(
+                (message["channel"], message["text"], message["user"])
+            )
+
         elif self.path == "/reactions.add":
             response = responses[self.path]
 

@@ -56,11 +56,12 @@ class HelpCommand(BaseCommand):
 
         game_admins = self.gamestate.get_admins(self.args["channel"])
         admins_names = [self.slack.pretty_name(i) for i in game_admins]
+
         yield (
             None,
             {
                 "func": "chat_postEphemeral",
-                "kwargs": {"text": "Game Admins: " + ", ".join(admins_names)},
+                "kwargs": {"text": f"Game Admins: {', '.join(admins_names)}"},
             },
         )
 

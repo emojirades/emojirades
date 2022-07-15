@@ -303,7 +303,7 @@ class TestBotCommands:
             for example, description in command.examples:
                 assert re.compile(
                     rf"{re.escape(example)}\s+{re.escape(description)}"
-                ).search(slack_web_api.responses[-2][1])
+                ).search(slack_web_api.ephemeral_responses[-2][1])
 
     def test_game_status(self, slack_web_api, bot):
         bot.reset_and_transition_to("waiting")
