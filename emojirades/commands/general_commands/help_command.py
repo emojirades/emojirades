@@ -32,7 +32,13 @@ class HelpCommand(BaseCommand):
                 if example_length > longest_example:
                     longest_example = example_length
 
-        yield (None, "Available commands are:\n")
+        yield (
+            None,
+            {
+                "func": "chat_postEphemeral",
+                "kwargs": {"text": "Available commands are:\n"},
+            },
+        )
         message = f"```\n{'Example':<{longest_example}} {'Description':<{longest_description}}\n"
 
         for command in self.commands.values():
@@ -46,11 +52,18 @@ class HelpCommand(BaseCommand):
                 message += f"{example:<{longest_example}} {description:<{longest_description}}\n"
 
         message += "```"
-        yield (None, message)
+        yield (None, {"func": "chat_postEphemeral", "kwargs": {"text": message}})
 
         game_admins = self.gamestate.get_admins(self.args["channel"])
         admins_names = [self.slack.pretty_name(i) for i in game_admins]
-        yield (None, "Game Admins: " + ", ".join(admins_names))
+
+        yield (
+            None,
+            {
+                "func": "chat_postEphemeral",
+                "kwargs": {"text": f"Game Admins: {', '.join(admins_names)}"},
+            },
+        )
 
     def __str__(self):
         return "HelpCommand"

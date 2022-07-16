@@ -134,6 +134,12 @@ class EmojiradesBot:
                     if kwargs.get("channel") is None:
                         kwargs["channel"] = channel
 
+                    if (
+                        response["func"] == "chat_postEphemeral"
+                        and "user" not in kwargs
+                    ):
+                        kwargs["user"] = event.player_id
+
                     func(*args, **kwargs)
 
             session.close()
