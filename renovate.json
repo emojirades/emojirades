@@ -4,7 +4,7 @@
     "config:base",
     ":disableDependencyDashboard",
     "schedule:weekends",
-    "group:allNonMajor",
+    "group:allNonMajor"
   ],
-  "assignees": ["@emojirades/platform"],
+  "assignees": ["@emojirades/platform"]
 }
