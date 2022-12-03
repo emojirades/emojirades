@@ -16,7 +16,7 @@ jobs:
 
       - id: version
         run: |
-          echo "::set-output name=version::$(python3 -c 'import emojirades; print(emojirades.VERSION[1:])')"
+          echo "version=$(python3 -c 'import emojirades; print(emojirades.VERSION[1:])')" >> $GITHUB_OUTPUT
 
       - id: tag_check
         run: |
