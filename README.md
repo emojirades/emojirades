@@ -22,8 +22,11 @@ pylint emojirades
 # Formatter
 black --check .
 
-# Tests
+# Tests w/no stdout
 pytest
+
+# Tests w/stdout
+pytest -s
 ```
 
 ## Creating new DB revisions
