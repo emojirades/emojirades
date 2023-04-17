@@ -9,7 +9,6 @@ from emojirades.commands import BaseCommand
 
 
 class ScoreboardCommand(BaseCommand):
-
     TZ = "Australia/Melbourne"
     description = "Shows all the users scores"
 

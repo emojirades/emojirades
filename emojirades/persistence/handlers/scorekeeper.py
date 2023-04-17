@@ -148,7 +148,7 @@ class ScorekeeperDB:
     def position_on_scoreboard(self, channel, user):
         scoreboard = self.get_scoreboard(channel)
 
-        for (pos, user_id, score) in scoreboard:
+        for pos, user_id, score in scoreboard:
             if user_id == user:
                 return pos, score
 

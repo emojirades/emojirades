@@ -46,7 +46,6 @@ class GamestateDB:
             self.session.commit()
 
     def get_gamestates(self, current_workspace=True):
-
         stmt = select(Gamestate)
 
         if current_workspace:
@@ -105,7 +104,7 @@ class GamestateDB:
     def set_many_xyz(self, channel, user, pairs):
         gamestate = self.get_gamestate(channel)
 
-        for (xyz, value) in pairs:
+        for xyz, value in pairs:
             setattr(gamestate, xyz, value)
             self.record_history(channel, user, f"set,{xyz},{value}")
 
@@ -213,7 +212,9 @@ class GamestateDB:
         return [row.channel_id for row in result]
 
     def get_pending_channel(self, previous_winner):
-        stmt = select(Gamestate.channel_id,).where(
+        stmt = select(
+            Gamestate.channel_id,
+        ).where(
             Gamestate.workspace_id == self.workspace_id,
             or_(
                 Gamestate.step == GamestateStep.WAITING,

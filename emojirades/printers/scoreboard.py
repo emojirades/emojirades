@@ -59,7 +59,7 @@ class ScoreboardPrinter:
         longest_name = 0
         biggest_score = 0
 
-        for (name, score) in self.scoreboard:
+        for name, score in self.scoreboard:
             if score <= 0:
                 continue
 
