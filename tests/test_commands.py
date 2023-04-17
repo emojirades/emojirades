@@ -305,6 +305,23 @@ class TestBotCommands:
                     rf"{re.escape(example)}\s+{re.escape(description)}"
                 ).search(slack_web_api.ephemeral_responses[-2][1])
 
+        reactions = [
+            reaction(
+                bot.config.channel,
+                r"(\+1|ok)",
+                bot.events.help["ts"],
+            ),
+        ]
+
+        while not slack_web_api.reactions:
+            time.sleep(0.5)
+
+        for reaction
+
+        assert slack_web_api.reactions
+
+        slack_web_api.reactions[0] = (bot.config.channel, )
+
     def test_game_status(self, slack_web_api, bot):
         bot.reset_and_transition_to("waiting")
         bot.send(bot.events.game_status)

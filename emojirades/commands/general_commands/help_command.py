@@ -65,5 +65,16 @@ class HelpCommand(BaseCommand):
             },
         )
 
+        yield (
+            None,
+            {
+                "func": "reactions_add",
+                "kwargs": {
+                    "name": random.choice(["+1", "ok"]),
+                    "timestamp": self.args["ts"],
+                },
+            },
+        )
+
     def __str__(self):
         return "HelpCommand"

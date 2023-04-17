@@ -3,6 +3,7 @@ import pytest
 import types
 import json
 import time
+import re
 
 from emojirades.persistence import GamestateStep, get_session_factory
 from emojirades.scorekeeper import Scorekeeper
@@ -106,12 +107,39 @@ class TestBot:
 def slack_web_api(request, test_data):
     config, _ = test_data
 
+    class Reaction:
+        def __init__(self, dst, ts, emoji):
+            self.dst = dst
+            self.ts = ts
+            self.emoji = re.compile(emoji)
+
+        @attribute
+        def key(self):
+            return (self.dst, self.ts)
+
     class Foo:
         def __init__(self, conf):
             self.config = conf
             self.responses = []
-            self.reactions = []
+            self.reactions = {}
             self.ephemeral_responses = []
+
+        @staticmethod
+        def reaction(dst, ts, emoji):
+            return Reaction(dst, ts, emoji)
+
+        def contains_reaction(self, reaction):
+            found = self.reactions.get(reaction.key)
+
+            if not found:
+                return False
+
+            if reaction.match()
+
+            if self.reactions.get((reaction.channel, reaction.ts))
+
+            for reaction in self.reactions:
+                if reaction
 
     foo = Foo(config)
     setup_mock_web_api_server(foo)

@@ -208,12 +208,12 @@ class MockHandler(SimpleHTTPRequestHandler):
                 parsed = urllib.parse.parse_qs(data)
                 message = {
                     "channel": parsed["channel"][0],
-                    "name": parsed["name"][0],
                     "timestamp": parsed["timestamp"][0],
+                    "name": parsed["name"][0],
                 }
 
             self.test.reactions.append(
-                (message["channel"], message["name"], message["timestamp"])
+                self.test.reaction(message["channel"], message["timestamp"], message["name"])
             )
         else:
             response = responses[self.path]
