@@ -26,11 +26,8 @@ class HelpCommand(BaseCommand):
                 description_length = len(description)
                 example_length = len(example)
 
-                if description_length > longest_description:
-                    longest_description = description_length
-
-                if example_length > longest_example:
-                    longest_example = example_length
+                longest_description = max(longest_description, description_length)
+                longest_example = max(longest_example, example_length)
 
         yield (
             None,
