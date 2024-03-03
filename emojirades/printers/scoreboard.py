@@ -68,11 +68,8 @@ class ScoreboardPrinter:
             name_len = len(name)
             score_len = len(str(score))
 
-            if name_len > longest_name:
-                longest_name = name_len
-
-            if score_len > biggest_score:
-                biggest_score = score_len
+            longest_name = max(longest_name, name_len)
+            biggest_score = max(biggest_score, score_len)
 
         rank_buffer = 0
         last_score = 0
