@@ -5,7 +5,6 @@ import json
 import boto3
 
 from pythonjsonlogger import jsonlogger
-from slack_sdk.rtm_v2 import RTMClient
 
 from emojirades.persistence import (
     get_session_factory,
@@ -73,7 +72,7 @@ class EmojiradesBot:
         if slack.workspace_id in self.workspaces:
             self.logger.info("Deleting previous workspace: %s", slack.workspace_id)
 
-            self.workspaces[slack.workspace_id].rtm.close()
+            self.workspaces[slack.workspace_id].handler.close()
             time.sleep(1)
             del self.workspaces[slack.workspace_id]
 
@@ -82,10 +81,19 @@ class EmojiradesBot:
         session_factory = get_session_factory(db_uri)
         logger = self.logger
 
-        def handle_event(client: RTMClient, event: dict):
-            event = Event(event, client)
+        @slack.app.message()
+        @slack.app.event("reaction_added")
+        def handle_event(message: dict, event: dict):
+            client = slack
 
-            if not event.valid():
+            if message is not None:
+                parsed = Event(data=message, slack_client=client)
+            elif event is not None:
+                parsed = Event(data=event, slack_client=client)
+            else:
+                raise RuntimeError("Message and Event payloads are empty, unable to determine event")
+
+            if not parsed.valid():
                 client.logger.debug("Skipping event due to being invalid")
                 return
 
@@ -95,13 +103,13 @@ class EmojiradesBot:
             workspace = {
                 "scorekeeper": Scorekeeper(session, client.workspace_id),
                 "gamestate": Gamestate(session, client.workspace_id),
-                "slack": SlackClient(None, existing_client=client),
+                "slack": client,
             }
 
             logger.debug("Handling event: %s", event.data)
 
             for command in EmojiradesBot.match_event(event, workspace):
-                client.logger.debug("Matched %s for event %s", command, event.data)
+                slack.logger.debug("Matched %s for event %s", command, event.data)
 
                 for channel, response in command.execute():
                     client.logger.debug("------------------------")
@@ -118,12 +126,12 @@ class EmojiradesBot:
 
                     if isinstance(response, str):
                         # Plain strings are assumed as 'chat_postMessage'
-                        client.web_client.chat_postMessage(
+                        client.client.chat_postMessage(
                             channel=channel, text=response
                         )
                         continue
 
-                    func = getattr(client.web_client, response["func"], None)
+                    func = getattr(client.client, response["func"], None)
 
                     if func is None:
                         raise RuntimeError(f"Unmapped function '{response['func']}'")
@@ -143,8 +151,6 @@ class EmojiradesBot:
                     func(*args, **kwargs)
 
             session.close()
-
-        slack.rtm.on("message")(handle_event)
 
         return slack
 

@@ -71,6 +71,7 @@ if __name__ == "__main__":
         logger.info("Bot is listening for commands")
         bot.listen_for_commands(blocking=False)
 
+        # Both these branches result in 60s infinite loops
         if args.onboarding_queue is not None:
             bot.listen_for_onboarding(args.workspaces_uri, db_uri=args.db_uri)
         else:
