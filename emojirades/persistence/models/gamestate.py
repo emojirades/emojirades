@@ -52,7 +52,9 @@ class GamestateHistory(Base):
     channel_id = Column(Text)
     user_id = Column(Text)
 
-    timestamp = Column(DateTime, nullable=False, default=lambda: datetime.datetime.now(datetime.UTC))
+    timestamp = Column(
+        DateTime, nullable=False, default=lambda: datetime.datetime.now(datetime.UTC)
+    )
     operation = Column(Text, nullable=False)
 
     def __repr__(self):

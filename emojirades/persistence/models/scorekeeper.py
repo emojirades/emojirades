@@ -41,7 +41,9 @@ class ScoreboardHistory(Base):
     channel_id = Column(Text)
     user_id = Column(Text)
 
-    timestamp = Column(DateTime, nullable=False, default=lambda: datetime.datetime.now(datetime.UTC))
+    timestamp = Column(
+        DateTime, nullable=False, default=lambda: datetime.datetime.now(datetime.UTC)
+    )
     operation = Column(Text, nullable=False)
 
     Index("idx_scoreboard_history_channel", "workspace_id", "channel_id")
