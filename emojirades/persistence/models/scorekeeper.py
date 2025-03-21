@@ -18,8 +18,8 @@ class Scoreboard(Base):
     last_updated = Column(
         DateTime,
         nullable=False,
-        default=lambda: datetime.datetime.now(datetime.timezone.UTC),
-        onupdate=lambda: datetime.datetime.now(datetime.timezone.UTC),
+        default=lambda: datetime.datetime.now(datetime.timezone.utc),
+        onupdate=lambda: datetime.datetime.now(datetime.timezone.utc),
     )
 
     Index("idx_scoreboard_channel", "workspace_id", "channel_id", unique=True)
@@ -44,7 +44,7 @@ class ScoreboardHistory(Base):
     timestamp = Column(
         DateTime,
         nullable=False,
-        default=lambda: datetime.datetime.now(datetime.timezone.UTC),
+        default=lambda: datetime.datetime.now(datetime.timezone.utc),
     )
     operation = Column(Text, nullable=False)
 

@@ -31,8 +31,8 @@ class Gamestate(Base):
     last_updated = Column(
         DateTime,
         nullable=False,
-        default=lambda: datetime.datetime.now(datetime.timezone.UTC),
-        onupdate=lambda: datetime.datetime.now(datetime.timezone.UTC),
+        default=lambda: datetime.datetime.now(datetime.timezone.utc),
+        onupdate=lambda: datetime.datetime.now(datetime.timezone.utc),
     )
 
     def __repr__(self):
@@ -55,7 +55,7 @@ class GamestateHistory(Base):
     timestamp = Column(
         DateTime,
         nullable=False,
-        default=lambda: datetime.datetime.now(datetime.timezone.UTC),
+        default=lambda: datetime.datetime.now(datetime.timezone.utc),
     )
     operation = Column(Text, nullable=False)
 

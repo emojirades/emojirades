@@ -1,11 +1,9 @@
 [MASTER]
 ignore-paths=^emojirades/persistence/models/alembic/
+disable=duplicate-code
 
 [MESSAGES CONTROL]
 disable=
     missing-module-docstring,
     missing-class-docstring,
     missing-function-docstring,
-
-[SIMILARITIES]
-min-similarity-lines=8
