@@ -13,7 +13,7 @@ from websockets import serve
 # logger.addHandler(logging.StreamHandler())
 
 
-async def echo(websocket, path):
+async def echo(websocket):
     try:
         async for message in websocket:
             await websocket.send(message)
