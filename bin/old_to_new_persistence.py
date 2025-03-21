@@ -78,12 +78,16 @@ def process_state(workspace_id, state_filename):
                 "step": channel_state["step"].upper(),
                 "current_winner": channel_state["winner"],
                 "previous_winner": channel_state["old_winner"],
-                "emojirade": json.dumps(channel_state["emojirade"])
-                if channel_state["emojirade"]
-                else None,
-                "raw_emojirade": json.dumps(channel_state["raw_emojirade"])
-                if channel_state["raw_emojirade"]
-                else None,
+                "emojirade": (
+                    json.dumps(channel_state["emojirade"])
+                    if channel_state["emojirade"]
+                    else None
+                ),
+                "raw_emojirade": (
+                    json.dumps(channel_state["raw_emojirade"])
+                    if channel_state["raw_emojirade"]
+                    else None
+                ),
                 "first_guess": False,
                 "admins": json.dumps(channel_state["admins"]),
             }
