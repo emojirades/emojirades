@@ -53,7 +53,9 @@ class GamestateHistory(Base):
     user_id = Column(Text)
 
     timestamp = Column(
-        DateTime, nullable=False, default=lambda: datetime.datetime.now(datetime.timezone.UTC)
+        DateTime,
+        nullable=False,
+        default=lambda: datetime.datetime.now(datetime.timezone.UTC),
     )
     operation = Column(Text, nullable=False)
 
