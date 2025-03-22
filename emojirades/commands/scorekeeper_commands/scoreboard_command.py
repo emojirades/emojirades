@@ -1,6 +1,7 @@
+import datetime
 import os
 
-import pendulum
+from zoneinfo import ZoneInfo
 
 from emojirades.printers.scoreboard import ScoreboardPrinter
 from emojirades.analytics.scoreboard import ScoreboardAnalytics
@@ -9,7 +10,7 @@ from emojirades.commands import BaseCommand
 
 
 class ScoreboardCommand(BaseCommand):
-    TZ = "Australia/Melbourne"
+    TZ = ZoneInfo("Australia/Melbourne")
     description = "Shows all the users scores"
 
     # pylint: disable=line-too-long
@@ -73,9 +74,9 @@ class ScoreboardCommand(BaseCommand):
             if self.args.get("user_date"):
                 date = self.args["user_date"]
             else:
-                date = pendulum.now(tz=self.TZ).strftime("%Y%m%d")
+                date = datetime.datetime.now(tz=self.TZ).strftime("%Y%m%d")
 
-        parsed_date = pendulum.from_format(date, "YYYYMMDD", tz=self.TZ)
+        parsed_date = datetime.datetime.strptime(date, "%Y%m%d").astimezone(tz=self.TZ)
         self.logger.debug("Scoreboard date was set to: %s", parsed_date)
 
         return (scoreboard.get(parsed_date, time_unit), parsed_date)

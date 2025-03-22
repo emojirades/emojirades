@@ -1,10 +1,9 @@
 # Thanks to https://github.com/BeheadedKamikaze for his help with the algorithm
+import datetime
 import logging
 import math
 
 from collections import defaultdict
-
-import pendulum
 
 
 from emojirades.analytics.time_range import TimeRange
@@ -140,7 +139,7 @@ class ScoreboardAnalytics:
             for user_id in sorted(scoreboard, key=scoreboard.get, reverse=True)
         ]
 
-    def get_by_range(self, of_date: pendulum.DateTime, time_unit: TimeUnit):
+    def get_by_range(self, of_date: datetime.datetime, time_unit: TimeUnit):
         start_time = TimeRange.get_start_date(of_date, time_unit)
         end_time = TimeRange.get_end_date(of_date, time_unit)
 
@@ -148,5 +147,5 @@ class ScoreboardAnalytics:
 
         return self.calculate_score(self.get_data(start_time, end_time))
 
-    def get(self, of_date: pendulum.DateTime, time_unit):
+    def get(self, of_date: datetime.datetime, time_unit):
         return self.get_by_range(of_date, time_unit)

@@ -1,4 +1,4 @@
-import pendulum
+import datetime
 
 from emojirades.commands import BaseCommand
 
@@ -53,7 +53,7 @@ class HistoryCommand(BaseCommand):
 
         self.logger.debug("Printing history: %s", history)
 
-        now = pendulum.now(tz=pendulum.UTC)
+        now = datetime.datetime.now(tz=datetime.timezone.utc)
         history_log = []
 
         for item in history:

@@ -1,6 +1,5 @@
+import datetime
 import logging
-
-import pendulum
 
 from emojirades.analytics.time_range import TimeRange
 from emojirades.analytics.time_unit import TimeUnit
@@ -8,7 +7,7 @@ from emojirades.analytics.time_unit import TimeUnit
 
 class ScoreboardPrinter:
     def __init__(
-        self, data, slack, time_unit: TimeUnit, parsed_date: pendulum.DateTime
+        self, data, slack, time_unit: TimeUnit, parsed_date: datetime.datetime
     ):
         self.scoreboard = data
         self.slack = slack

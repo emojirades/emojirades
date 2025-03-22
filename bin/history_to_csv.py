@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
-import pendulum
 import json
 import csv
 
 
-tz = pendulum.timezone("Australia/Melbourne")
+tz = ZoneInfo("Australia/Melbourne")
 history_filename = "emojirades/tests/fixtures/history.json"
 
 with open(history_filename) as history_file:

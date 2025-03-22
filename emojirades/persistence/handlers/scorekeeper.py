@@ -1,5 +1,3 @@
-import pendulum
-
 from sqlalchemy import select, delete, asc, desc
 
 from ..models import Scoreboard, ScoreboardHistory
@@ -186,7 +184,7 @@ class ScorekeeperDB:
         scorekeeper_history = [
             {
                 "user_id": row[0].user_id,
-                "timestamp": pendulum.instance(row[0].timestamp),
+                "timestamp": row[0].timestamp,
                 "operation": row[0].operation,
             }
             for row in result

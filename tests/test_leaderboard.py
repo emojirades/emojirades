@@ -1,6 +1,9 @@
+import datetime
+
+from zoneinfo import ZoneInfo
+
 from emojirades.analytics.scoreboard import ScoreboardAnalytics
 
-import pendulum
 import pytest
 import json
 
@@ -15,17 +18,19 @@ class TestScoreboardAnalytics:
             history = json.load(ff)
 
         for item in history:
-            item["timestamp"] = pendulum.parse(item["timestamp"], tz=mel_tz)
+            item["timestamp"] = datetime.datetime.strftime(
+                item["timestamp"], "%Y-%m-%d %H:%M:%S"
+            ).astimezone(tz=mel_tz)
 
         return ScoreboardAnalytics(history)
 
     @pytest.fixture
     def current_date(self, mel_tz):
-        return pendulum.datetime(2020, 6, 20, tz=mel_tz)
+        return datetime.datetime(2020, 6, 20, tzinfo=mel_tz)
 
     @pytest.fixture
     def mel_tz(self):
-        return pendulum.timezone("Australia/Melbourne")
+        return ZoneInfo("Australia/Melbourne")
 
     def test_fixture_loading(self, lb):
         assert len(lb.history) > 0
@@ -47,7 +52,7 @@ class TestScoreboardAnalytics:
         ]
 
     def test_get_historical_month(self, lb, mel_tz):
-        historical_date = pendulum.datetime(2020, 5, 10, tz=mel_tz)
+        historical_date = datetime.datetime(2020, 5, 10, tzinfo=mel_tz)
 
         assert lb.get(historical_date, TimeUnit.MONTHLY) == [
             ("U5HKU1Q0W", 74),
