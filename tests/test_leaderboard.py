@@ -18,7 +18,7 @@ class TestScoreboardAnalytics:
             history = json.load(ff)
 
         for item in history:
-            item["timestamp"] = datetime.datetime.strftime(
+            item["timestamp"] = datetime.datetime.strptime(
                 item["timestamp"], "%Y-%m-%d %H:%M:%S"
             ).astimezone(tz=mel_tz)
 

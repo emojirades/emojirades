@@ -14,7 +14,7 @@ class TimeRange:
             return first_day_of_week.replace(hour=0, minute=0, second=0)
 
         if time_unit == TimeUnit.MONTHLY:
-            first_day_of_month = on_date - datetime.replace(day=1)
+            first_day_of_month = on_date.replace(day=1)
 
             return first_day_of_month.replace(hour=0, minute=0, second=0)
 
@@ -25,9 +25,9 @@ class TimeRange:
         cls, on_date: datetime.datetime, time_unit: TimeUnit
     ) -> datetime.datetime:
         if time_unit == TimeUnit.WEEKLY:
-            last_day_of_week = TimeRange.get_start_date(on_date, time_unit) + timedelta(
-                days=6
-            )
+            last_day_of_week = TimeRange.get_start_date(
+                on_date, time_unit
+            ) + datetime.timedelta(days=6)
 
             return last_day_of_week.replace(hour=23, minute=59, second=59)
 
