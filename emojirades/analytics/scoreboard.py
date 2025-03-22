@@ -143,7 +143,9 @@ class ScoreboardAnalytics:
         start_time = TimeRange.get_start_date(of_date, time_unit)
         end_time = TimeRange.get_end_date(of_date, time_unit)
 
-        self.logger.debug("Getting %s date range from %s => %s", time_unit, start_time, end_time)
+        self.logger.debug(
+            "Getting %s date range from %s => %s", time_unit, start_time, end_time
+        )
 
         return self.calculate_score(self.get_data(start_time, end_time))
 
