@@ -20,7 +20,7 @@ class TestScoreboardAnalytics:
         for item in history:
             item["timestamp"] = datetime.datetime.strptime(
                 item["timestamp"], "%Y-%m-%d %H:%M:%S"
-            ).astimezone(tz=mel_tz)
+            ).replace(tzinfo=mel_tz)
 
         return ScoreboardAnalytics(history)
 
