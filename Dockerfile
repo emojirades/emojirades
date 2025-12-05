@@ -1,4 +1,4 @@
-FROM python:3.13-bookworm
+FROM python:3.14-bookworm
 
 WORKDIR /build
 
@@ -10,7 +10,7 @@ RUN pip3 install --upgrade setuptools wheel build
 RUN python3 -m build
 
 
-FROM python:3.13-bookworm
+FROM python:3.14-bookworm
 
 COPY --from=0 /build/dist/emojirades-*-py3-none-any.whl /tmp/
 
