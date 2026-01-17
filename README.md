@@ -22,11 +22,8 @@ pylint emojirades
 # Formatter
 black --check .
 
-# Tests w/no stdout
-pytest
-
-# Tests w/stdout
-pytest -s
+# Tests
+./scripts/run_tests.sh
 ```
 
 ## Creating new DB revisions
