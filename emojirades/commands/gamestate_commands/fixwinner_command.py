@@ -22,7 +22,7 @@ class FixWinnerCommand(BaseCommand):
         channel = self.args["channel"]
         new_winner = self.args["winner"]
 
-        (previous_winner, current_winner) = self.gamestate.winners(channel)
+        previous_winner, current_winner = self.gamestate.winners(channel)
 
         if new_winner == previous_winner:
             yield (None, ":face_palm: You can't award yourself the win")

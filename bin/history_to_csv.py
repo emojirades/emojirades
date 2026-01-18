@@ -6,7 +6,6 @@ from zoneinfo import ZoneInfo
 import json
 import csv
 
-
 tz = ZoneInfo("Australia/Melbourne")
 history_filename = "emojirades/tests/fixtures/history.json"
 

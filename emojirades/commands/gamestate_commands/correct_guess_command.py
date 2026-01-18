@@ -67,7 +67,7 @@ class CorrectGuessCommand(BaseCommand):
         yield from super().execute()
 
         channel = self.args["channel"]
-        (previous_winner, current_winner) = self.gamestate.winners(channel)
+        previous_winner, current_winner = self.gamestate.winners(channel)
 
         if not self.args["inferred"]:
             if self.args["user"] != current_winner:
@@ -94,10 +94,10 @@ class CorrectGuessCommand(BaseCommand):
             alternatives = ""
 
         self.gamestate.correct_guess(channel, self.args["target_user"])
-        (position, score) = self.scorekeeper.plusplus(channel, self.args["target_user"])
+        position, score = self.scorekeeper.plusplus(channel, self.args["target_user"])
 
         # Fetch these again as correct_guess will have rotated them
-        (previous_winner, current_winner) = self.gamestate.winners(channel)
+        previous_winner, current_winner = self.gamestate.winners(channel)
 
         if self.args["inferred"]:
             yield (

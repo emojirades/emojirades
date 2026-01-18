@@ -12,7 +12,6 @@ from emojirades.persistence.models import (
     ScoreboardHistory,
 )
 
-
 parser = argparse.ArgumentParser()
 parser.add_argument("--source-db-uri", required=True, help="Path to sqlite DB")
 parser.add_argument("--target-db-uri", required=True, help="Full postgres DB URI")

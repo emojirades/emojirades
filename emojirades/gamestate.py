@@ -10,7 +10,6 @@ from emojirades.persistence import GamestateStep, GamestateDB
 from emojirades.commands import BaseCommand
 from emojirades.slack.event import Event
 
-
 module_logger = logging.getLogger("EmojiradesBot.gamestate")
 
 
