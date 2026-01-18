@@ -21,7 +21,7 @@ class GameStatusCommand(BaseCommand):
         yield from super().execute()
 
         channel = self.args["channel"]
-        (previous_winner, current_winner) = self.gamestate.winners(channel)
+        previous_winner, current_winner = self.gamestate.winners(channel)
 
         if current_winner is None:
             yield (None, "No game currently active, start a new one!")

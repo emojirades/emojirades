@@ -7,7 +7,6 @@ import asyncio
 from websockets.exceptions import ConnectionClosed
 from websockets import serve
 
-
 # logger = logging.getLogger("websockets.server")
 # logger.setLevel(logging.DEBUG)
 # logger.addHandler(logging.StreamHandler())

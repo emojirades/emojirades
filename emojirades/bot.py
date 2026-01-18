@@ -20,7 +20,6 @@ from emojirades.commands import BaseCommand
 from emojirades.gamestate import Gamestate
 from emojirades.slack.event import Event
 
-
 command_registry = CommandRegistry.command_patterns()
 
 
