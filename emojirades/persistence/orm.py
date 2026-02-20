@@ -57,7 +57,8 @@ def migrate(db_uri, migration_ini=None, migration_dir=None):
 
 
 def populate(db_uri, table, data_filename, commit_every=100):
-    session = get_session_factory(db_uri)()
+    session_factory = get_session_factory(db_uri)
+    session = session_factory()
 
     if table == "gamestate":
         Obj = Gamestate
@@ -78,18 +79,24 @@ def populate(db_uri, table, data_filename, commit_every=100):
     else:
         raise RuntimeError(f"Unknown table {table}?")
 
-    with open(data_filename, "rt", encoding="utf-8") as data_file:
-        data = json.load(data_file)
+    try:
+        with open(data_filename, "rt", encoding="utf-8") as data_file:
+            data = json.load(data_file)
 
-        for i, row in enumerate(data):
-            for key, func in col_funcs.items():
-                row[key] = func(row[key])
+            for i, row in enumerate(data):
+                for key, func in col_funcs.items():
+                    row[key] = func(row[key])
 
-            obj = Obj(**row)
-            session.add(obj)
+                obj = Obj(**row)
+                session.add(obj)
 
-            if i % commit_every == 0:
-                session.commit()
+                if i % commit_every == 0:
+                    session.commit()
 
-    session.commit()
-    session.close()
+        session.commit()
+    except Exception:
+        session.rollback()
+        raise
+    finally:
+        session.close()
+        session_factory.remove()
