@@ -45,8 +45,8 @@ class Gamestate:
     class InvalidStateException(Exception):
         pass
 
-    def __init__(self, session, workspace_id):
-        self.handler = GamestateDB(session, workspace_id)
+    def __init__(self, session, workspace_id, caching=False):
+        self.handler = GamestateDB(session, workspace_id, caching=caching)
 
         self.logger = logging.getLogger("EmojiradesBot.gamestate.Gamestate")
 

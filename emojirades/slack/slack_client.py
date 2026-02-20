@@ -1,4 +1,5 @@
 import logging
+import threading
 
 from expiringdict import ExpiringDict
 
@@ -9,26 +10,24 @@ from emojirades.persistence import get_auth_handler
 
 class SlackClient:
     # pylint: disable=too-many-instance-attributes
-    def __init__(self, auth_uri, extra_slack_kwargs=None, existing_client=None):
+    def __init__(self, auth_uri, extra_slack_kwargs=None):
         self.logger = logging.getLogger("EmojiradesBot.slack.SlackClient")
 
-        if auth_uri is None and existing_client is not None:
-            self.rtm = existing_client
-        else:
-            self.config = get_auth_handler(auth_uri).load()
+        self.config = get_auth_handler(auth_uri).load()
 
-            if extra_slack_kwargs is None:
-                extra_slack_kwargs = {}
+        if extra_slack_kwargs is None:
+            extra_slack_kwargs = {}
 
-            # pylint: disable=no-member
-            self.rtm = slack_sdk.rtm_v2.RTMClient(
-                token=self.config["bot_access_token"],
-                logger=self.logger,
-                **extra_slack_kwargs,
-            )
-            # pylint: enable=no-member
+        # pylint: disable=no-member
+        self.rtm = slack_sdk.rtm_v2.RTMClient(
+            token=self.config["bot_access_token"],
+            logger=self.logger,
+            **extra_slack_kwargs,
+        )
+        # pylint: enable=no-member
 
         self.last_ts = float(0)
+        self.cache_lock = threading.Lock()
 
         self.user_info_cache = ExpiringDict(
             max_len=100, max_age_seconds=172800
@@ -52,20 +51,24 @@ class SlackClient:
             self.rtm.connect()
 
     def user_info(self, user_id):
-        user = self.user_info_cache.get(user_id)
+        with self.cache_lock:
+            user = self.user_info_cache.get(user_id)
 
         if user is None:
             user = self.rtm.web_client.users_info(user=user_id)["user"]
-            self.user_info_cache[user_id] = user
+            with self.cache_lock:
+                self.user_info_cache[user_id] = user
 
         return user
 
     def bot_info(self, bot_id):
-        bot_user = self.bot_user_info_cache.get(bot_id)
+        with self.cache_lock:
+            bot_user = self.bot_user_info_cache.get(bot_id)
 
         if not bot_user:
             bot_user = self.rtm.web_client.bots_info(bot=bot_id)["bot"]
-            self.bot_user_info_cache[bot_id] = bot_user
+            with self.cache_lock:
+                self.bot_user_info_cache[bot_id] = bot_user
 
         return bot_user
 

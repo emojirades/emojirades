@@ -4,8 +4,8 @@ from emojirades.persistence import ScorekeeperDB
 
 
 class Scorekeeper:
-    def __init__(self, session, workspace_id):
-        self.handler = ScorekeeperDB(session, workspace_id)
+    def __init__(self, session, workspace_id, caching=False):
+        self.handler = ScorekeeperDB(session, workspace_id, caching=caching)
 
         self.logger = logging.getLogger("EmojiradesBot.scorekeeper.ScoreKeeper")
 

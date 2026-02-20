@@ -93,9 +93,9 @@ class EmojiradesBot:
 
             try:
                 workspace = {
-                    "scorekeeper": Scorekeeper(session, client.workspace_id),
-                    "gamestate": Gamestate(session, client.workspace_id),
-                    "slack": SlackClient(None, existing_client=client),
+                    "scorekeeper": Scorekeeper(session, client.workspace_id, caching=True),
+                    "gamestate": Gamestate(session, client.workspace_id, caching=True),
+                    "slack": slack,
                 }
 
                 logger.debug("Handling event: %s", event.data)
