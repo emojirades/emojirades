@@ -1,6 +1,7 @@
 import datetime
 import json
 import os
+import threading
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -16,9 +17,16 @@ from .models import (
     GamestateStep,
 )
 
+_engines = {}
+_engines_lock = threading.Lock()
+
 
 def get_engine(db_uri, echo=False):
-    return create_engine(db_uri, echo=echo, future=True)
+    with _engines_lock:
+        key = (db_uri, echo)
+        if key not in _engines:
+            _engines[key] = create_engine(db_uri, echo=echo, future=True)
+        return _engines[key]
 
 
 def get_session_factory(db_uri):
