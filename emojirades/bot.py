@@ -128,7 +128,9 @@ class EmojiradesBot:
                         func = getattr(client.web_client, response["func"], None)
 
                         if func is None:
-                            raise RuntimeError(f"Unmapped function '{response['func']}'")
+                            raise RuntimeError(
+                                f"Unmapped function '{response['func']}'"
+                            )
 
                         args = response.get("args", [])
                         kwargs = response.get("kwargs", {})
