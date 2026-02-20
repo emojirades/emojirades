@@ -147,16 +147,19 @@ class EmojiradesBot:
                         func(*args, **kwargs)
 
                 session.commit()
-            except Exception:
+            except Exception:  # pylint: disable=broad-exception-caught
                 logger.exception("Error handling event: %s", event.data)
                 session.rollback()
 
                 try:
                     client.web_client.chat_postMessage(
                         channel=event.channel,
-                        text=f"I'm sorry <@{event.player_id}>, but I had a problem processing that message :sob:",
+                        text=(
+                            f"I'm sorry <@{event.player_id}>, but I had a "
+                            "problem processing that message :sob:"
+                        ),
                     )
-                except Exception:
+                except Exception:  # pylint: disable=broad-exception-caught
                     logger.exception("Failed to send error message back to Slack")
             finally:
                 session_factory.remove()
