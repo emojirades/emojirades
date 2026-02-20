@@ -98,6 +98,8 @@ class EmojiradesBot:
                     "slack": slack,
                 }
 
+                event.resolve_overrides(workspace["gamestate"])
+
                 logger.debug("Handling event: %s", event.data)
 
                 for command in EmojiradesBot.match_event(event, workspace):

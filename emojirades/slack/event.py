@@ -1,3 +1,4 @@
+import re
 from emojirades.slack.slack_client import SlackClient
 
 
@@ -6,22 +7,44 @@ class InvalidEvent(Exception):
 
 
 class Event:
+    # pylint: disable=line-too-long
+    user_override_regex = re.compile(
+        r".*(?P<override_cmd>[\s]+player=[\s]*(<@(?P<user_override>[0-9A-Z]+)>)).*"
+    )
+    channel_override_regex = re.compile(
+        r".*(?P<override_cmd>[\s]+channel=[\s]*(<#(?P<channel_override>[0-9A-Z]+)\|(?P<channel_name>[0-9A-Za-z_-]+)>)).*"
+    )
+    # pylint: enable=line-too-long
+
     def __init__(self, data, slack_client: SlackClient):
         self.data = data
         self.slack_client = slack_client
 
+        self.original_channel = data.get("channel")
+        self.original_player_id = None  # Resolved on first access to player_id
+
     @property
     def player_id(self):
+        if self.original_player_id:
+            return self.data.get("user", self.original_player_id)
+
         if "user" in self.data:
-            return self.data["user"]
+            self.original_player_id = self.data["user"]
+        elif self.data.get("message", {}).get("user"):
+            self.original_player_id = self.data["message"]["user"]
+        elif "bot_id" in self.data:
+            self.original_player_id = self.__get_bot_user_id()
+        else:
+            raise InvalidEvent("Can't find user id or bot id")
 
-        if self.data.get("message", {}).get("user"):
-            return self.data["message"]["user"]
+        return self.original_player_id
 
-        if "bot_id" in self.data:
-            return self.__get_bot_user_id()
-
-        raise InvalidEvent("Can't find user id or bot id")
+    @player_id.setter
+    def player_id(self, value):
+        if not self.original_player_id:
+            # Trigger resolution of original_player_id
+            _ = self.player_id
+        self.data["user"] = value
 
     @property
     def text(self):
@@ -38,6 +61,39 @@ class Event:
     @channel.setter
     def channel(self, value):
         self.data["channel"] = value
+
+    def resolve_overrides(self, gamestate):
+        """
+        Resolves channel and player overrides if the original user is an admin
+        """
+        original_user = self.player_id
+        original_channel = self.channel
+
+        # Perform the channel override if it matches
+        channel_override_match = self.channel_override_regex.match(self.text)
+
+        if channel_override_match:
+            new_channel = channel_override_match.groupdict()["channel_override"]
+
+            if (
+                isinstance(new_channel, str)
+                and new_channel[0] in ("G", "C")
+                and gamestate.is_admin(new_channel, original_user)
+            ):
+                self.channel = new_channel
+                self.text = self.text.replace(
+                    channel_override_match.groupdict()["override_cmd"], ""
+                )
+
+        # Only check for user override if the user is an admin in the (potentially overridden) channel
+        if self.is_game_channel and gamestate.is_admin(self.channel, original_user):
+            user_override_match = self.user_override_regex.match(self.text)
+
+            if user_override_match:
+                self.player_id = user_override_match.groupdict()["user_override"]
+                self.text = self.text.replace(
+                    user_override_match.groupdict()["override_cmd"], ""
+                )
 
     @property
     def is_game_channel(self):
