@@ -2,8 +2,14 @@ from abc import ABC, abstractmethod, abstractproperty
 
 import logging
 import re
+from functools import lru_cache
 
 from emojirades.slack.event import Event
+
+
+@lru_cache(maxsize=1024)
+def get_compiled_pattern(pattern_str):
+    return re.compile(pattern_str, re.DOTALL)
 
 
 class BaseCommand(ABC):
@@ -37,23 +43,27 @@ class BaseCommand(ABC):
             self.args["original_user"] = event.original_player_id
 
         # Perform the command's actual match
-        patterns = tuple(
-            i.format(me=self.slack.bot_id) if "{me}" in i else i for i in self.patterns
-        )
+        for pattern_raw in self.patterns:
+            pattern_str = (
+                pattern_raw.format(me=self.slack.bot_id)
+                if "{me}" in pattern_raw
+                else pattern_raw
+            )
 
-        for pattern in patterns:
+            pattern = get_compiled_pattern(pattern_str)
+
             self.logger.debug(
                 "Matching '%s' against '%s'",
-                pattern,
+                pattern_str,
                 event.text,
             )
 
-            match = re.compile(pattern, re.DOTALL).match(event.text)
+            match = pattern.match(event.text)
 
             if not match:
                 self.logger.debug(
                     "Failed to match '%s' against '%s'",
-                    pattern,
+                    pattern_str,
                     event.text,
                 )
 
@@ -76,7 +86,14 @@ class BaseCommand(ABC):
 
     @classmethod
     def match(cls, text, **kwargs):
-        return any(re.match(pattern.format(**kwargs), text) for pattern in cls.patterns)
+        for pattern_raw in cls.patterns:
+            pattern_str = pattern_raw.format(**kwargs)
+            pattern = get_compiled_pattern(pattern_str)
+
+            if pattern.match(text):
+                return True
+
+        return False
 
     @property
     def description(self):
