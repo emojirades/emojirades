@@ -91,57 +91,73 @@ class EmojiradesBot:
             # Get a per-thread session
             session = session_factory()
 
-            workspace = {
-                "scorekeeper": Scorekeeper(session, client.workspace_id),
-                "gamestate": Gamestate(session, client.workspace_id),
-                "slack": SlackClient(None, existing_client=client),
-            }
+            try:
+                workspace = {
+                    "scorekeeper": Scorekeeper(session, client.workspace_id),
+                    "gamestate": Gamestate(session, client.workspace_id),
+                    "slack": SlackClient(None, existing_client=client),
+                }
 
-            logger.debug("Handling event: %s", event.data)
+                logger.debug("Handling event: %s", event.data)
 
-            for command in EmojiradesBot.match_event(event, workspace):
-                client.logger.debug("Matched %s for event %s", command, event.data)
+                for command in EmojiradesBot.match_event(event, workspace):
+                    client.logger.debug("Matched %s for event %s", command, event.data)
 
-                for channel, response in command.execute():
-                    client.logger.debug("------------------------")
-                    client.logger.debug(
-                        "Command %s executed with response: %s",
-                        command,
-                        (channel, response),
-                    )
-
-                    if channel is not None:
-                        channel = EmojiradesBot.decode_channel(channel, workspace)
-                    else:
-                        channel = EmojiradesBot.decode_channel(event.channel, workspace)
-
-                    if isinstance(response, str):
-                        # Plain strings are assumed as 'chat_postMessage'
-                        client.web_client.chat_postMessage(
-                            channel=channel, text=response
+                    for channel, response in command.execute():
+                        client.logger.debug("------------------------")
+                        client.logger.debug(
+                            "Command %s executed with response: %s",
+                            command,
+                            (channel, response),
                         )
-                        continue
 
-                    func = getattr(client.web_client, response["func"], None)
+                        if channel is not None:
+                            channel = EmojiradesBot.decode_channel(channel, workspace)
+                        else:
+                            channel = EmojiradesBot.decode_channel(
+                                event.channel, workspace
+                            )
 
-                    if func is None:
-                        raise RuntimeError(f"Unmapped function '{response['func']}'")
+                        if isinstance(response, str):
+                            # Plain strings are assumed as 'chat_postMessage'
+                            client.web_client.chat_postMessage(
+                                channel=channel, text=response
+                            )
+                            continue
 
-                    args = response.get("args", [])
-                    kwargs = response.get("kwargs", {})
+                        func = getattr(client.web_client, response["func"], None)
 
-                    if kwargs.get("channel") is None:
-                        kwargs["channel"] = channel
+                        if func is None:
+                            raise RuntimeError(f"Unmapped function '{response['func']}'")
 
-                    if (
-                        response["func"] == "chat_postEphemeral"
-                        and "user" not in kwargs
-                    ):
-                        kwargs["user"] = event.player_id
+                        args = response.get("args", [])
+                        kwargs = response.get("kwargs", {})
 
-                    func(*args, **kwargs)
+                        if kwargs.get("channel") is None:
+                            kwargs["channel"] = channel
 
-            session.close()
+                        if (
+                            response["func"] == "chat_postEphemeral"
+                            and "user" not in kwargs
+                        ):
+                            kwargs["user"] = event.player_id
+
+                        func(*args, **kwargs)
+
+                session.commit()
+            except Exception:
+                logger.exception("Error handling event: %s", event.data)
+                session.rollback()
+
+                try:
+                    client.web_client.chat_postMessage(
+                        channel=event.channel,
+                        text=f"I'm sorry <@{event.player_id}>, but I had a problem processing that message :sob:",
+                    )
+                except Exception:
+                    logger.exception("Failed to send error message back to Slack")
+            finally:
+                session_factory.remove()
 
         slack.rtm.on("message")(handle_event)
 
