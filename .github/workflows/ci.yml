@@ -25,18 +25,18 @@ jobs:
       - id: black
         run: black --check .
 
-      - id: pylint
-        run: pylint emojirades
+      - id: ruff
+        run: ruff check emojirades
 
     outputs:
       black_conclusion: ${{ steps.black.conclusion }}
-      pylint_conclusion: ${{ steps.pylint.conclusion }}
+      ruff_conclusion: ${{ steps.ruff.conclusion }}
 
   pytest:
     runs-on: ubuntu-24.04
 
     needs: linter
-    if: ${{ needs.linter.outputs.black_conclusion == 'success' && needs.linter.outputs.pylint_conclusion == 'success' }}
+    if: ${{ needs.linter.outputs.black_conclusion == 'success' && needs.linter.outputs.ruff_conclusion == 'success' }}
 
     strategy:
       matrix:

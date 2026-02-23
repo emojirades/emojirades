@@ -1,10 +1,9 @@
 import logging
 import pytest
-import types
 import json
 import time
 
-from emojirades.persistence import GamestateStep, get_session_factory
+from emojirades.persistence import get_session_factory
 from emojirades.scorekeeper import Scorekeeper
 from emojirades.gamestate import Gamestate
 from emojirades.bot import EmojiradesBot, configure_parent_logger
@@ -37,7 +36,7 @@ class TestBot:
         print("-" * 20)
         print("DEBUG")
         print("-" * 20)
-        print(f"Gamestates:")
+        print("Gamestates:")
         gamestates = self.gamestate.handler.get_gamestates(current_workspace=False)
 
         for gamestate in gamestates:

@@ -1,4 +1,3 @@
-import time
 import re
 
 from emojirades.persistence import GamestateStep

@@ -7,7 +7,6 @@ from emojirades.commands.gamestate_commands.inferred_correct_guess_command impor
 from emojirades.helpers import sanitize_text, match_emojirade, match_emoji
 from emojirades.helpers import ScottFactorExceededException
 from emojirades.persistence import GamestateStep, GamestateDB
-from emojirades.commands import BaseCommand
 from emojirades.slack.event import Event
 
 module_logger = logging.getLogger("EmojiradesBot.gamestate")

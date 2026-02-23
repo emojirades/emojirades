@@ -4,26 +4,22 @@ Slack bot that understands the emojirades game and handles score keeping.
 ![CI Status](https://github.com/emojirades/emojirades/actions/workflows/ci.yml/badge.svg) ![PyPI version](https://badge.fury.io/py/emojirades.svg)
 
 # Developing
-## Install the dependencies
-```bash
-pip3 install --upgrade pip wheel
-```
 
-## Install the module & dependencies
+## Install & Setup
 ```bash
-pip3 install -e .[dev]
+uv venv --python 3.14
+
+source .venv/bin/activate
+
+uv pip install -e '.[dev]'
+
+pre-commit install
 ```
 
 ## Run the tests
 ```bash
-# Linter
-pylint emojirades
+uv run ./scripts/run_tests.sh
 
-# Formatter
-black --check .
-
-# Tests
-./scripts/run_tests.sh
 ```
 
 ## Creating new DB revisions

@@ -1,10 +1,12 @@
 import logging
+import sys
 import time
+import traceback
 import json
 
 import boto3
 
-from pythonjsonlogger import json
+from pythonjsonlogger import json as jsonlogger
 from slack_sdk.rtm_v2 import RTMClient
 
 from emojirades.persistence import (
@@ -38,7 +40,7 @@ def configure_parent_logger(level, name="Emojirades"):
     ]
 
     handler = logging.StreamHandler()
-    formatter = json.JsonFormatter(" ".join(f"%({i})s" for i in field_keys))
+    formatter = jsonlogger.JsonFormatter(" ".join(f"%({i})s" for i in field_keys))
     handler.setFormatter(formatter)
     logger.addHandler(handler)
     logger.setLevel(level)
@@ -93,7 +95,9 @@ class EmojiradesBot:
 
             try:
                 workspace = {
-                    "scorekeeper": Scorekeeper(session, client.workspace_id, caching=True),
+                    "scorekeeper": Scorekeeper(
+                        session, client.workspace_id, caching=True
+                    ),
                     "gamestate": Gamestate(session, client.workspace_id, caching=True),
                     "slack": slack,
                 }
@@ -149,8 +153,10 @@ class EmojiradesBot:
                         func(*args, **kwargs)
 
                 session.commit()
-            except Exception:  # pylint: disable=broad-exception-caught
+            except Exception as e:  # pylint: disable=broad-exception-caught
                 logger.exception("Error handling event: %s", event.data)
+                print(f"Error handling event: {e}", file=sys.stderr)
+                traceback.print_exc()
                 session.rollback()
 
                 try:
@@ -161,8 +167,13 @@ class EmojiradesBot:
                             "problem processing that message :sob:"
                         ),
                     )
-                except Exception:  # pylint: disable=broad-exception-caught
+                except Exception as e:  # pylint: disable=broad-exception-caught
                     logger.exception("Failed to send error message back to Slack")
+                    print(
+                        f"Failed to send error message back to Slack: {e}",
+                        file=sys.stderr,
+                    )
+                    traceback.print_exc()
             finally:
                 session_factory.remove()
 

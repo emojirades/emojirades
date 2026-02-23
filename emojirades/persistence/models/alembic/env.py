@@ -5,6 +5,15 @@ from sqlalchemy import pool
 
 from alembic import context
 
+from emojirades.persistence.models.base import Base
+from emojirades.persistence.models import (
+    Gamestate as Gamestate,
+    GamestateHistory as GamestateHistory,
+    GamestateStep as GamestateStep,
+    Scoreboard as Scoreboard,
+    ScoreboardHistory as ScoreboardHistory,
+)
+
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
@@ -15,12 +24,6 @@ fileConfig(config.config_file_name)
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-# from myapp import mymodel
-# target_metadata = mymodel.Base.metadata
-
-from emojirades.persistence.models.base import Base
-from emojirades.persistence.models import *
-
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,

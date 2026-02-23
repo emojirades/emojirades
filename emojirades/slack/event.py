@@ -67,7 +67,6 @@ class Event:
         Resolves channel and player overrides if the original user is an admin
         """
         original_user = self.player_id
-        original_channel = self.channel
 
         # Perform the channel override if it matches
         channel_override_match = self.channel_override_regex.match(self.text)
@@ -149,7 +148,7 @@ class Event:
         }
 
         if self.data.get("subtype"):
-            if not self.data["subtype"] in allowed_subtypes:
+            if self.data["subtype"] not in allowed_subtypes:
                 return False
 
             if self.data["subtype"] == "message_changed":

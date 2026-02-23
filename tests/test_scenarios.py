@@ -391,14 +391,14 @@ class TestBotScenarios:
         override = {"text": "emojirade foo | bar"}
         bot.send({**bot.events.posted_emojirade, **override})
         assert bot.step == GamestateStep.PROVIDED
-        assert bot.get_xyz("emojirade") == f'["foo", "bar"]'
-        assert bot.get_xyz("raw_emojirade") == f'["foo", "bar"]'
+        assert bot.get_xyz("emojirade") == '["foo", "bar"]'
+        assert bot.get_xyz("raw_emojirade") == '["foo", "bar"]'
         assert len(bot.scorekeeper.scoreboard(bot.config.channel)) == 0
 
         bot.send(bot.events.posted_emoji)
         assert bot.step == GamestateStep.GUESSING
-        assert bot.get_xyz("emojirade") == f'["foo", "bar"]'
-        assert bot.get_xyz("raw_emojirade") == f'["foo", "bar"]'
+        assert bot.get_xyz("emojirade") == '["foo", "bar"]'
+        assert bot.get_xyz("raw_emojirade") == '["foo", "bar"]'
         assert len(bot.scorekeeper.scoreboard(bot.config.channel)) == 0
 
         override = {"text": "foo"}
@@ -413,14 +413,14 @@ class TestBotScenarios:
         override = {"text": "emojirade foo | bar"}
         bot.send({**bot.events.posted_emojirade, **override})
         assert bot.step == GamestateStep.PROVIDED
-        assert bot.get_xyz("emojirade") == f'["foo", "bar"]'
-        assert bot.get_xyz("raw_emojirade") == f'["foo", "bar"]'
+        assert bot.get_xyz("emojirade") == '["foo", "bar"]'
+        assert bot.get_xyz("raw_emojirade") == '["foo", "bar"]'
         assert len(bot.scorekeeper.scoreboard(bot.config.channel)) == 0
 
         bot.send(bot.events.posted_emoji)
         assert bot.step == GamestateStep.GUESSING
-        assert bot.get_xyz("emojirade") == f'["foo", "bar"]'
-        assert bot.get_xyz("raw_emojirade") == f'["foo", "bar"]'
+        assert bot.get_xyz("emojirade") == '["foo", "bar"]'
+        assert bot.get_xyz("raw_emojirade") == '["foo", "bar"]'
         assert len(bot.scorekeeper.scoreboard(bot.config.channel)) == 0
 
         override = {"text": "bar"}
@@ -478,7 +478,7 @@ class TestBotScenarios:
         bot.send({**bot.events.posted_emojirade, **override})
 
         assert bot.step == GamestateStep.PROVIDED
-        assert bot.get_xyz("emojirade") == f'["space the final frontier"]'
+        assert bot.get_xyz("emojirade") == '["space the final frontier"]'
         assert (
             bot.get_xyz("raw_emojirade").encode().decode("unicode-escape")
             == f'["{raw_rade}"]'
