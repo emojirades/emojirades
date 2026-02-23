@@ -6,7 +6,7 @@ import json
 
 import boto3
 
-from pythonjsonlogger import json
+from pythonjsonlogger import json as jsonlogger
 from slack_sdk.rtm_v2 import RTMClient
 
 from emojirades.persistence import (
@@ -40,7 +40,7 @@ def configure_parent_logger(level, name="Emojirades"):
     ]
 
     handler = logging.StreamHandler()
-    formatter = json.JsonFormatter(" ".join(f"%({i})s" for i in field_keys))
+    formatter = jsonlogger.JsonFormatter(" ".join(f"%({i})s" for i in field_keys))
     handler.setFormatter(formatter)
     logger.addHandler(handler)
     logger.setLevel(level)

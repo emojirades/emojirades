@@ -25,8 +25,8 @@ jobs:
       - id: black
         run: black --check .
 
-      - id: pylint
-        run: pylint emojirades
+      - id: ruff
+        run: ruff --check emojirades
 
     outputs:
       black_conclusion: ${{ steps.black.conclusion }}

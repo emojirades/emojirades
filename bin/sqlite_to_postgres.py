@@ -2,7 +2,7 @@
 
 import argparse
 
-from sqlalchemy import create_engine, select, insert
+from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
 
 from emojirades.persistence.models import (
