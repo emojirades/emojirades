@@ -32,6 +32,9 @@ class TestBot:
         self.slack.rtm.send(event)
         time.sleep(0.2)
 
+    def commit(self):
+        self.gamestate.handler.session.commit()
+
     def debug(self):
         print("-" * 20)
         print("DEBUG")

@@ -96,8 +96,6 @@ class GamestateDB:
         setattr(gamestate, xyz, value)
         self.record_history(channel, user, f"set,{xyz},{value}")
 
-        self.session.commit()
-
         if self.caching:
             self.clear_cache(channel)
 
@@ -107,8 +105,6 @@ class GamestateDB:
         for xyz, value in pairs:
             setattr(gamestate, xyz, value)
             self.record_history(channel, user, f"set,{xyz},{value}")
-
-        self.session.commit()
 
         if self.caching:
             self.clear_cache(channel)
@@ -127,8 +123,6 @@ class GamestateDB:
         admins.append(user)
         gamestate.admins = json.dumps(admins)
 
-        self.session.commit()
-
         if self.caching:
             self.clear_cache(channel)
 
@@ -145,8 +139,6 @@ class GamestateDB:
         admins.remove(user)
         gamestate.admins = json.dumps(admins)
 
-        self.session.commit()
-
         if self.caching:
             self.clear_cache(channel)
 
@@ -161,8 +153,6 @@ class GamestateDB:
         gamestate.emojirade = None
         gamestate.raw_emojirade = None
         gamestate.first_guess = True
-
-        self.session.commit()
 
         if self.caching:
             self.clear_cache(channel)
