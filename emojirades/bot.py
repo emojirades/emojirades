@@ -1,5 +1,7 @@
 import logging
+import sys
 import time
+import traceback
 import json
 
 import boto3
@@ -149,8 +151,10 @@ class EmojiradesBot:
                         func(*args, **kwargs)
 
                 session.commit()
-            except Exception:  # pylint: disable=broad-exception-caught
+            except Exception as e:  # pylint: disable=broad-exception-caught
                 logger.exception("Error handling event: %s", event.data)
+                print(f"Error handling event: {e}", file=sys.stderr)
+                traceback.print_exc()
                 session.rollback()
 
                 try:
@@ -161,8 +165,10 @@ class EmojiradesBot:
                             "problem processing that message :sob:"
                         ),
                     )
-                except Exception:  # pylint: disable=broad-exception-caught
+                except Exception as e:  # pylint: disable=broad-exception-caught
                     logger.exception("Failed to send error message back to Slack")
+                    print(f"Failed to send error message back to Slack: {e}", file=sys.stderr)
+                    traceback.print_exc()
             finally:
                 session_factory.remove()
 
