@@ -95,7 +95,9 @@ class EmojiradesBot:
 
             try:
                 workspace = {
-                    "scorekeeper": Scorekeeper(session, client.workspace_id, caching=True),
+                    "scorekeeper": Scorekeeper(
+                        session, client.workspace_id, caching=True
+                    ),
                     "gamestate": Gamestate(session, client.workspace_id, caching=True),
                     "slack": slack,
                 }
@@ -167,7 +169,10 @@ class EmojiradesBot:
                     )
                 except Exception as e:  # pylint: disable=broad-exception-caught
                     logger.exception("Failed to send error message back to Slack")
-                    print(f"Failed to send error message back to Slack: {e}", file=sys.stderr)
+                    print(
+                        f"Failed to send error message back to Slack: {e}",
+                        file=sys.stderr,
+                    )
                     traceback.print_exc()
             finally:
                 session_factory.remove()
