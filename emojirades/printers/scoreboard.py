@@ -20,11 +20,11 @@ class ScoreboardPrinter:
         date_range = ""
 
         if self.time_unit in [TimeUnit.WEEKLY, TimeUnit.MONTHLY]:
-            start = TimeRange.get_start_date(self.parsed_date, self.time_unit).format(
-                "YYYY-MM-DD"
+            start = TimeRange.get_start_date(self.parsed_date, self.time_unit).strftime(
+                "%Y-%m-%d"
             )
-            end = TimeRange.get_end_date(self.parsed_date, self.time_unit).format(
-                "YYYY-MM-DD"
+            end = TimeRange.get_end_date(self.parsed_date, self.time_unit).strftime(
+                "%Y-%m-%d"
             )
             date_range = f"({start} - {end})"
 
@@ -52,34 +52,30 @@ class ScoreboardPrinter:
             yield None, "Nothing to see here!"
             return
 
+        # Prepare and truncate names
+        processed_scoreboard = []
+        for name_id, score in self.scoreboard:
+            if score <= 0:
+                continue
+            name = self.slack.pretty_name(name_id)
+            if len(name) >= 20:
+                name = f"{name[:18]}.."
+            processed_scoreboard.append((name, score))
+
+        if not processed_scoreboard:
+            yield None, "Nothing to see here!"
+            return
+
         lines = ["```", self.print_title(), ""]
 
         # Calculate the max width of the name and score columns
-        longest_name = 0
-        biggest_score = 0
-
-        for name, score in self.scoreboard:
-            if score <= 0:
-                continue
-
-            name = self.slack.pretty_name(name)
-
-            name_len = len(name)
-            score_len = len(str(score))
-
-            longest_name = max(longest_name, name_len)
-            biggest_score = max(biggest_score, score_len)
+        longest_name = max(len(name) for name, _ in processed_scoreboard)
+        biggest_score = max(len(str(score)) for _, score in processed_scoreboard)
 
         rank_buffer = 0
         last_score = 0
 
-        for pos, (name, score) in enumerate(self.scoreboard, start=1):
-            if score <= 0:
-                continue
-
-            name = self.slack.pretty_name(name)
-            name = name if len(name) < 20 else "{name[0:18]}.."
-
+        for pos, (name, score) in enumerate(processed_scoreboard, start=1):
             if score == last_score:
                 rank_buffer -= 1
             elif rank_buffer < 0:
@@ -87,9 +83,10 @@ class ScoreboardPrinter:
 
             last_score = score
 
+            points_str = "point" if score == 1 else "points"
             lines.append(
                 f"{pos + rank_buffer:>2}. {name:<{longest_name}}"
-                + f" [ {score:>{biggest_score}} point{'s' if score > 1 or score < 0 else ' '} ]"
+                + f" [ {score:>{biggest_score}} {points_str:<6} ]"
             )
 
         lines.append("```")

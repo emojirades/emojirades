@@ -2,6 +2,20 @@
 # These are used directly by a commands execute function
 
 
+def _is_admin_or_old_winner(self):
+    channel = self.args["channel"]
+    previous_winner, _ = self.gamestate.winners(channel)
+    is_old_winner = self.args["user"] == previous_winner
+    is_admin = self.gamestate.is_admin(channel, self.args["user"])
+    return is_admin, is_old_winner
+
+
+def _admin_error(self):
+    channel = self.args["channel"]
+    admins = [f"<@{admin}>" for admin in self.gamestate.get_admins(channel)]
+    return (None, f"Game admins currently are: {', '.join(admins)}")
+
+
 def admin_check(command):
     def wrapped_command(self):
         channel = self.args["channel"]
@@ -12,9 +26,7 @@ def admin_check(command):
                 f"Sorry <@{self.args['user']}> but you need to be "
                 "a game admin to do that :upside_down_face:",
             )
-
-            admins = [f"<@{admin}>" for admin in self.gamestate.get_admins(channel)]
-            yield (None, f"Game admins currently are: {', '.join(admins)}")
+            yield _admin_error(self)
             return
 
         yield from command(self)
@@ -24,18 +36,7 @@ def admin_check(command):
 
 def admin_or_old_winner_check(command):
     def wrapped_command(self):
-        channel = self.args["channel"]
-
-        is_old_winner = False
-        is_admin = False
-
-        previous_winner, _ = self.gamestate.winners(channel)
-
-        if self.args["user"] == previous_winner:
-            is_old_winner = True
-
-        if self.gamestate.is_admin(channel, self.args["user"]):
-            is_admin = True
+        is_admin, is_old_winner = _is_admin_or_old_winner(self)
 
         if not is_old_winner and not is_admin:
             yield (
@@ -43,9 +44,7 @@ def admin_or_old_winner_check(command):
                 f"Sorry <@{self.args['user']}> but you need to be the old winner "
                 "(or a game admin) to do that :upside_down_face:",
             )
-
-            admins = [f"<@{admin}>" for admin in self.gamestate.get_admins(channel)]
-            yield (None, f"Game admins currently are: {', '.join(admins)}")
+            yield _admin_error(self)
             return
 
         yield from command(self)
@@ -56,17 +55,7 @@ def admin_or_old_winner_check(command):
 def admin_or_old_winner_set_check(command):
     def wrapped_command(self):
         channel = self.args["channel"]
-
-        is_old_winner = False
-        is_admin = False
-
-        previous_winner, _ = self.gamestate.winners(channel)
-
-        if self.args["user"] == previous_winner:
-            is_old_winner = True
-
-        if self.gamestate.is_admin(channel, self.args["user"]):
-            is_admin = True
+        is_admin, is_old_winner = _is_admin_or_old_winner(self)
 
         # Game can only be in the 'set' state if the user isn't an admin
         if (not is_admin and is_old_winner) and self.gamestate.guessing(channel):
@@ -82,9 +71,7 @@ def admin_or_old_winner_set_check(command):
                 f"Sorry <@{self.args['user']}> but you need to be the old winner "
                 "(or a game admin) to do that :upside_down_face:",
             )
-
-            admins = [f"<@{admin}>" for admin in self.gamestate.get_admins(channel)]
-            yield (None, f"Game admins currently are: {', '.join(admins)}")
+            yield _admin_error(self)
             return
 
         yield from command(self)

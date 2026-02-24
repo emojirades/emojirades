@@ -74,7 +74,6 @@ class ScorekeeperDB:
 
         self.record_history(channel, user, f"++,{previous_score},{current_score}")
 
-        self.session.commit()
         self.clear_cache(channel)
 
         return self.position_on_scoreboard(channel, user)
@@ -90,7 +89,6 @@ class ScorekeeperDB:
 
         self.record_history(channel, user, f"--,{previous_score},{current_score}")
 
-        self.session.commit()
         self.clear_cache(channel)
 
         return self.position_on_scoreboard(channel, user)
@@ -106,7 +104,6 @@ class ScorekeeperDB:
 
         self.record_history(channel, user, f"set,{previous_score},{current_score}")
 
-        self.session.commit()
         self.clear_cache(channel)
 
         return self.position_on_scoreboard(channel, user)

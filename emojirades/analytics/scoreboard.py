@@ -57,11 +57,9 @@ class ScoreboardAnalytics:
             return low
 
         # Binary search first guess with ratio to the time range of history
-        # pylint: disable=c-extension-no-member
         guess = math.floor(
             (start_time - first_time) / (last_time - first_time) * (high - low) + low
         )
-        # pylint: enable=c-extension-no-member
 
         self.logger.debug("first_guess=%s", guess)
 
@@ -74,9 +72,7 @@ class ScoreboardAnalytics:
             else:
                 return guess
 
-            # pylint: disable=c-extension-no-member
             guess = math.floor((high - low) / 2 + low)
-            # pylint: enable=c-extension-no-member
 
         # If somehow still find nothing
         return self.NOT_FOUND

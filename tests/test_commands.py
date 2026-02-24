@@ -23,6 +23,7 @@ class TestBotCommands:
         """The old winner is allowed to 'reset' their rade if the game isn't in progress"""
         bot.reset_and_transition_to("provided")
         bot.gamestate.set_admin(bot.config.channel, bot.config.player_4)
+        bot.commit()
 
         # Should be allowed
         bot.send(bot.events.new_game)
@@ -31,6 +32,7 @@ class TestBotCommands:
         # Reset
         bot.reset_and_transition_to("guessing")
         bot.gamestate.set_admin(bot.config.channel, bot.config.player_4)
+        bot.commit()
 
         # Should not be allowed
         bot.send(bot.events.new_game)
@@ -58,6 +60,8 @@ class TestBotCommands:
 
         for user_id, (user_name, score) in user_scores.items():
             bot.scorekeeper.overwrite(bot.config.channel, user_id, score)
+
+        bot.commit()
 
         expected = """```
  :: All Time leaderboard ::

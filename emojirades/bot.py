@@ -208,17 +208,15 @@ class EmojiradesBot:
         :param workspace: Workspace object containing state
         :return Command: The matched command to be executed
         """
-        # pylint: disable=invalid-name
-        for GameCommand in workspace["gamestate"].infer_commands(event):
-            yield GameCommand(event, workspace)
+        for game_command_cls in workspace["gamestate"].infer_commands(event):
+            yield game_command_cls(event, workspace)
 
-        for Command in command_registry.values():
-            if Command.match(event.text, me=workspace["slack"].bot_id):
-                if Command.__name__ == "HelpCommand":
-                    yield Command(event, workspace, commands=command_registry)
+        for command_cls in command_registry.values():
+            if command_cls.match(event.text, me=workspace["slack"].bot_id):
+                if command_cls.__name__ == "HelpCommand":
+                    yield command_cls(event, workspace, commands=command_registry)
                 else:
-                    yield Command(event, workspace)
-        # pylint: enable=invalid-name
+                    yield command_cls(event, workspace)
 
     @staticmethod
     def decode_channel(channel: str, workspace: dict):
