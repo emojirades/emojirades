@@ -1,9 +1,9 @@
 import datetime
 import enum
 
-from sqlalchemy import Column, Text, Enum, DateTime, Boolean, Integer, Index, Identity
+from sqlalchemy import Column, Text, Enum, Boolean, Integer, Index, Identity
 
-from .base import Base
+from .base import Base, AwareDateTime
 
 
 class GamestateStep(enum.Enum):
@@ -29,7 +29,7 @@ class Gamestate(Base):
     admins = Column(Text, nullable=False, default="[]")
 
     last_updated = Column(
-        DateTime,
+        AwareDateTime,
         nullable=False,
         default=lambda: datetime.datetime.now(datetime.timezone.utc),
         onupdate=lambda: datetime.datetime.now(datetime.timezone.utc),
@@ -53,7 +53,7 @@ class GamestateHistory(Base):
     user_id = Column(Text)
 
     timestamp = Column(
-        DateTime,
+        AwareDateTime,
         nullable=False,
         default=lambda: datetime.datetime.now(datetime.timezone.utc),
     )
