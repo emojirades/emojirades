@@ -1,8 +1,8 @@
 import datetime
 
-from sqlalchemy import Column, Text, Integer, DateTime, Identity, Index
+from sqlalchemy import Column, Text, Integer, Identity, Index
 
-from .base import Base
+from .base import Base, AwareDateTime
 
 
 class Scoreboard(Base):
@@ -16,7 +16,7 @@ class Scoreboard(Base):
     score = Column(Integer, nullable=False, default=0)
 
     last_updated = Column(
-        DateTime,
+        AwareDateTime,
         nullable=False,
         default=lambda: datetime.datetime.now(datetime.timezone.utc),
         onupdate=lambda: datetime.datetime.now(datetime.timezone.utc),
@@ -42,7 +42,7 @@ class ScoreboardHistory(Base):
     user_id = Column(Text)
 
     timestamp = Column(
-        DateTime,
+        AwareDateTime,
         nullable=False,
         default=lambda: datetime.datetime.now(datetime.timezone.utc),
     )

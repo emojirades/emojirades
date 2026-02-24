@@ -1,9 +1,16 @@
+import datetime
 import string
 import re
 
 from functools import lru_cache
 
 from unidecode import unidecode
+
+
+def ensure_utc(dt: datetime.datetime) -> datetime.datetime:
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=datetime.timezone.utc)
+    return dt.astimezone(datetime.timezone.utc)
 
 
 class ScottFactorExceededException(Exception):

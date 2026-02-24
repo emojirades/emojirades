@@ -6,6 +6,7 @@ import math
 from collections import defaultdict
 
 
+from emojirades.helpers import ensure_utc
 from emojirades.analytics.time_range import TimeRange
 from emojirades.analytics.time_unit import TimeUnit
 
@@ -15,6 +16,8 @@ class ScoreboardAnalytics:
 
     def __init__(self, history):
         self.history = history
+        for item in self.history:
+            item["timestamp"] = ensure_utc(item["timestamp"])
         self.len = len(history)
 
         self.logger = logging.getLogger("EmojiradesBot.analytics.ScoreboardAnalytics")
@@ -136,8 +139,8 @@ class ScoreboardAnalytics:
         ]
 
     def get_by_range(self, of_date: datetime.datetime, time_unit: TimeUnit):
-        start_time = TimeRange.get_start_date(of_date, time_unit)
-        end_time = TimeRange.get_end_date(of_date, time_unit)
+        start_time = ensure_utc(TimeRange.get_start_date(of_date, time_unit))
+        end_time = ensure_utc(TimeRange.get_end_date(of_date, time_unit))
 
         self.logger.debug(
             "Getting %s date range from %s => %s", time_unit, start_time, end_time
