@@ -24,7 +24,7 @@ jobs:
 
       - id: create_release
         if: ${{ success() }}
-        uses: softprops/action-gh-release@v2.5.0
+        uses: softprops/action-gh-release@v2.6.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: v${{ steps.version.outputs.version }}
@@ -77,7 +77,7 @@ jobs:
           asset_name: emojirades-${{ needs.release.outputs.version }}-py3-none-any.whl
           asset_content_type: application/x-pywheel+zip
 
-      - uses: pypa/gh-action-pypi-publish@v1.13.0
+      - uses: pypa/gh-action-pypi-publish@v1.14.0
         if: ${{ success() }}
         with:
           user: __token__
