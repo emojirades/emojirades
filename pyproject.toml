@@ -39,7 +39,7 @@ dependencies = [
 dev = [
     "pre-commit~=4.6.0",
     "pytest~=9.0.2",
-    "black~=26.1.0",
+    "black>=26.1,<26.4",
     "ruff~=0.15.2",
     "websockets~=16.0",
 ]
