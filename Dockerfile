@@ -2,9 +2,8 @@ FROM python:3.14-bookworm
 
 WORKDIR /build
 
-COPY bin /build/bin
 COPY src /build/src
-COPY setup.cfg pyproject.toml README.md LICENSE /build/
+COPY pyproject.toml README.md LICENSE /build/
 
 RUN pip3 install --upgrade setuptools wheel build
 RUN python3 -m build

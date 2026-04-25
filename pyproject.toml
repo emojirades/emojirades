@@ -1,6 +1,64 @@
 [build-system]
-requires = [
-  "setuptools >= 65.6.3",
-  "wheel"
-]
+requires = ["setuptools>=65.6.3", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "emojirades"
+dynamic = ["version"]
+description = "Slack bot that understands the Emojirades game!"
+readme = "README.md"
+license = {file = "LICENSE"}
+authors = [
+    {name = "The Emojirades Team", email = "support@emojirades.io"}
+]
+keywords = ["slack", "slackbot", "emojirades", "plusplus", "game"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Communications :: Chat",
+    "Topic :: Games/Entertainment",
+]
+requires-python = ">=3.12"
+dependencies = [
+    "slack_sdk~=3.40.1",
+    "requests~=2.32.3",
+    "boto3~=1.42.30",
+    "Unidecode~=1.4.0",
+    "expiringdict~=1.2.2",
+    "SQLAlchemy~=2.0.9",
+    "alembic~=1.18.1",
+    "psycopg2-binary~=2.9.5",
+    "python-json-logger~=4.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pre-commit~=4.5.1",
+    "pytest~=9.0.2",
+    "black~=26.1.0",
+    "ruff~=0.15.2",
+    "websockets~=16.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/emojirades/emojirades"
+
+[project.scripts]
+emojirades = "emojirades.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.dynamic]
+version = {attr = "emojirades.VERSION"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+exclude = ["tests*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.ini"]

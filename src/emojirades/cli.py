@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import argparse
 import logging
 import time
@@ -9,9 +7,11 @@ import os
 from emojirades.bot import EmojiradesBot, configure_parent_logger
 
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-v", "--verbose", action="count", default=0, help="Logging level")
+    parser.add_argument(
+        "-v", "--verbose", action="count", default=0, help="Logging level"
+    )
     parser.add_argument("--log-file", default=sys.stderr, help="File we will log to")
 
     subparsers = parser.add_subparsers(help="Bot Mode", dest="mode")
@@ -35,7 +35,9 @@ if __name__ == "__main__":
         required="DATABASE_URI" not in os.environ,
     )
     parser_populate.add_argument("--table", help="Name of the table", required=True)
-    parser_populate.add_argument("--data-file", help="Filename we'll read from", required=True)
+    parser_populate.add_argument(
+        "--data-file", help="Filename we'll read from", required=True
+    )
 
     # Single Workspace
     parser_single = subparsers.add_parser("single", help="Single Workspace")
@@ -60,7 +62,12 @@ if __name__ == "__main__":
         default=os.environ.get("WORKSPACES_URI"),
         required="WORKSPACES_URI" not in os.environ,
     )
-    parser_multiple.add_argument("--workspace-id", dest="workspace_ids", action="append", help="Specific workspace IDs")
+    parser_multiple.add_argument(
+        "--workspace-id",
+        dest="workspace_ids",
+        action="append",
+        help="Specific workspace IDs",
+    )
     parser_multiple.add_argument(
         "--db-uri",
         help="Optionally override the workspace db_uri",
@@ -98,15 +105,24 @@ if __name__ == "__main__":
             bot.configure_workspace(args.db_uri, args.auth_uri)
         elif args.mode == "multiple":
             logger.debug("Configuring for Multiple Workspace mode")
-            bot.configure_workspaces(args.workspaces_uri, args.workspace_ids, args.onboarding_queue, db_uri=args.db_uri)
+            bot.configure_workspaces(
+                args.workspaces_uri,
+                args.workspace_ids,
+                args.onboarding_queue,
+                db_uri=args.db_uri,
+            )
         else:
             parser.error("Unknown mode")
 
-        logger.info("Bot is listening for commands")
-        bot.listen_for_commands(blocking=False)
+    logger.info("Bot is listening for commands")
+    bot.listen_for_commands(blocking=False)
 
-        if args.onboarding_queue is not None:
-            bot.listen_for_onboarding(args.workspaces_uri, db_uri=args.db_uri)
-        else:
-            while True:
-                time.sleep(60)
+    if args.onboarding_queue is not None:
+        bot.listen_for_onboarding(args.workspaces_uri, db_uri=args.db_uri)
+    else:
+        while True:
+            time.sleep(60)
+
+
+if __name__ == "__main__":
+    main()
