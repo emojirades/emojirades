@@ -14,29 +14,29 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
           python-version: "3.14"
 
-      - run: pip3 install --upgrade setuptools wheel
-      - run: pip3 install -e .[dev]
+      - name: Install dependencies
+        run: uv sync --extra dev
 
-      - id: black
-        run: black --check .
+      - name: Black
+        run: uv run black --check .
 
-      - id: ruff
-        run: ruff check emojirades
-
-    outputs:
-      black_conclusion: ${{ steps.black.conclusion }}
-      ruff_conclusion: ${{ steps.ruff.conclusion }}
+      - name: Ruff
+        run: uv run ruff check src/emojirades
 
   pytest:
     runs-on: ubuntu-24.04
 
     needs: linter
-    if: ${{ needs.linter.outputs.black_conclusion == 'success' && needs.linter.outputs.ruff_conclusion == 'success' }}
 
     strategy:
       matrix:
@@ -46,12 +46,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
 
-      - run: pip3 install --upgrade setuptools wheel
-      - run: pip3 install -e .[dev]
+      - name: Install dependencies
+        run: uv sync --extra dev
 
-      - run: ./scripts/run_tests.sh
+      - name: Run Tests
+        run: ./scripts/run_tests.sh

@@ -3,26 +3,29 @@ A Slack bot that understands the Emojirades game and handles scorekeeping.
 
 ![CI Status](https://github.com/emojirades/emojirades/actions/workflows/ci.yml/badge.svg)
 
-## Quick Start (Development)
+## Local Development Setup
 
-This project uses `uv` for dependency management.
+This project uses `uv` for dependency management. Follow these steps to set up your local environment:
 
-### Setup Environment
+### 1. Install dependencies
+Install the project and all development tools into a local virtual environment:
 ```bash
-# Create venv and install dependencies
 uv sync --extra dev
+```
 
-# Install pre-commit hooks
+### 2. Configure Git Hooks
+We use `pre-commit` to ensure code quality. Initialize the hooks so they run automatically on `git commit`:
+```bash
 uv run pre-commit install
 ```
 
-### Run Tests
+### 3. Run Tests
+Ensure everything is working correctly:
 ```bash
-# Run the test suite
-uv run ./scripts/run_tests.sh
+uv run --extra dev ./scripts/run_tests.sh
 ```
 
-## Running the Bot
+## Running the Bot Locally
 
 ### Initialization
 ```bash
@@ -39,6 +42,31 @@ uv run emojirades single --db-uri "sqlite:///emojirades.db" --auth-uri "auth.jso
 ```bash
 docker build -t emojirades .
 docker run -e DATABASE_URI=sqlite:////data/emojirades.db -v $(pwd)/data:/data emojirades
+```
+
+## Dependency Management
+
+This project uses `uv` for lightning-fast dependency management and deterministic builds.
+
+### Adding/Updating Dependencies
+```bash
+# Add a new package
+uv add requests
+
+# Add a dev dependency
+uv add --dev pytest
+
+# Update a specific package
+uv add requests@latest
+
+# Update all packages to latest allowed by constraints
+uv lock --upgrade
+```
+
+### Syncing Environment
+If the `uv.lock` or `pyproject.toml` file changes, sync your local environment:
+```bash
+uv sync
 ```
 
 ## Database Migrations
