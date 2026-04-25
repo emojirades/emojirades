@@ -1,201 +1,57 @@
 # Emojirades
-Slack bot that understands the emojirades game and handles score keeping.
+A Slack bot that understands the Emojirades game and handles scorekeeping.
 
-![CI Status](https://github.com/emojirades/emojirades/actions/workflows/ci.yml/badge.svg) ![PyPI version](https://badge.fury.io/py/emojirades.svg)
+![CI Status](https://github.com/emojirades/emojirades/actions/workflows/ci.yml/badge.svg)
 
-# Developing
+## Quick Start (Development)
 
-## Install & Setup
+This project uses `uv` for dependency management.
+
+### Setup Environment
 ```bash
-uv venv --python 3.14
+# Create venv and install dependencies
+uv sync --extra dev
 
-source .venv/bin/activate
-
-uv pip install -e '.[dev]'
-
-pre-commit install
+# Install pre-commit hooks
+uv run pre-commit install
 ```
 
-## Run the tests
+### Run Tests
 ```bash
+# Run the test suite
 uv run ./scripts/run_tests.sh
-
 ```
 
-## Creating new DB revisions
-If you make changes to `emojirades/persistence/models` you'll need to generate new revisions. This tracks the changes and applies them to the DB at each bots startup
-```
-cd emojirades/persistence/models
-alembic revision --autogenerate --message "<useful insightful few words>"
-```
+## Running the Bot
 
-# Running
-## Set Environment Variables
-If you're using an auth file from AWS S3 you'll need to set the appropriate `AWS_` environment variables!
-
-## Separate Database
-Using a database like PostgreSQL, you'll need to have created a database with a username and password before starting this.
-
-If you've just created a fresh DB, you'll need to load the initial database:
-```
-emojirades -vv init --db-uri "sqlite:///emojirades.db"
-```
-
-After initialising the DB you can load in any optional pre-existing state.
-
-The json files must be a list of objects, with each objects `key: value` representing a column in the associated model
-
-If you are coming from the old style of state.json and scores.json you can run the following to produce json files that can be used in the above populate command
-
-```
-./bin/old_to_new_persistence.py --workspace-id TABC123 --state-file state.json --score-file scores.json
-```
-
-This will produce `state.json.processed`, `scores.json.processed_scores` and `scores.json.processed_score_history`
-
-They can be populated by running:
-```
-emojirades -vv populate --db-uri "sqlite:///emojirades.db" --table gamestate --data-file state.json.processed
-emojirades -vv populate --db-uri "sqlite:///emojirades.db" --table scoreboard --data-file scores.json.processed_scores
-emojirades -vv populate --db-uri "sqlite:///emojirades.db" --table scoreboard_history --data-file scores.json.processed_score_history
-```
-
-## Run the daemon for a single workspace
-This command uses locally stored files to keep the game state:
-
-`emojirades single --db-uri sqlite:///emojirades.db --auth-uri auth.json`
-
-This command uses a separate PostgreSQL DB and an auth file from AWS S3:
-
-`emojirades single --db-uri postgresql://user:pass@hostname/database --auth-uri s3://bucket/auth.json`
-
-## Run the daemon for multiple workspaces
-Here we provide a local folder of workspaces and an optional set of workspace ids (will load all in folder by default):
-
-`emojirades mulitple --workspaces-dir path/to/workspaces [--workspace-id A1B2C3D4E]`
-
-Here we provide an S3 path of workspaces and an optional set of workspace ids (will load all in folder by default):
-
-`emojirades multiple --workspaces-dir s3://bucket/path/to/workspaces [--workspace-id A1B2C3D4E]`
-
-Here we provide an S3 path of workspaces and an AWS SQS queue to listen to for new workspaces:
-
-`emojirades multiple --workspaces-dir s3://bucket/path/to/workspaces --onboarding-queue workspace-onboarding-queue`
-
-Here we provide an S3 path of workspaces and override the db_uri:
-
-`emojirades multiple --workspaces-dir s3://bucket/path/to/workspaces --db-uri sqlite:///emojirades.db`
-
-The workspaces directory must be in the following format (local or s3):
-```
-./workspaces
-
-./workspaces/shards
-./workspaces/shards/0
-./workspaces/shards/0/A1B2C3D4E.json
-./workspaces/shards/0/Z9Y8X7W6V.json
-
-./workspaces/directory
-./workspaces/directory/A1B2C3D4E
-./workspaces/directory/A1B2C3D4E/auth.json
-./workspaces/directory/Z9Y8X7W6V
-./workspaces/directory/Z9Y8X7W6V/auth.json
-```
-
-Each instance of the bot will listen to a specific shard (specified as the --workspaces-dir).
-
-The contents of the shard config (eg. `./workspaces/shards/0/A1B2C3D4E.json`) will be a file similar to:
-```
-{
-  "workspace_id": "A1B2C3D4E",
-  "db_uri": "sqlite:////data/emojirades.db",  # Optional, needed if you do not specify one with the bot itself
-  "auth_uri": "s3://bucket/workspaces/directory/A1B2C3D4E/auth.json",
-}
-```
-
-The concept above with the two different directories is shards to allow for the bot to scale out horizontally. As the bot(s) get busier, the operator can increase the shard count (number of bot instances) and new onboarded workspaces are allocated to the next available shard with capacity.
-
-The emojirades bot will take care of running multiple games across different channels in a single workspace. This is a limitation in the design currently where you need a bot-per-workspace.
-
-## Service configuration
-```
-cp emojirades.service /etc/systemd/system/
-sudo chmod 0664 /etc/systemd/system/emojirades.service
-
-# Edit the /etc/systemd/system/emojirades.service file and update the user and group
-
-cp emojirades.config /etc/emojirades
-sudo chmod 0400 /etc/emojirades
-
-# Edit the /etc/emojirades config file with your configuration for the bot
-
-sudo systemctl daemon-reload
-sudo systemctl enable emojirades
-sudo systemctl start emojirades
-
-```
-# Release process
-1. Checkout master branch
-2. Update `emojirades/__init__.py` with the new version (vX.Y.Z)
-3. Commit
-4. Tag the commit with vX.Y.Z
-5. `git push; git push --tags` together
-4. Github Actions will trigger the Release Job when a tagged commit to master is detected
-    1. Changelog will be generated and a Github Release as well with the changelog
-    2. New python wheel will be built and published to PyPI and attached to the Release
-    3. New container image will be built and published to Github Container Registry
-
-## Building the Container Image
-```
-docker build --pull --no-cache -t ghcr.io/emojirades/emojirades:X.Y.Z -t ghcr.io/emojirades/emojirades:latest .
-```
-
-## Running the Container
-In this example we run the game with S3 hosted configuration for a single workspace.
-
-```
-docker run -d \
-  --name emojirades \
-  --restart=always \
-  -v "/path/to/your/.aws/:/root/.aws/:ro" \
-  -v "emojirades-data:/data" \
-  -e "AWS_PROFILE=emojirades" \
-  ghcr.io/emojirades/emojirades:X.Y.X \
-    --db-uri sqlite:////data/emojirades.db \
-    --auth-uri s3://bucket/path/to/auth.json \
-    -vv
-```
-
-## Migrating from SQLite to Postgres
-This assumes you have a local copy of your sqlite DB file and already setup and can access your postgres DB.
-
+### Initialization
 ```bash
-# Sourced venv/etc
-
-# Init the DB to setup the table structure
-./bin/emojirades init --db-uri 'postgresql+psycopg2://user:password@host:port/dbname'
-
-# Run the migration script
-./bin/sqlite_to_postgres.py \
-    --source-db-uri 'sqlite+pysqlite:///relative/path/to/emojirades.db' \
-    --target-db-uri 'postgresql+psycopg2://user:password@host:port/dbname'
-
-# Update the sequences by logging into postgres and resetting them to +1
-emojirades=# select max(event_id) from gamestate_history;
- max
-------
- 3086
-(1 row)
-
-emojirades=# ALTER SEQUENCE gamestate_history_event_id_seq RESTART WITH 3087;
-ALTER SEQUENCE
-
-emojirades=# select max(event_id) from scoreboard_history;
- max
-------
- 1622
-(1 row)
-
-emojirades=# ALTER SEQUENCE scoreboard_history_event_id_seq RESTART WITH 1623;
-ALTER SEQUENCE
+# Initialize the database (SQLite)
+uv run emojirades init --db-uri "sqlite:///emojirades.db"
 ```
+
+### Run (Single Workspace)
+```bash
+uv run emojirades single --db-uri "sqlite:///emojirades.db" --auth-uri "auth.json"
+```
+
+### Run (Docker)
+```bash
+docker build -t emojirades .
+docker run -e DATABASE_URI=sqlite:////data/emojirades.db -v $(pwd)/data:/data emojirades
+```
+
+## Database Migrations
+We use Alembic for database migrations.
+```bash
+# Apply migrations
+uv run emojirades init
+
+# Generate a new migration (after modifying models)
+export PYTHONPATH=src
+cd src/emojirades/persistence/models
+uv run alembic revision --autogenerate -m "description of changes"
+```
+
+## Deployment
+The bot is automatically published to GHCR on tagged releases. See `src/emojirades/__init__.py` for the current version.
