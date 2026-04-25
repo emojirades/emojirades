@@ -3,7 +3,7 @@ FROM python:3.14-bookworm
 WORKDIR /build
 
 COPY bin /build/bin
-COPY emojirades /build/emojirades
+COPY src /build/src
 COPY setup.cfg pyproject.toml README.md LICENSE /build/
 
 RUN pip3 install --upgrade setuptools wheel build

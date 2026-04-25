@@ -5,7 +5,7 @@ from sqlalchemy import Column, Text, Integer, Identity, Index
 from .base import Base, AwareDateTime
 
 
-class Scoreboard(Base):
+class ScoreboardModel(Base):
     # pylint: disable=too-few-public-methods
     __tablename__ = "scoreboard"
 
@@ -26,12 +26,12 @@ class Scoreboard(Base):
 
     def __repr__(self):
         return (
-            f"Scoreboard(w_id={self.workspace_id!r}, c_id={self.channel_id!r}, "
+            f"ScoreboardModel(w_id={self.workspace_id!r}, c_id={self.channel_id!r}, "
             f"u_id={self.user_id!r}, score={self.score!r})"
         )
 
 
-class ScoreboardHistory(Base):
+class ScoreboardHistoryModel(Base):
     # pylint: disable=too-few-public-methods
     __tablename__ = "scoreboard_history"
 
@@ -52,7 +52,7 @@ class ScoreboardHistory(Base):
 
     def __repr__(self):
         return (
-            f"ScoreboardHistory(w_id={self.workspace_id!r}, "
+            f"ScoreboardHistoryModel(w_id={self.workspace_id!r}, "
             f"c_id={self.channel_id!r}, u_id={self.user_id!r}, "
             f"op={self.operation!r})"
         )

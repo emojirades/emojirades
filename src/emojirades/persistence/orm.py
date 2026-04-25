@@ -10,10 +10,10 @@ from alembic.config import Config
 from alembic import command
 
 from .models import (
-    Gamestate,
-    GamestateHistory,
-    Scoreboard,
-    ScoreboardHistory,
+    GamestateModel,
+    GamestateHistoryModel,
+    ScoreboardModel,
+    ScoreboardHistoryModel,
     GamestateStep,
 )
 
@@ -69,18 +69,18 @@ def populate(db_uri, table, data_filename, commit_every=100):
     session = session_factory()
 
     if table == "gamestate":
-        Obj = Gamestate
+        Obj = GamestateModel
         col_funcs = {
             "step": lambda x: getattr(GamestateStep, x),
         }
     elif table == "gamestate_history":
-        Obj = GamestateHistory
+        Obj = GamestateHistoryModel
         col_funcs = {}
     elif table == "scoreboard":
-        Obj = Scoreboard
+        Obj = ScoreboardModel
         col_funcs = {}
     elif table == "scoreboard_history":
-        Obj = ScoreboardHistory
+        Obj = ScoreboardHistoryModel
         col_funcs = {
             "timestamp": lambda x: datetime.datetime.strptime(x, "%Y-%m-%d %H:%M:%S"),
         }

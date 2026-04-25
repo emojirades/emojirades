@@ -5,11 +5,11 @@ from .orm import (
     populate as populate,
 )
 from .models import (
-    Gamestate as Gamestate,
-    GamestateHistory as GamestateHistory,
+    GamestateModel as GamestateModel,
+    GamestateHistoryModel as GamestateHistoryModel,
     GamestateStep as GamestateStep,
-    Scoreboard as Scoreboard,
-    ScoreboardHistory as ScoreboardHistory,
+    ScoreboardModel as ScoreboardModel,
+    ScoreboardHistoryModel as ScoreboardHistoryModel,
 )
 from .handlers import (
     GamestateDB as GamestateDB,

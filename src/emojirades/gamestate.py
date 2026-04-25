@@ -44,8 +44,8 @@ class Gamestate:
     class InvalidStateException(Exception):
         pass
 
-    def __init__(self, session, workspace_id, caching=False):
-        self.handler = GamestateDB(session, workspace_id, caching=caching)
+    def __init__(self, session_factory, workspace_id, caching=False):
+        self.handler = GamestateDB(session_factory, workspace_id, caching=caching)
 
         self.logger = logging.getLogger("EmojiradesBot.gamestate.Gamestate")
 
@@ -123,7 +123,7 @@ class Gamestate:
                 self.handler.set_xyz(channel, user, "first_guess", False)
 
     def get_admins(self, channel):
-        return json.loads(self.handler.get_xyz(channel, "admins"))
+        return json.loads(self.handler.get_xyz(channel, "admins") or "[]")
 
     def set_admin(self, channel, user_id):
         return self.handler.add_admin(channel, user_id)
@@ -132,7 +132,7 @@ class Gamestate:
         return self.handler.remove_admin(channel, user_id)
 
     def is_admin(self, channel, user_id):
-        admins = json.loads(self.handler.get_xyz(channel, "admins"))
+        admins = json.loads(self.handler.get_xyz(channel, "admins") or "[]")
 
         if not admins:
             # If no one is an admin, everyone is an admin!

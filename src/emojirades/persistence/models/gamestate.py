@@ -13,7 +13,7 @@ class GamestateStep(enum.Enum):
     GUESSING = 4
 
 
-class Gamestate(Base):
+class GamestateModel(Base):
     # pylint: disable=too-few-public-methods
     __tablename__ = "gamestate"
 
@@ -37,12 +37,12 @@ class Gamestate(Base):
 
     def __repr__(self):
         return (
-            f"Gamestate(workspace_id={self.workspace_id!r},"
+            f"GamestateModel(workspace_id={self.workspace_id!r},"
             f"channel_id={self.channel_id!r}, step={self.step!r})"
         )
 
 
-class GamestateHistory(Base):
+class GamestateHistoryModel(Base):
     # pylint: disable=too-few-public-methods
     __tablename__ = "gamestate_history"
 
@@ -61,7 +61,7 @@ class GamestateHistory(Base):
 
     def __repr__(self):
         return (
-            f"GamestateHistory(w_id={self.workspace_id!r}, "
+            f"GamestateHistoryModel(w_id={self.workspace_id!r}, "
             f"c_id={self.channel_id!r}, u_id={self.user_id!r}, "
             f"op={self.operation!r})"
         )
@@ -69,6 +69,6 @@ class GamestateHistory(Base):
 
 Index(
     "idx_gamestate_history_channel",
-    GamestateHistory.workspace_id,
-    GamestateHistory.channel_id,
+    GamestateHistoryModel.workspace_id,
+    GamestateHistoryModel.channel_id,
 )

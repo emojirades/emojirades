@@ -19,7 +19,7 @@ class TestBot:
         for k, v in kwargs.items():
             setattr(self, k, v)
 
-        self.slack = self.bot.workspaces[self.config.team]
+        self.slack = self.bot.workspaces[self.config.team]["slack"]
 
     @property
     def step(self):
@@ -148,8 +148,8 @@ def bot(auth_uri, db_uri, test_data):
 
     test_bot = TestBot(
         bot=bot,
-        gamestate=Gamestate(session, config.team),
-        scorekeeper=Scorekeeper(session, config.team),
+        gamestate=Gamestate(session_factory, config.team),
+        scorekeeper=Scorekeeper(session_factory, config.team),
         config=config,
         events=events,
         db_uri=db_uri,

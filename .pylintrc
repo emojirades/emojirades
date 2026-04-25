@@ -1,5 +1,5 @@
 [MASTER]
-ignore-paths=^emojirades/persistence/models/alembic/
+ignore-paths=^src/emojirades/persistence/models/alembic/
 disable=duplicate-code
 
 [MESSAGES CONTROL]

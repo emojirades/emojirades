@@ -2,19 +2,23 @@ import json
 
 from sqlalchemy import select, delete, desc, or_
 
-from ..models import Gamestate, GamestateHistory, GamestateStep
+from ..models import GamestateModel, GamestateHistoryModel, GamestateStep
 
 
 class GamestateDB:
     HISTORY_LIMIT = 5
 
-    def __init__(self, session, workspace_id, caching=False):
-        self.session = session
+    def __init__(self, session_factory, workspace_id, caching=False):
+        self.session_factory = session_factory
         self.workspace_id = workspace_id
         self.caching = caching
 
         self.gamestate_cache = {}
         self.history_cache = {}
+
+    @property
+    def session(self):
+        return self.session_factory()
 
     def clear_cache(self, channel):
         self.gamestate_cache.pop(channel, None)
@@ -27,14 +31,14 @@ class GamestateDB:
         self.gamestate_cache = {}
         self.history_cache = {}
 
-        self.session.execute(delete(GamestateHistory))
-        self.session.execute(delete(Gamestate))
+        self.session.execute(delete(GamestateHistoryModel))
+        self.session.execute(delete(GamestateModel))
 
         self.session.commit()
 
     def record_history(self, channel, user, operation, commit=False):
         self.session.add(
-            GamestateHistory(
+            GamestateHistoryModel(
                 workspace_id=self.workspace_id,
                 channel_id=channel,
                 user_id=user,
@@ -46,42 +50,28 @@ class GamestateDB:
             self.session.commit()
 
     def get_gamestates(self, current_workspace=True):
-        stmt = select(Gamestate)
+        stmt = select(GamestateModel)
 
         if current_workspace:
-            stmt.where(Gamestate.workspace_id == self.workspace_id)
+            stmt = stmt.where(GamestateModel.workspace_id == self.workspace_id)
 
         return self.session.execute(stmt)
 
     def get_gamestate(self, channel):
-        if gamestate := self.gamestate_cache.get(channel):
+        # session.get handles both local (identity map) and database lookups
+        # It's more robust than manual caching with merge for composite PKs
+        gamestate = self.session.get(GamestateModel, (self.workspace_id, channel))
+
+        if gamestate:
             return gamestate
 
-        stmt = select(Gamestate).where(
-            Gamestate.workspace_id == self.workspace_id,
-            Gamestate.channel_id == channel,
-        )
-
-        result = self.session.execute(stmt).first()
-
-        if result:
-            gamestate = result[0]
-
-            if self.caching:
-                self.gamestate_cache[channel] = gamestate
-
-            return gamestate
-
-        gamestate = Gamestate(
+        gamestate = GamestateModel(
             workspace_id=self.workspace_id,
             channel_id=channel,
         )
 
         self.session.add(gamestate)
         self.session.commit()
-
-        if self.caching:
-            self.gamestate_cache[channel] = gamestate
 
         return gamestate
 
@@ -115,7 +105,7 @@ class GamestateDB:
     def add_admin(self, channel, user):
         gamestate = self.get_gamestate(channel)
 
-        admins = json.loads(gamestate.admins)
+        admins = json.loads(gamestate.admins or "[]")
 
         if user in admins:
             return False
@@ -131,7 +121,7 @@ class GamestateDB:
     def remove_admin(self, channel, user):
         gamestate = self.get_gamestate(channel)
 
-        admins = json.loads(gamestate.admins)
+        admins = json.loads(gamestate.admins or "[]")
 
         if user not in admins:
             return False
@@ -166,16 +156,16 @@ class GamestateDB:
 
         stmt = (
             select(
-                GamestateHistory.user_id,
-                GamestateHistory.timestamp,
-                GamestateHistory.operation,
+                GamestateHistoryModel.user_id,
+                GamestateHistoryModel.timestamp,
+                GamestateHistoryModel.operation,
             )
             .where(
-                GamestateHistory.workspace_id == self.workspace_id,
-                GamestateHistory.channel_id == channel,
+                GamestateHistoryModel.workspace_id == self.workspace_id,
+                GamestateHistoryModel.channel_id == channel,
             )
             .order_by(
-                desc(GamestateHistory.timestamp),
+                desc(GamestateHistoryModel.timestamp),
             )
         )
 
@@ -194,7 +184,7 @@ class GamestateDB:
 
     def get_channels(self):
         stmt = select(
-            Gamestate.channel_id,
+            GamestateModel.channel_id,
         )
 
         result = self.session.execute(stmt).fetchall()
@@ -203,14 +193,14 @@ class GamestateDB:
 
     def get_pending_channel(self, previous_winner):
         stmt = select(
-            Gamestate.channel_id,
+            GamestateModel.channel_id,
         ).where(
-            Gamestate.workspace_id == self.workspace_id,
+            GamestateModel.workspace_id == self.workspace_id,
             or_(
-                Gamestate.step == GamestateStep.WAITING,
-                Gamestate.step == GamestateStep.PROVIDED,
+                GamestateModel.step == GamestateStep.WAITING,
+                GamestateModel.step == GamestateStep.PROVIDED,
             ),
-            Gamestate.previous_winner == previous_winner,
+            GamestateModel.previous_winner == previous_winner,
         )
 
         # We pick the first

@@ -74,13 +74,22 @@ class EmojiradesBot:
         if slack.workspace_id in self.workspaces:
             self.logger.info("Deleting previous workspace: %s", slack.workspace_id)
 
-            self.workspaces[slack.workspace_id].rtm.close()
+            self.workspaces[slack.workspace_id]["slack"].rtm.close()
             time.sleep(1)
             del self.workspaces[slack.workspace_id]
 
-        self.workspaces[slack.workspace_id] = slack
-
         session_factory = get_session_factory(db_uri)
+        workspace = {
+            "scorekeeper": Scorekeeper(
+                session_factory, slack.workspace_id, caching=True
+            ),
+            "gamestate": Gamestate(session_factory, slack.workspace_id, caching=True),
+            "slack": slack,
+            "session_factory": session_factory,
+        }
+
+        self.workspaces[slack.workspace_id] = workspace
+
         logger = self.logger
 
         def handle_event(client: RTMClient, event: dict):
@@ -94,14 +103,6 @@ class EmojiradesBot:
             session = session_factory()
 
             try:
-                workspace = {
-                    "scorekeeper": Scorekeeper(
-                        session, client.workspace_id, caching=True
-                    ),
-                    "gamestate": Gamestate(session, client.workspace_id, caching=True),
-                    "slack": slack,
-                }
-
                 event.resolve_overrides(workspace["gamestate"])
 
                 logger.debug("Handling event: %s", event.data)
@@ -177,9 +178,9 @@ class EmojiradesBot:
             finally:
                 session_factory.remove()
 
-        slack.rtm.on("message")(handle_event)
+        workspace["slack"].rtm.on("message")(handle_event)
 
-        return slack
+        return workspace["slack"]
 
     def configure_workspaces(
         self, workspaces_uri, workspace_ids, onboarding_queue, db_uri=None
@@ -247,8 +248,8 @@ class EmojiradesBot:
     def listen_for_commands(self, blocking=True):
         self.logger.info("Starting Slack monitor(s)")
 
-        for slack in self.workspaces.values():
-            slack.start(blocking=blocking)
+        for workspace in self.workspaces.values():
+            workspace["slack"].start(blocking=blocking)
 
     def listen_for_onboarding(self, workspaces_uri, db_uri=None, blocking=True):
         sqs = boto3.client("sqs")

@@ -1,19 +1,23 @@
 from sqlalchemy import select, delete, asc, desc
 
-from ..models import Scoreboard, ScoreboardHistory
+from ..models import ScoreboardModel, ScoreboardHistoryModel
 
 
 class ScorekeeperDB:
     SCOREBOARD_LIMIT = 15
     HISTORY_LIMIT = 15
 
-    def __init__(self, session, workspace_id, caching=False):
-        self.session = session
+    def __init__(self, session_factory, workspace_id, caching=False):
+        self.session_factory = session_factory
         self.workspace_id = workspace_id
         self.caching = caching
 
         self.scoreboard_cache = {}
         self.history_cache = {}
+
+    @property
+    def session(self):
+        return self.session_factory()
 
     def clear_cache(self, channel):
         self.scoreboard_cache.pop(channel, None)
@@ -26,14 +30,14 @@ class ScorekeeperDB:
         self.scoreboard_cache = {}
         self.history_cache = {}
 
-        self.session.execute(delete(ScoreboardHistory))
-        self.session.execute(delete(Scoreboard))
+        self.session.execute(delete(ScoreboardHistoryModel))
+        self.session.execute(delete(ScoreboardModel))
 
         self.session.commit()
 
     def record_history(self, channel, user, operation, commit=False):
         self.session.add(
-            ScoreboardHistory(
+            ScoreboardHistoryModel(
                 workspace_id=self.workspace_id,
                 channel_id=channel,
                 user_id=user,
@@ -45,10 +49,12 @@ class ScorekeeperDB:
             self.session.commit()
 
     def get_user(self, channel, user):
-        stmt = select(Scoreboard).where(
-            Scoreboard.workspace_id == self.workspace_id,
-            Scoreboard.channel_id == channel,
-            Scoreboard.user_id == user,
+        # We don't cache user objects directly here (get_scoreboard caches them in a list)
+        # But for correctness if we ever do, or if an object is already in session:
+        stmt = select(ScoreboardModel).where(
+            ScoreboardModel.workspace_id == self.workspace_id,
+            ScoreboardModel.channel_id == channel,
+            ScoreboardModel.user_id == user,
         )
 
         result = self.session.execute(stmt).first()
@@ -56,7 +62,7 @@ class ScorekeeperDB:
         if result:
             return result[0]
 
-        return Scoreboard(
+        return ScoreboardModel(
             workspace_id=self.workspace_id,
             channel_id=channel,
             user_id=user,
@@ -116,13 +122,13 @@ class ScorekeeperDB:
             return scoreboard
 
         stmt = (
-            select(Scoreboard)
+            select(ScoreboardModel)
             .where(
-                Scoreboard.workspace_id == self.workspace_id,
-                Scoreboard.channel_id == channel,
+                ScoreboardModel.workspace_id == self.workspace_id,
+                ScoreboardModel.channel_id == channel,
             )
             .order_by(
-                desc(Scoreboard.score),
+                desc(ScoreboardModel.score),
             )
         )
 
@@ -158,20 +164,20 @@ class ScorekeeperDB:
         if history := self.history_cache.get(cache_key):
             return history
 
-        stmt = select(ScoreboardHistory).where(
-            ScoreboardHistory.workspace_id == self.workspace_id,
-            ScoreboardHistory.channel_id == channel,
+        stmt = select(ScoreboardHistoryModel).where(
+            ScoreboardHistoryModel.workspace_id == self.workspace_id,
+            ScoreboardHistoryModel.channel_id == channel,
         )
 
         if user is not None:
             stmt = stmt.where(
-                ScoreboardHistory.user_id == user,
+                ScoreboardHistoryModel.user_id == user,
             )
 
         if order_by == "asc":
-            stmt = stmt.order_by(asc(ScoreboardHistory.timestamp))
+            stmt = stmt.order_by(asc(ScoreboardHistoryModel.timestamp))
         elif order_by == "desc":
-            stmt = stmt.order_by(desc(ScoreboardHistory.timestamp))
+            stmt = stmt.order_by(desc(ScoreboardHistoryModel.timestamp))
 
         if limit:
             stmt = stmt.limit(limit)

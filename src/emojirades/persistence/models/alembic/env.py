@@ -7,11 +7,11 @@ from alembic import context
 
 from emojirades.persistence.models.base import Base
 from emojirades.persistence.models import (
-    Gamestate as Gamestate,
-    GamestateHistory as GamestateHistory,
+    GamestateModel as GamestateModel,
+    GamestateHistoryModel as GamestateHistoryModel,
     GamestateStep as GamestateStep,
-    Scoreboard as Scoreboard,
-    ScoreboardHistory as ScoreboardHistory,
+    ScoreboardModel as ScoreboardModel,
+    ScoreboardHistoryModel as ScoreboardHistoryModel,
 )
 
 # this is the Alembic Config object, which provides
