@@ -1,18 +1,31 @@
-FROM python:3.14-bookworm
+# Stage 1: Build the wheel using uv
+FROM ghcr.io/astral-sh/uv:python3.14-trixie-slim AS builder
 
-WORKDIR /build
+# Enable bytecode compilation for faster startup in the final image
+ENV UV_COMPILE_BYTECODE=1
 
-COPY src /build/src
-COPY pyproject.toml README.md LICENSE /build/
+# Set the working directory
+WORKDIR /app
 
-RUN pip3 install --upgrade setuptools wheel build
-RUN python3 -m build
+# Copy the project files
+COPY . .
+
+# Build the project wheel using uv
+RUN uv build --wheel --out-dir /dist
 
 
-FROM python:3.14-bookworm
+# Stage 2: Final production image
+FROM python:3.14-slim-trixie
 
-COPY --from=0 /build/dist/emojirades-*-py3-none-any.whl /tmp/
+# Set environment variables for better logging and container behavior
+ENV PYTHONUNBUFFERED=1
 
-RUN pip3 install /tmp/emojirades-*-py3-none-any.whl && rm /tmp/emojirades-*-py3-none-any.whl
+# Copy the built wheel from the builder stage
+COPY --from=builder /dist/*.whl /tmp/
 
-ENTRYPOINT ["/usr/local/bin/emojirades"]
+# Install the wheel using pip. We use --no-cache-dir to keep the image small.
+# The dependencies are automatically resolved and installed from the wheel.
+RUN pip install --no-cache-dir /tmp/*.whl && rm /tmp/*.whl
+
+# Set the entrypoint to the console script defined in pyproject.toml
+ENTRYPOINT ["emojirades"]
