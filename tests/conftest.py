@@ -26,21 +26,21 @@ class TestBot:
         return self.gamestate.step(self.config.channel)
 
     def get_xyz(self, xyz):
-        return self.gamestate.handler.get_xyz(self.config.channel, xyz)
+        return self.gamestate.repository.get_xyz(self.config.channel, xyz)
 
     def send(self, event):
         self.slack.rtm.send(event)
         time.sleep(0.2)
 
     def commit(self):
-        self.gamestate.handler.session.commit()
+        self.gamestate.repository.session.commit()
 
     def debug(self):
         print("-" * 20)
         print("DEBUG")
         print("-" * 20)
         print("Gamestates:")
-        gamestates = self.gamestate.handler.get_gamestates(current_workspace=False)
+        gamestates = self.gamestate.repository.get_gamestates(current_workspace=False)
 
         for gamestate in gamestates:
             print(f"- {gamestate}")
@@ -56,8 +56,8 @@ class TestBot:
 
     def reset_and_transition_to(self, state, delete=True):
         if delete:
-            self.gamestate.handler.delete(iknowwhatimdoing=True)
-            self.scorekeeper.handler.delete(iknowwhatimdoing=True)
+            self.gamestate.repository.delete(iknowwhatimdoing=True)
+            self.scorekeeper.repository.delete(iknowwhatimdoing=True)
             time.sleep(0.2)
 
         if state == "waiting":
@@ -90,7 +90,7 @@ class TestBot:
             time.sleep(0.2)
 
         # Verify after fast forward there's no dodgy channels
-        gamestates = self.gamestate.handler.get_gamestates(current_workspace=False)
+        gamestates = self.gamestate.repository.get_gamestates(current_workspace=False)
 
         for gamestate in gamestates:
             assert gamestate[0].channel_id[0] in ("C", "G")

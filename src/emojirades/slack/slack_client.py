@@ -4,7 +4,7 @@ import threading
 import slack_sdk
 from expiringdict import ExpiringDict
 
-from emojirades.persistence import get_auth_handler
+from emojirades.persistence import get_auth_repository
 
 
 class SlackClient:
@@ -12,7 +12,7 @@ class SlackClient:
     def __init__(self, auth_uri, extra_slack_kwargs=None):
         self.logger = logging.getLogger("EmojiradesBot.slack.SlackClient")
 
-        self.config = get_auth_handler(auth_uri).load()
+        self.config = get_auth_repository(auth_uri).load()
 
         if extra_slack_kwargs is None:
             extra_slack_kwargs = {}

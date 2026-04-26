@@ -110,7 +110,7 @@ class CorrectGuessCommand(BaseCommand):
         emoji = random.choice(self.other_emojis + self.position_emojis.get(position, []))
         emoji_text = f" :{emoji}:"
 
-        if self.gamestate.handler.is_first_guess(channel):
+        if self.gamestate.repository.is_first_guess(channel):
             yield (
                 None,
                 random.choice(self.first_guess_messages),

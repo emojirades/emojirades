@@ -5,7 +5,7 @@ from sqlalchemy import delete, desc, or_, select
 from ..models import GamestateHistoryModel, GamestateModel, GamestateStep
 
 
-class GamestateDB:
+class GamestateRepository:
     HISTORY_LIMIT = 5
 
     def __init__(self, session_factory, workspace_id, caching=False):

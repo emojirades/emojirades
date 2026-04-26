@@ -3,7 +3,7 @@ from sqlalchemy import asc, delete, desc, select
 from ..models import ScoreboardHistoryModel, ScoreboardModel
 
 
-class ScorekeeperDB:
+class ScorekeeperRepository:
     SCOREBOARD_LIMIT = 15
     HISTORY_LIMIT = 15
 

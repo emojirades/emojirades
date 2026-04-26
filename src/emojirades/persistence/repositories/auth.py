@@ -4,7 +4,7 @@ import boto3
 
 
 # pylint: disable=too-few-public-methods
-class S3AuthFileHandler:
+class S3AuthFileRepository:
     def __init__(self, auth_uri):
         _, _, self._bucket, self._key = auth_uri.split("/", 3)
 
@@ -20,7 +20,7 @@ class S3AuthFileHandler:
 
 
 # pylint: disable=too-few-public-methods
-class LocalAuthFileHandler:
+class LocalAuthFileRepository:
     def __init__(self, auth_uri):
         self.auth_uri = auth_uri
 
@@ -29,8 +29,8 @@ class LocalAuthFileHandler:
             return json.load(auth_file)
 
 
-def get_auth_handler(uri):
+def get_auth_repository(uri):
     if uri.startswith("s3://"):
-        return S3AuthFileHandler(uri)
+        return S3AuthFileRepository(uri)
 
-    return LocalAuthFileHandler(uri)
+    return LocalAuthFileRepository(uri)

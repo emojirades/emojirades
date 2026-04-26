@@ -13,7 +13,7 @@ from emojirades.commands.registry import CommandRegistry
 from emojirades.gamestate import Gamestate
 from emojirades.persistence import (
     get_session_factory,
-    get_workspace_handler,
+    get_workspace_repository,
     migrate,
     populate,
 )
@@ -171,9 +171,9 @@ class EmojiradesBot:
         return workspace["slack"]
 
     def configure_workspaces(self, workspaces_uri, workspace_ids, onboarding_queue, db_uri=None):
-        handler = get_workspace_handler(workspaces_uri)
+        repository = get_workspace_repository(workspaces_uri)
 
-        for workspace in handler.workspaces():
+        for workspace in repository.workspaces():
             if workspace_ids and workspace["workspace_id"] not in workspace_ids:
                 continue
 
@@ -242,7 +242,7 @@ class EmojiradesBot:
         response = sqs.get_queue_url(QueueName=self.onboarding_queue)
         queue_url = response["QueueUrl"]
 
-        handler = get_workspace_handler(workspaces_uri)
+        repository = get_workspace_repository(workspaces_uri)
 
         if blocking:
             oneshot = False
@@ -265,7 +265,7 @@ class EmojiradesBot:
 
                 self.logger.debug("Bot received onboarding for %s", body["workspace_id"])
 
-                workspace = handler.workspace(body["workspace_id"])
+                workspace = repository.workspace(body["workspace_id"])
 
                 if db_uri is not None:
                     workspace["db_uri"] = db_uri

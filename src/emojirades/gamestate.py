@@ -10,7 +10,7 @@ from emojirades.helpers import (
     match_emojirade,
     sanitize_text,
 )
-from emojirades.persistence import GamestateDB, GamestateStep
+from emojirades.persistence import GamestateRepository, GamestateStep
 from emojirades.slack.event import Event
 
 module_logger = logging.getLogger("EmojiradesBot.gamestate")
@@ -49,22 +49,22 @@ class Gamestate:
         pass
 
     def __init__(self, session_factory, workspace_id, caching=False):
-        self.handler = GamestateDB(session_factory, workspace_id, caching=caching)
+        self.repository = GamestateRepository(session_factory, workspace_id, caching=caching)
 
         self.logger = logging.getLogger("EmojiradesBot.gamestate.Gamestate")
 
     def in_progress(self, channel):
         invalid_steps = (GamestateStep.NEW_GAME,)
 
-        return self.handler.get_xyz(channel, "step") not in invalid_steps
+        return self.repository.get_xyz(channel, "step") not in invalid_steps
 
     def not_in_progress(self, channel):
         valid_steps = (GamestateStep.NEW_GAME, GamestateStep.WAITING)
-        return self.handler.get_xyz(channel, "step") in valid_steps
+        return self.repository.get_xyz(channel, "step") in valid_steps
 
     def guessing(self, channel):
         valid_steps = (GamestateStep.GUESSING,)
-        return self.handler.get_xyz(channel, "step") in valid_steps
+        return self.repository.get_xyz(channel, "step") in valid_steps
 
     def infer_commands(self, event: Event):
         """
@@ -80,8 +80,8 @@ class Gamestate:
 
         # Check to see if the winner is posting emoji's
         if (
-            self.handler.get_xyz(channel, "step") == GamestateStep.PROVIDED
-            and user == self.handler.get_xyz(channel, "current_winner")
+            self.repository.get_xyz(channel, "step") == GamestateStep.PROVIDED
+            and user == self.repository.get_xyz(channel, "current_winner")
             and match_emoji(text)
         ):
             self.winner_posted(channel, user)
@@ -91,14 +91,14 @@ class Gamestate:
             pass
 
         # Check to see if the users guess is right!
-        elif self.handler.get_xyz(channel, "step") == GamestateStep.GUESSING and user not in (
-            self.handler.get_xyz(channel, "previous_winner"),
-            self.handler.get_xyz(channel, "current_winner"),
+        elif self.repository.get_xyz(channel, "step") == GamestateStep.GUESSING and user not in (
+            self.repository.get_xyz(channel, "previous_winner"),
+            self.repository.get_xyz(channel, "current_winner"),
         ):
             guess = sanitize_text(text)
 
             try:
-                emojirade = json.loads(self.handler.get_xyz(channel, "emojirade"))
+                emojirade = json.loads(self.repository.get_xyz(channel, "emojirade"))
 
                 if match_emojirade(guess, emojirade):
                     self.logger.debug(
@@ -121,20 +121,20 @@ class Gamestate:
                     guess,
                 )
 
-            if self.handler.is_first_guess(channel):
-                self.handler.set_xyz(channel, user, "first_guess", False)
+            if self.repository.is_first_guess(channel):
+                self.repository.set_xyz(channel, user, "first_guess", False)
 
     def get_admins(self, channel):
-        return json.loads(self.handler.get_xyz(channel, "admins") or "[]")
+        return json.loads(self.repository.get_xyz(channel, "admins") or "[]")
 
     def set_admin(self, channel, user_id):
-        return self.handler.add_admin(channel, user_id)
+        return self.repository.add_admin(channel, user_id)
 
     def remove_admin(self, channel, user_id):
-        return self.handler.remove_admin(channel, user_id)
+        return self.repository.remove_admin(channel, user_id)
 
     def is_admin(self, channel, user_id):
-        admins = json.loads(self.handler.get_xyz(channel, "admins") or "[]")
+        admins = json.loads(self.repository.get_xyz(channel, "admins") or "[]")
 
         if not admins:
             # If no one is an admin, everyone is an admin!
@@ -143,21 +143,21 @@ class Gamestate:
         return user_id in admins
 
     def new_game(self, channel, previous_winner, current_winner):
-        self.handler.new_game(channel, previous_winner, current_winner)
+        self.repository.new_game(channel, previous_winner, current_winner)
 
     def get_emojirade(self, channel):
-        return json.loads(self.handler.get_xyz(channel, "emojirade"))
+        return json.loads(self.repository.get_xyz(channel, "emojirade"))
 
     def set_emojirade(self, channel, emojirades, user):
         valid_steps = (GamestateStep.WAITING, GamestateStep.PROVIDED)
-        step = self.handler.get_xyz(channel, "step")
+        step = self.repository.get_xyz(channel, "step")
 
         if step not in valid_steps:
             raise self.InvalidStateException(
                 f"Expecting state to be WAITING or PROVIDED, was {step}"
             )
 
-        self.handler.set_many_xyz(
+        self.repository.set_many_xyz(
             channel,
             user,
             [
@@ -169,12 +169,12 @@ class Gamestate:
 
     def winner_posted(self, channel, user):
         valid_steps = (GamestateStep.PROVIDED,)
-        step = self.handler.get_xyz(channel, "step")
+        step = self.repository.get_xyz(channel, "step")
 
         if step not in valid_steps:
             raise self.InvalidStateException(f"Expecting state to be PROVIDED, was {step}")
 
-        self.handler.set_many_xyz(
+        self.repository.set_many_xyz(
             channel,
             user,
             [
@@ -185,16 +185,16 @@ class Gamestate:
 
     def correct_guess(self, channel, winner):
         valid_steps = (GamestateStep.GUESSING,)
-        step = self.handler.get_xyz(channel, "step")
+        step = self.repository.get_xyz(channel, "step")
 
         if step not in valid_steps:
             raise self.InvalidStateException(f"Expecting state to be GUESSING, was {step}")
 
-        self.handler.set_many_xyz(
+        self.repository.set_many_xyz(
             channel,
             winner,
             [
-                ("previous_winner", self.handler.get_xyz(channel, "current_winner")),
+                ("previous_winner", self.repository.get_xyz(channel, "current_winner")),
                 ("current_winner", winner),
                 ("step", GamestateStep.WAITING),
                 ("emojirade", None),
@@ -203,23 +203,23 @@ class Gamestate:
         )
 
     def fixwinner(self, channel, winner):
-        loser = self.handler.get_xyz(channel, "current_winner")
+        loser = self.repository.get_xyz(channel, "current_winner")
 
-        self.handler.set_xyz(channel, winner, "current_winner", winner)
+        self.repository.set_xyz(channel, winner, "current_winner", winner)
 
         return loser, winner
 
     def winners(self, channel):
         return (
-            self.handler.get_xyz(channel, "previous_winner"),
-            self.handler.get_xyz(channel, "current_winner"),
+            self.repository.get_xyz(channel, "previous_winner"),
+            self.repository.get_xyz(channel, "current_winner"),
         )
 
     def step(self, channel):
-        return self.handler.get_xyz(channel, "step")
+        return self.repository.get_xyz(channel, "step")
 
     def get_channels(self):
-        return self.handler.get_channels()
+        return self.repository.get_channels()
 
     def get_pending_channel(self, user):
-        return self.handler.get_pending_channel(user)
+        return self.repository.get_pending_channel(user)

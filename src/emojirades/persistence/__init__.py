@@ -1,15 +1,3 @@
-from .handlers import (
-    GamestateDB as GamestateDB,
-)
-from .handlers import (
-    ScorekeeperDB as ScorekeeperDB,
-)
-from .handlers import (
-    get_auth_handler as get_auth_handler,
-)
-from .handlers import (
-    get_workspace_handler as get_workspace_handler,
-)
 from .models import (
     GamestateHistoryModel as GamestateHistoryModel,
 )
@@ -36,4 +24,16 @@ from .orm import (
 )
 from .orm import (
     populate as populate,
+)
+from .repositories import (
+    GamestateRepository as GamestateRepository,
+)
+from .repositories import (
+    ScorekeeperRepository as ScorekeeperRepository,
+)
+from .repositories import (
+    get_auth_repository as get_auth_repository,
+)
+from .repositories import (
+    get_workspace_repository as get_workspace_repository,
 )

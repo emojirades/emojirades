@@ -5,8 +5,8 @@ import pathlib
 import boto3
 
 
-def set_handler_args(self, *args, handler_params, **kwargs):
-    for arg, pos in handler_params:
+def set_repository_args(self, *args, repository_params, **kwargs):
+    for arg, pos in repository_params:
         if pos is not None:
             if len(args) > pos:
                 setattr(self, arg, args[pos])
@@ -22,12 +22,12 @@ def set_handler_args(self, *args, handler_params, **kwargs):
 
 
 # pylint: disable=too-few-public-methods
-class S3WorkspaceDirectoryHandler:
+class S3WorkspaceDirectoryRepository:
     def __init__(self, *args, **kwargs):
         self.workspace_uri = ""
 
         params = [("workspace_uri", 0)]
-        set_handler_args(self, *args, handler_params=params, **kwargs)
+        set_repository_args(self, *args, repository_params=params, **kwargs)
 
         _, _, self._bucket, self._prefix = self.workspace_uri.split("/", 3)
 
@@ -65,12 +65,12 @@ class S3WorkspaceDirectoryHandler:
 
 
 # pylint: disable=too-few-public-methods
-class LocalWorkspaceDirectoryHandler:
+class LocalWorkspaceDirectoryRepository:
     def __init__(self, *args, **kwargs):
         self.workspace_uri = ""
 
         params = [("workspace_uri", 0)]
-        set_handler_args(self, *args, handler_params=params, **kwargs)
+        set_repository_args(self, *args, repository_params=params, **kwargs)
 
         self._folder = pathlib.Path(self.workspace_uri[7:])
 
@@ -86,8 +86,8 @@ class LocalWorkspaceDirectoryHandler:
                 yield json.load(workspace_file)
 
 
-def get_workspace_handler(uri):
+def get_workspace_repository(uri):
     if uri.startswith("s3://"):
-        return S3WorkspaceDirectoryHandler(uri)
+        return S3WorkspaceDirectoryRepository(uri)
 
-    return LocalWorkspaceDirectoryHandler(uri)
+    return LocalWorkspaceDirectoryRepository(uri)
