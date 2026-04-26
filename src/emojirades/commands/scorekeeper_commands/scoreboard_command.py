@@ -14,10 +14,10 @@ class ScoreboardCommand(BaseCommand):
 
     # pylint: disable=line-too-long
     patterns = (
-        r"<@{me}>[\s]+(?:score|leader)[\s]*board(?P<all_boards>s){0,1}$",
+        r"<@{me}>[\s]+(?:score|leader)[\s]*board(?P<all_boards>s){{0,1}}$",
         (
             r"<@{me}>[\s]+(?:score|leader)[\s]*board "
-            r"(?P<range>weekly|monthly) (?P<user_date>[0-9]{8})"
+            r"(?P<range>weekly|monthly) (?P<user_date>[0-9]{{8}})"
         ),
         (
             r"<@{me}>[\s]+(?:score|leader)[\s]*board "
