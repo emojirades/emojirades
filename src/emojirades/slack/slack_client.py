@@ -1,9 +1,8 @@
 import logging
 import threading
 
-from expiringdict import ExpiringDict
-
 import slack_sdk
+from expiringdict import ExpiringDict
 
 from emojirades.persistence import get_auth_handler
 
@@ -29,12 +28,8 @@ class SlackClient:
         self.last_ts = float(0)
         self.cache_lock = threading.Lock()
 
-        self.user_info_cache = ExpiringDict(
-            max_len=100, max_age_seconds=172800
-        )  # 2 days
-        self.bot_user_info_cache = ExpiringDict(
-            max_len=100, max_age_seconds=172800
-        )  # 2 days
+        self.user_info_cache = ExpiringDict(max_len=100, max_age_seconds=172800)  # 2 days
+        self.bot_user_info_cache = ExpiringDict(max_len=100, max_age_seconds=172800)  # 2 days
 
         response = self.rtm.web_client.auth_test()
 

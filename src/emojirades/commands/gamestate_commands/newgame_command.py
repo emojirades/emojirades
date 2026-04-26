@@ -1,13 +1,11 @@
-from emojirades.wrappers import admin_or_old_winner_set_check
 from emojirades.commands import BaseCommand
+from emojirades.wrappers import admin_or_old_winner_set_check
 
 
 class NewGameCommand(BaseCommand):
     description = "Initiate a new game by setting the Old Winner and the Winner"
 
-    patterns = (
-        r"<@{me}> new[\s]*game <@(?P<old_winner>[0-9A-Z]+)> <@(?P<winner>[0-9A-Z]+)>",
-    )
+    patterns = (r"<@{me}> new[\s]*game <@(?P<old_winner>[0-9A-Z]+)> <@(?P<winner>[0-9A-Z]+)>",)
 
     examples = [
         ("<@{me}> new game @old_winner @winner", "Initiates a new game"),

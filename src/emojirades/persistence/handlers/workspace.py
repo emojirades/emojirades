@@ -1,6 +1,6 @@
-import pathlib
 import json
 import os
+import pathlib
 
 import boto3
 

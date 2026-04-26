@@ -107,9 +107,7 @@ class TestBotCommands:
         # Check the user cannot award to themselves
         bot.reset_and_transition_to("guessed", delete=True)
 
-        override = {
-            "text": f"<@{bot.config.bot_id}> fixwinner <@{bot.config.player_2}>"
-        }
+        override = {"text": f"<@{bot.config.bot_id}> fixwinner <@{bot.config.player_2}>"}
         bot.send({**bot.events.fixwinner, **override})
 
         expected = ":face_palm: You can't award yourself the win"
@@ -133,9 +131,7 @@ class TestBotCommands:
         # Check the user cannot award to the winner (no-op)
         bot.reset_and_transition_to("guessed", delete=True)
 
-        override = {
-            "text": f"<@{bot.config.bot_id}> fixwinner <@{bot.config.player_3}>"
-        }
+        override = {"text": f"<@{bot.config.bot_id}> fixwinner <@{bot.config.player_3}>"}
         bot.send({**bot.events.fixwinner, **override})
 
         expected = "This won't actually do anything? :shrug::face_with_monocle:"
@@ -304,9 +300,9 @@ class TestBotCommands:
 
         for command in commands.values():
             for example, description in command.examples:
-                assert re.compile(
-                    rf"{re.escape(example)}\s+{re.escape(description)}"
-                ).search(slack_web_api.ephemeral_responses[-2][1])
+                assert re.compile(rf"{re.escape(example)}\s+{re.escape(description)}").search(
+                    slack_web_api.ephemeral_responses[-2][1]
+                )
 
     def test_game_status(self, slack_web_api, bot):
         bot.reset_and_transition_to("waiting")

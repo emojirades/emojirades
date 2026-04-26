@@ -2,15 +2,14 @@
 # https://github.com/slackapi/python-slack-sdk/blob/main/tests/rtm/test_rtm_client_functional.py
 # https://github.com/slackapi/python-slack-sdk/blob/main/tests/rtm/mock_web_api_server.py
 
-import urllib.parse
-import threading
-import logging
 import json
-
-from http.server import HTTPServer, SimpleHTTPRequestHandler
-from unittest import TestCase
+import logging
+import threading
+import urllib.parse
 from http import HTTPStatus
+from http.server import HTTPServer, SimpleHTTPRequestHandler
 from typing import Type
+from unittest import TestCase
 
 
 # Mock API Server
@@ -20,9 +19,9 @@ class MockHandler(SimpleHTTPRequestHandler):
     logger = logging.getLogger(__name__)
 
     def is_valid_token(self):
-        return "authorization" in self.headers and str(
-            self.headers["authorization"]
-        ).startswith("Bearer xoxb-")
+        return "authorization" in self.headers and str(self.headers["authorization"]).startswith(
+            "Bearer xoxb-"
+        )
 
     def is_invalid_rtm_start(self):
         return (
@@ -212,9 +211,7 @@ class MockHandler(SimpleHTTPRequestHandler):
                     "timestamp": parsed["timestamp"][0],
                 }
 
-            self.test.reactions.append(
-                (message["channel"], message["name"], message["timestamp"])
-            )
+            self.test.reactions.append((message["channel"], message["name"], message["timestamp"]))
         else:
             response = responses[self.path]
 
@@ -229,9 +226,7 @@ class MockHandler(SimpleHTTPRequestHandler):
 
 
 class MockServerThread(threading.Thread):
-    def __init__(
-        self, test: TestCase, handler: Type[SimpleHTTPRequestHandler] = MockHandler
-    ):
+    def __init__(self, test: TestCase, handler: Type[SimpleHTTPRequestHandler] = MockHandler):
         threading.Thread.__init__(self)
         self.handler = handler
         self.handler.test = test

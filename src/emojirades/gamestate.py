@@ -1,12 +1,16 @@
-import logging
 import json
+import logging
 
 from emojirades.commands.gamestate_commands.inferred_correct_guess_command import (
     InferredCorrectGuessCommand,
 )
-from emojirades.helpers import sanitize_text, match_emojirade, match_emoji
-from emojirades.helpers import ScottFactorExceededException
-from emojirades.persistence import GamestateStep, GamestateDB
+from emojirades.helpers import (
+    ScottFactorExceededException,
+    match_emoji,
+    match_emojirade,
+    sanitize_text,
+)
+from emojirades.persistence import GamestateDB, GamestateStep
 from emojirades.slack.event import Event
 
 module_logger = logging.getLogger("EmojiradesBot.gamestate")
@@ -87,9 +91,7 @@ class Gamestate:
             pass
 
         # Check to see if the users guess is right!
-        elif self.handler.get_xyz(
-            channel, "step"
-        ) == GamestateStep.GUESSING and user not in (
+        elif self.handler.get_xyz(channel, "step") == GamestateStep.GUESSING and user not in (
             self.handler.get_xyz(channel, "previous_winner"),
             self.handler.get_xyz(channel, "current_winner"),
         ):
@@ -170,9 +172,7 @@ class Gamestate:
         step = self.handler.get_xyz(channel, "step")
 
         if step not in valid_steps:
-            raise self.InvalidStateException(
-                f"Expecting state to be PROVIDED, was {step}"
-            )
+            raise self.InvalidStateException(f"Expecting state to be PROVIDED, was {step}")
 
         self.handler.set_many_xyz(
             channel,
@@ -188,9 +188,7 @@ class Gamestate:
         step = self.handler.get_xyz(channel, "step")
 
         if step not in valid_steps:
-            raise self.InvalidStateException(
-                f"Expecting state to be GUESSING, was {step}"
-            )
+            raise self.InvalidStateException(f"Expecting state to be GUESSING, was {step}")
 
         self.handler.set_many_xyz(
             channel,

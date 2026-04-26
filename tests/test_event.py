@@ -1,9 +1,10 @@
-from unittest.mock import Mock, MagicMock
+import json
+from unittest.mock import MagicMock, Mock
 
 import pytest
-import json
 
 from emojirades.slack.event import Event, InvalidEvent
+
 from .file_fixture import FileFixture
 
 

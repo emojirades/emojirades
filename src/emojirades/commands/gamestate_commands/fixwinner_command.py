@@ -1,11 +1,10 @@
-from emojirades.wrappers import admin_or_old_winner_check, only_not_in_progress
 from emojirades.commands import BaseCommand
+from emojirades.wrappers import admin_or_old_winner_check, only_not_in_progress
 
 
 class FixWinnerCommand(BaseCommand):
     description = (
-        "Resets the currently awarded win to another player "
-        "(in case of a ninja or something)"
+        "Resets the currently awarded win to another player (in case of a ninja or something)"
     )
 
     patterns = (r"<@{me}> fixwinner <@(?P<winner>[0-9A-Z]+)>",)

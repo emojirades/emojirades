@@ -1,9 +1,9 @@
 import datetime
 import enum
 
-from sqlalchemy import Column, Text, Enum, Boolean, Integer, Index, Identity
+from sqlalchemy import Boolean, Column, Enum, Identity, Index, Integer, Text
 
-from .base import Base, AwareDateTime
+from .base import AwareDateTime, Base
 
 
 class GamestateStep(enum.Enum):

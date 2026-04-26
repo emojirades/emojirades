@@ -1,12 +1,11 @@
 import datetime
 import os
-
 from zoneinfo import ZoneInfo
 
-from emojirades.printers.scoreboard import ScoreboardPrinter
 from emojirades.analytics.scoreboard import ScoreboardAnalytics
 from emojirades.analytics.time_unit import TimeUnit
 from emojirades.commands import BaseCommand
+from emojirades.printers.scoreboard import ScoreboardPrinter
 
 
 class ScoreboardCommand(BaseCommand):
@@ -15,9 +14,15 @@ class ScoreboardCommand(BaseCommand):
 
     # pylint: disable=line-too-long
     patterns = (
-        r"<@{me}>[\s]+(?:score|leader)[\s]*board(?P<all_boards>s){{0,1}}$",
-        r"<@{me}>[\s]+(?:score|leader)[\s]*board (?P<range>weekly|monthly) (?P<user_date>[0-9]{{8}})",
-        r"<@{me}>[\s]+(?:score|leader)[\s]*board (?P<range>weekly|monthly|all time|alltime|all|everything)",
+        r"<@{me}>[\s]+(?:score|leader)[\s]*board(?P<all_boards>s){0,1}$",
+        (
+            r"<@{me}>[\s]+(?:score|leader)[\s]*board "
+            r"(?P<range>weekly|monthly) (?P<user_date>[0-9]{8})"
+        ),
+        (
+            r"<@{me}>[\s]+(?:score|leader)[\s]*board "
+            r"(?P<range>weekly|monthly|all time|alltime|all|everything)"
+        ),
     )
 
     examples = [
@@ -58,10 +63,7 @@ class ScoreboardCommand(BaseCommand):
         self.logger.debug("Getting a %s scoreboard", time_unit)
 
         if time_unit == TimeUnit.ALL_TIME:
-            return [
-                (b, c)
-                for (a, b, c) in self.scorekeeper.scoreboard(self.args["channel"])
-            ], None
+            return [(b, c) for (a, b, c) in self.scorekeeper.scoreboard(self.args["channel"])], None
 
         history = self.scorekeeper.history_all(self.args["channel"])
         scoreboard = ScoreboardAnalytics(history)

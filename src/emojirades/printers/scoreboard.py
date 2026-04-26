@@ -6,9 +6,7 @@ from emojirades.analytics.time_unit import TimeUnit
 
 
 class ScoreboardPrinter:
-    def __init__(
-        self, data, slack, time_unit: TimeUnit, parsed_date: datetime.datetime
-    ):
+    def __init__(self, data, slack, time_unit: TimeUnit, parsed_date: datetime.datetime):
         self.scoreboard = data
         self.slack = slack
         self.time_unit = time_unit
@@ -20,12 +18,8 @@ class ScoreboardPrinter:
         date_range = ""
 
         if self.time_unit in [TimeUnit.WEEKLY, TimeUnit.MONTHLY]:
-            start = TimeRange.get_start_date(self.parsed_date, self.time_unit).strftime(
-                "%Y-%m-%d"
-            )
-            end = TimeRange.get_end_date(self.parsed_date, self.time_unit).strftime(
-                "%Y-%m-%d"
-            )
+            start = TimeRange.get_start_date(self.parsed_date, self.time_unit).strftime("%Y-%m-%d")
+            end = TimeRange.get_end_date(self.parsed_date, self.time_unit).strftime("%Y-%m-%d")
             date_range = f"({start} - {end})"
 
         return date_range

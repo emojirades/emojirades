@@ -1,8 +1,8 @@
 import json
 
-from sqlalchemy import select, delete, desc, or_
+from sqlalchemy import delete, desc, or_, select
 
-from ..models import GamestateModel, GamestateHistoryModel, GamestateStep
+from ..models import GamestateHistoryModel, GamestateModel, GamestateStep
 
 
 class GamestateDB:
@@ -174,9 +174,7 @@ class GamestateDB:
 
         result = self.session.execute(stmt).fetchall()
 
-        gamestate_history = [
-            (row.user_id, row.timestamp, row.operation) for row in result
-        ]
+        gamestate_history = [(row.user_id, row.timestamp, row.operation) for row in result]
 
         self.history_cache[channel] = gamestate_history
 

@@ -1,16 +1,16 @@
-import logging
-import pytest
 import json
+import logging
 import time
 
+import pytest
+
+from emojirades.bot import EmojiradesBot, configure_parent_logger
+from emojirades.gamestate import Gamestate
 from emojirades.persistence import get_session_factory
 from emojirades.scorekeeper import Scorekeeper
-from emojirades.gamestate import Gamestate
-from emojirades.bot import EmojiradesBot, configure_parent_logger
-
 from tests.slack import (
-    setup_mock_web_api_server,
     cleanup_mock_web_api_server,
+    setup_mock_web_api_server,
 )
 
 
@@ -48,18 +48,10 @@ class TestBot:
         print(f"Previous Winner: {self.gamestate.winners(self.config.channel)[0]}")
         print(f"Current Winner: {self.gamestate.winners(self.config.channel)[1]}")
 
-        print(
-            f"Player 1: {self.scorekeeper.user_score(self.config.channel, self.config.player_1)}"
-        )
-        print(
-            f"Player 2: {self.scorekeeper.user_score(self.config.channel, self.config.player_2)}"
-        )
-        print(
-            f"Player 3: {self.scorekeeper.user_score(self.config.channel, self.config.player_3)}"
-        )
-        print(
-            f"Player 4: {self.scorekeeper.user_score(self.config.channel, self.config.player_4)}"
-        )
+        print(f"Player 1: {self.scorekeeper.user_score(self.config.channel, self.config.player_1)}")
+        print(f"Player 2: {self.scorekeeper.user_score(self.config.channel, self.config.player_2)}")
+        print(f"Player 3: {self.scorekeeper.user_score(self.config.channel, self.config.player_3)}")
+        print(f"Player 4: {self.scorekeeper.user_score(self.config.channel, self.config.player_4)}")
         print("-" * 20)
 
     def reset_and_transition_to(self, state, delete=True):

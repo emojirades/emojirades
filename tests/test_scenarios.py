@@ -1,10 +1,10 @@
-import time
 import re
+import time
 
-from emojirades.persistence import GamestateStep
 from emojirades.commands.gamestate_commands.correct_guess_command import (
     CorrectGuessCommand,
 )
+from emojirades.persistence import GamestateStep
 
 
 class TestBotScenarios:
@@ -59,9 +59,7 @@ class TestBotScenarios:
         assert bot.get_xyz("current_winner") == bot.config.player_3
         assert bot.get_xyz("emojirade") is None
         assert bot.get_xyz("raw_emojirade") is None
-        assert bot.scorekeeper.scoreboard(bot.config.channel) == [
-            (1, bot.config.player_3, 1)
-        ]
+        assert bot.scorekeeper.scoreboard(bot.config.channel) == [(1, bot.config.player_3, 1)]
 
     def test_valid_manually_awarded_complete_game(self, slack_web_api, bot):
         """Performs a complete valid round but the win is manually awarded"""
@@ -110,9 +108,7 @@ class TestBotScenarios:
         assert bot.get_xyz("current_winner") == bot.config.player_3
         assert bot.get_xyz("emojirade") is None
         assert bot.get_xyz("raw_emojirade") is None
-        assert bot.scorekeeper.scoreboard(bot.config.channel) == [
-            (1, bot.config.player_3, 1)
-        ]
+        assert bot.scorekeeper.scoreboard(bot.config.channel) == [(1, bot.config.player_3, 1)]
 
     def test_valid_responses(self, slack_web_api, bot):
         """
@@ -248,10 +244,7 @@ class TestBotScenarios:
             assert channel == slack_web_api.responses[total_responses + i][0]
 
             if isinstance(msg, list):
-                assert any(
-                    j.match(slack_web_api.responses[total_responses + i][1])
-                    for j in msg
-                )
+                assert any(j.match(slack_web_api.responses[total_responses + i][1]) for j in msg)
             else:
                 assert msg.match(slack_web_api.responses[total_responses + i][1])
 
@@ -479,10 +472,7 @@ class TestBotScenarios:
 
         assert bot.step == GamestateStep.PROVIDED
         assert bot.get_xyz("emojirade") == '["space the final frontier"]'
-        assert (
-            bot.get_xyz("raw_emojirade").encode().decode("unicode-escape")
-            == f'["{raw_rade}"]'
-        )
+        assert bot.get_xyz("raw_emojirade").encode().decode("unicode-escape") == f'["{raw_rade}"]'
 
     def test_emoji_detection(self, slack_web_api, bot):
         """Performs tests to ensure when an emoji is posted the game progresses in state"""

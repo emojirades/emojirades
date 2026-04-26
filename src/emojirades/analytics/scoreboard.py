@@ -2,13 +2,11 @@
 import datetime
 import logging
 import math
-
 from collections import defaultdict
 
-
-from emojirades.helpers import ensure_utc
 from emojirades.analytics.time_range import TimeRange
 from emojirades.analytics.time_unit import TimeUnit
+from emojirades.helpers import ensure_utc
 
 
 class ScoreboardAnalytics:
@@ -107,9 +105,7 @@ class ScoreboardAnalytics:
 
         # Get events from checkpoint to end_time
         cursor = affected_row_index + 1
-        while (
-            cursor <= (self.len - 1) and self.history[cursor]["timestamp"] <= end_time
-        ):
+        while cursor <= (self.len - 1) and self.history[cursor]["timestamp"] <= end_time:
             results.append(self.history[cursor])
             cursor += 1
 
@@ -142,9 +138,7 @@ class ScoreboardAnalytics:
         start_time = ensure_utc(TimeRange.get_start_date(of_date, time_unit))
         end_time = ensure_utc(TimeRange.get_end_date(of_date, time_unit))
 
-        self.logger.debug(
-            "Getting %s date range from %s => %s", time_unit, start_time, end_time
-        )
+        self.logger.debug("Getting %s date range from %s => %s", time_unit, start_time, end_time)
 
         return self.calculate_score(self.get_data(start_time, end_time))
 

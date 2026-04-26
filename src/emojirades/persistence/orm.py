@@ -3,18 +3,17 @@ import json
 import os
 import threading
 
+from alembic import command
+from alembic.config import Config
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-from alembic.config import Config
-from alembic import command
-
 from .models import (
-    GamestateModel,
     GamestateHistoryModel,
-    ScoreboardModel,
-    ScoreboardHistoryModel,
+    GamestateModel,
     GamestateStep,
+    ScoreboardHistoryModel,
+    ScoreboardModel,
 )
 
 _engines = {}

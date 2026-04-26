@@ -1,13 +1,12 @@
 import datetime
-
+import json
 from zoneinfo import ZoneInfo
 
-from emojirades.analytics.scoreboard import ScoreboardAnalytics
-
 import pytest
-import json
 
+from emojirades.analytics.scoreboard import ScoreboardAnalytics
 from emojirades.analytics.time_unit import TimeUnit
+
 from .file_fixture import FileFixture
 
 

@@ -1,9 +1,15 @@
-from .scorekeeper import (
-    ScoreboardModel as ScoreboardModel,
-    ScoreboardHistoryModel as ScoreboardHistoryModel,
+from .gamestate import (
+    GamestateHistoryModel as GamestateHistoryModel,
 )
 from .gamestate import (
     GamestateModel as GamestateModel,
-    GamestateHistoryModel as GamestateHistoryModel,
+)
+from .gamestate import (
     GamestateStep as GamestateStep,
+)
+from .scorekeeper import (
+    ScoreboardHistoryModel as ScoreboardHistoryModel,
+)
+from .scorekeeper import (
+    ScoreboardModel as ScoreboardModel,
 )

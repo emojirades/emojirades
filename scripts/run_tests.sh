@@ -8,5 +8,4 @@ WS_PID=$!
 trap "kill ${WS_PID}" EXIT
 
 # Run tests using the dev environment
-export PYTHONPATH=src
 uv run --extra dev python -m pytest

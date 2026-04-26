@@ -1,6 +1,6 @@
-from sqlalchemy import select, delete, asc, desc
+from sqlalchemy import asc, delete, desc, select
 
-from ..models import ScoreboardModel, ScoreboardHistoryModel
+from ..models import ScoreboardHistoryModel, ScoreboardModel
 
 
 class ScorekeeperDB:
@@ -137,8 +137,7 @@ class ScorekeeperDB:
 
         result = self.session.execute(stmt).fetchall()
         scoreboard = [
-            (pos, row[0].user_id, row[0].score)
-            for pos, row in enumerate(result, start=1)
+            (pos, row[0].user_id, row[0].score) for pos, row in enumerate(result, start=1)
         ]
 
         if self.caching:

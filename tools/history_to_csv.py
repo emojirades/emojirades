@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 
+import csv
+import json
 from datetime import datetime
 from zoneinfo import ZoneInfo
-
-import json
-import csv
 
 tz = ZoneInfo("Australia/Melbourne")
 history_filename = "emojirades/tests/fixtures/history.json"

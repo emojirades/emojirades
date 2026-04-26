@@ -39,7 +39,6 @@ dependencies = [
 dev = [
     "pre-commit~=4.6.0",
     "pytest~=9.0.2",
-    "black>=26.1,<26.4",
     "ruff~=0.15.2",
     "websockets~=16.0",
 ]
@@ -62,3 +61,36 @@ exclude = ["tests*"]
 
 [tool.setuptools.package-data]
 "*" = ["*.ini"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+exclude = [
+    "src/emojirades/persistence/models/alembic",
+]
+
+[tool.ruff.lint]
+# Enable a base set of rules (Pyflakes, pycodestyle, etc.)
+select = ["E", "F", "W", "I"]
+# Mimic the .pylintrc disables
+ignore = [
+    "D100", # missing-module-docstring
+    "D101", # missing-class-docstring
+    "D102", # missing-function-docstring
+    "D103", # missing-function-docstring
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+log_cli = true
+log_cli_level = "INFO"

@@ -1,8 +1,8 @@
 import datetime
 
-from sqlalchemy import Column, Text, Integer, Identity, Index
+from sqlalchemy import Column, Identity, Index, Integer, Text
 
-from .base import Base, AwareDateTime
+from .base import AwareDateTime, Base
 
 
 class ScoreboardModel(Base):

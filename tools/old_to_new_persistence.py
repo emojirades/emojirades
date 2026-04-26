@@ -28,9 +28,7 @@ def process_score(workspace_id, score_filename):
             )
 
         for item in channel_scores["history"]:
-            timestamp = datetime.datetime.fromtimestamp(
-                item["timestamp"], tz=datetime.timezone.utc
-            )
+            timestamp = datetime.datetime.fromtimestamp(item["timestamp"], tz=datetime.timezone.utc)
 
             if item["operation"].startswith("Manually"):
                 operation = "set"
@@ -54,9 +52,7 @@ def process_score(workspace_id, score_filename):
     with open(f"{score_filename}.processed_scores", "wt") as new_scores_file:
         json.dump(new_scores, new_scores_file, indent=4, sort_keys=True)
 
-    with open(
-        f"{score_filename}.processed_score_history", "wt"
-    ) as new_score_history_file:
+    with open(f"{score_filename}.processed_score_history", "wt") as new_score_history_file:
         json.dump(new_score_history, new_score_history_file, indent=4, sort_keys=True)
 
 
@@ -79,9 +75,7 @@ def process_state(workspace_id, state_filename):
                 "current_winner": channel_state["winner"],
                 "previous_winner": channel_state["old_winner"],
                 "emojirade": (
-                    json.dumps(channel_state["emojirade"])
-                    if channel_state["emojirade"]
-                    else None
+                    json.dumps(channel_state["emojirade"]) if channel_state["emojirade"] else None
                 ),
                 "raw_emojirade": (
                     json.dumps(channel_state["raw_emojirade"])

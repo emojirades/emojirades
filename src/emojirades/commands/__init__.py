@@ -1,7 +1,6 @@
-from abc import ABC
-
 import logging
 import re
+from abc import ABC
 from functools import lru_cache
 
 from emojirades.slack.event import Event
@@ -45,9 +44,7 @@ class BaseCommand(ABC):
         # Perform the command's actual match
         for pattern_raw in self.patterns:
             pattern_str = (
-                pattern_raw.format(me=self.slack.bot_id)
-                if "{me}" in pattern_raw
-                else pattern_raw
+                pattern_raw.format(me=self.slack.bot_id) if "{me}" in pattern_raw else pattern_raw
             )
 
             pattern = get_compiled_pattern(pattern_str)

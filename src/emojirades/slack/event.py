@@ -1,4 +1,5 @@
 import re
+
 from emojirades.slack.slack_client import SlackClient
 
 
@@ -84,15 +85,14 @@ class Event:
                     channel_override_match.groupdict()["override_cmd"], ""
                 )
 
-        # Only check for user override if the user is an admin in the (potentially overridden) channel
+        # Only check for user override if the user is an admin in the (potentially
+        # overridden) channel
         if self.is_game_channel and gamestate.is_admin(self.channel, original_user):
             user_override_match = self.user_override_regex.match(self.text)
 
             if user_override_match:
                 self.player_id = user_override_match.groupdict()["user_override"]
-                self.text = self.text.replace(
-                    user_override_match.groupdict()["override_cmd"], ""
-                )
+                self.text = self.text.replace(user_override_match.groupdict()["override_cmd"], "")
 
     @property
     def is_game_channel(self):

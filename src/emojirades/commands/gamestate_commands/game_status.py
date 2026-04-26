@@ -1,5 +1,4 @@
 from emojirades.commands import BaseCommand
-
 from emojirades.persistence import GamestateStep
 
 

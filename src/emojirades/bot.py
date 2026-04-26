@@ -1,26 +1,25 @@
+import json
 import logging
 import sys
 import time
 import traceback
-import json
 
 import boto3
-
 from pythonjsonlogger import json as jsonlogger
 from slack_sdk.rtm_v2 import RTMClient
 
+from emojirades.commands import BaseCommand
+from emojirades.commands.registry import CommandRegistry
+from emojirades.gamestate import Gamestate
 from emojirades.persistence import (
     get_session_factory,
     get_workspace_handler,
     migrate,
     populate,
 )
-from emojirades.commands.registry import CommandRegistry
-from emojirades.slack.slack_client import SlackClient
 from emojirades.scorekeeper import Scorekeeper
-from emojirades.commands import BaseCommand
-from emojirades.gamestate import Gamestate
 from emojirades.slack.event import Event
+from emojirades.slack.slack_client import SlackClient
 
 command_registry = CommandRegistry.command_patterns()
 
@@ -80,9 +79,7 @@ class EmojiradesBot:
 
         session_factory = get_session_factory(db_uri)
         workspace = {
-            "scorekeeper": Scorekeeper(
-                session_factory, slack.workspace_id, caching=True
-            ),
+            "scorekeeper": Scorekeeper(session_factory, slack.workspace_id, caching=True),
             "gamestate": Gamestate(session_factory, slack.workspace_id, caching=True),
             "slack": slack,
             "session_factory": session_factory,
@@ -121,23 +118,17 @@ class EmojiradesBot:
                         if channel is not None:
                             channel = EmojiradesBot.decode_channel(channel, workspace)
                         else:
-                            channel = EmojiradesBot.decode_channel(
-                                event.channel, workspace
-                            )
+                            channel = EmojiradesBot.decode_channel(event.channel, workspace)
 
                         if isinstance(response, str):
                             # Plain strings are assumed as 'chat_postMessage'
-                            client.web_client.chat_postMessage(
-                                channel=channel, text=response
-                            )
+                            client.web_client.chat_postMessage(channel=channel, text=response)
                             continue
 
                         func = getattr(client.web_client, response["func"], None)
 
                         if func is None:
-                            raise RuntimeError(
-                                f"Unmapped function '{response['func']}'"
-                            )
+                            raise RuntimeError(f"Unmapped function '{response['func']}'")
 
                         args = response.get("args", [])
                         kwargs = response.get("kwargs", {})
@@ -145,10 +136,7 @@ class EmojiradesBot:
                         if kwargs.get("channel") is None:
                             kwargs["channel"] = channel
 
-                        if (
-                            response["func"] == "chat_postEphemeral"
-                            and "user" not in kwargs
-                        ):
+                        if response["func"] == "chat_postEphemeral" and "user" not in kwargs:
                             kwargs["user"] = event.player_id
 
                         func(*args, **kwargs)
@@ -182,9 +170,7 @@ class EmojiradesBot:
 
         return workspace["slack"]
 
-    def configure_workspaces(
-        self, workspaces_uri, workspace_ids, onboarding_queue, db_uri=None
-    ):
+    def configure_workspaces(self, workspaces_uri, workspace_ids, onboarding_queue, db_uri=None):
         handler = get_workspace_handler(workspaces_uri)
 
         for workspace in handler.workspaces():
@@ -233,13 +219,12 @@ class EmojiradesBot:
             return channel
 
         if channel.startswith("U"):
-            # Channel is a User ID, which means the real channel is the DM with that user
+            # Channel is a User ID, which means the real channel is the DM with that
+            # user
             dm_id = workspace["slack"].find_im(channel)
 
             if dm_id is None:
-                raise RuntimeError(
-                    f"Unable to find direct message channel for '{channel}'"
-                )
+                raise RuntimeError(f"Unable to find direct message channel for '{channel}'")
 
             return dm_id
 
@@ -271,18 +256,14 @@ class EmojiradesBot:
                 try:
                     body = json.loads(message["Body"])
                 except json.JSONDecodeError:
-                    self.logger.debug(
-                        "Onboarding message not JSON: %s", message["Body"]
-                    )
+                    self.logger.debug("Onboarding message not JSON: %s", message["Body"])
                     continue
 
                 if "workspace_id" not in body:
                     self.logger.debug("Unable to parse onboarding payload: %s", body)
                     continue
 
-                self.logger.debug(
-                    "Bot received onboarding for %s", body["workspace_id"]
-                )
+                self.logger.debug("Bot received onboarding for %s", body["workspace_id"])
 
                 workspace = handler.workspace(body["workspace_id"])
 

@@ -1,9 +1,0 @@
-[MASTER]
-ignore-paths=^src/emojirades/persistence/models/alembic/
-disable=duplicate-code
-
-[MESSAGES CONTROL]
-disable=
-    missing-module-docstring,
-    missing-class-docstring,
-    missing-function-docstring,

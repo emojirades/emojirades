@@ -1,17 +1,15 @@
 import argparse
 import logging
-import time
-import sys
 import os
+import sys
+import time
 
 from emojirades.bot import EmojiradesBot, configure_parent_logger
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-v", "--verbose", action="count", default=0, help="Logging level"
-    )
+    parser.add_argument("-v", "--verbose", action="count", default=0, help="Logging level")
     parser.add_argument("--log-file", default=sys.stderr, help="File we will log to")
 
     subparsers = parser.add_subparsers(help="Bot Mode", dest="mode")
@@ -35,9 +33,7 @@ def main():
         required="DATABASE_URI" not in os.environ,
     )
     parser_populate.add_argument("--table", help="Name of the table", required=True)
-    parser_populate.add_argument(
-        "--data-file", help="Filename we'll read from", required=True
-    )
+    parser_populate.add_argument("--data-file", help="Filename we'll read from", required=True)
 
     # Single Workspace
     parser_single = subparsers.add_parser("single", help="Single Workspace")

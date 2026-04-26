@@ -1,13 +1,11 @@
 import random
 
-from emojirades.wrappers import only_guessing
 from emojirades.commands import BaseCommand
+from emojirades.wrappers import only_guessing
 
 
 class CorrectGuessCommand(BaseCommand):
-    description = (
-        "Manually award a player the win, when automated inferrence didn't work"
-    )
+    description = "Manually award a player the win, when automated inferrence didn't work"
 
     patterns = (r"<@(?P<target_user>[0-9A-Z]+)>[\s]*\+\+",)
 
@@ -50,7 +48,7 @@ class CorrectGuessCommand(BaseCommand):
 
     custom_messages = {
         1000: "Ok {winner} just give up already, you've won the game",
-        500: ":tada::tada: Ladies and gentlemen {winner} has daym done it again :tada::tada:",
+        500: (":tada::tada: Ladies and gentlemen {winner} has daym done it again :tada::tada:"),
         400: ":trophy: This is a big milestone {winner}, you should feel proud",
         300: "Third century's the charm they say {winner}, congrats :sunglasses:",
         200: "Not going to lie {winner} this is pretty impressive",
@@ -73,7 +71,7 @@ class CorrectGuessCommand(BaseCommand):
             if self.args["user"] != current_winner:
                 yield (
                     None,
-                    "You're not the current winner, stop awarding other people the win >.>",
+                    ("You're not the current winner, stop awarding other people the win >.>"),
                 )
                 return
 
@@ -87,9 +85,7 @@ class CorrectGuessCommand(BaseCommand):
         first_emojirade = raw_emojirades.pop(0)
 
         if raw_emojirades:
-            alternatives = ", with alternatives " + " OR ".join(
-                [f"`{i}`" for i in raw_emojirades]
-            )
+            alternatives = ", with alternatives " + " OR ".join([f"`{i}`" for i in raw_emojirades])
         else:
             alternatives = ""
 
@@ -111,9 +107,7 @@ class CorrectGuessCommand(BaseCommand):
                 },
             )
 
-        emoji = random.choice(
-            self.other_emojis + self.position_emojis.get(position, [])
-        )
+        emoji = random.choice(self.other_emojis + self.position_emojis.get(position, []))
         emoji_text = f" :{emoji}:"
 
         if self.gamestate.handler.is_first_guess(channel):
@@ -138,7 +132,7 @@ class CorrectGuessCommand(BaseCommand):
 
         yield (
             None,
-            f"{prefix}, you're now at {score} point{'s' if score > 1 else ''}{emoji_text}",
+            (f"{prefix}, you're now at {score} point{'s' if score > 1 else ''}{emoji_text}"),
         )
 
         yield (None, f"The correct emojirade was `{first_emojirade}`{alternatives}")

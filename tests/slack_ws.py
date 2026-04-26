@@ -3,8 +3,8 @@
 
 import asyncio
 
-from websockets.exceptions import ConnectionClosed
 from websockets import serve
+from websockets.exceptions import ConnectionClosed
 
 # logger = logging.getLogger("websockets.server")
 # logger.setLevel(logging.DEBUG)

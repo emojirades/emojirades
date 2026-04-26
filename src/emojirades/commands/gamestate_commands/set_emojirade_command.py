@@ -1,8 +1,8 @@
 import random
 
-from emojirades.wrappers import only_in_progress, only_as_direct_message
 from emojirades.checks import emojirade_is_banned
 from emojirades.commands import BaseCommand
+from emojirades.wrappers import only_as_direct_message, only_in_progress
 
 
 class SetEmojiradeCommand(BaseCommand):
@@ -62,9 +62,7 @@ class SetEmojiradeCommand(BaseCommand):
             return
 
         # Break the alternatives out, ignoring non-truthy items (empty)
-        raw_emojirades = [
-            i.strip() for i in self.args["emojirade"].split("|") if i.strip()
-        ]
+        raw_emojirades = [i.strip() for i in self.args["emojirade"].split("|") if i.strip()]
 
         self.gamestate.set_emojirade(channel, raw_emojirades, user)
 
