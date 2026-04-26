@@ -23,9 +23,15 @@ ENV PYTHONUNBUFFERED=1
 # Copy the built wheel from the builder stage
 COPY --from=builder /dist/*.whl /tmp/
 
-# Install the wheel using pip. We use --no-cache-dir to keep the image small.
-# The dependencies are automatically resolved and installed from the wheel.
+# Copy Alembic migrations
+COPY --from=builder /app/alembic.ini /app/alembic.ini
+COPY --from=builder /app/migrations /app/migrations
+
+# Install the wheel using pip
 RUN pip install --no-cache-dir /tmp/*.whl && rm /tmp/*.whl
 
-# Set the entrypoint to the console script defined in pyproject.toml
+# Set the working directory to where alembic.ini is
+WORKDIR /app
+
+# Set the entrypoint
 ENTRYPOINT ["emojirades"]

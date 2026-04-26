@@ -1,18 +1,24 @@
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
-
 from alembic import context
+from sqlalchemy import engine_from_config, pool
 
-from emojirades.persistence.models.base import Base
+from emojirades.persistence.models import (
+    GamestateHistoryModel as GamestateHistoryModel,
+)
 from emojirades.persistence.models import (
     GamestateModel as GamestateModel,
-    GamestateHistoryModel as GamestateHistoryModel,
+)
+from emojirades.persistence.models import (
     GamestateStep as GamestateStep,
-    ScoreboardModel as ScoreboardModel,
+)
+from emojirades.persistence.models import (
     ScoreboardHistoryModel as ScoreboardHistoryModel,
 )
+from emojirades.persistence.models import (
+    ScoreboardModel as ScoreboardModel,
+)
+from emojirades.persistence.models.base import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

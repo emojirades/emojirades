@@ -76,8 +76,7 @@ We use Alembic for database migrations.
 uv run emojirades init
 
 # Generate a new migration (after modifying models)
-export PYTHONPATH=src
-cd src/emojirades/persistence/models
+# This can now be run directly from the root
 uv run alembic revision --autogenerate -m "description of changes"
 ```
 
