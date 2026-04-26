@@ -32,22 +32,12 @@ def get_session_factory(db_uri):
     return scoped_session(sessionmaker(bind=get_engine(db_uri)))
 
 
-def discover_root():
-    return os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+def discover_migration_ini():
+    return os.path.join(os.path.dirname(__file__), "alembic.ini")
 
 
-def discover_migration_ini(base=None):
-    if base is None:
-        base = discover_root()
-
-    return os.path.join(base, "alembic.ini")
-
-
-def discover_migration_dir(base=None):
-    if base is None:
-        base = discover_root()
-
-    return os.path.join(base, "migrations")
+def discover_migration_dir():
+    return os.path.join(os.path.dirname(__file__), "migrations")
 
 
 def migrate(db_uri, migration_ini=None, migration_dir=None):

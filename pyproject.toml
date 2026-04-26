@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools>=65.6.3", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build_meta"
 
 [project]
 name = "emojirades"
@@ -49,18 +49,16 @@ Homepage = "https://github.com/emojirades/emojirades"
 [project.scripts]
 emojirades = "emojirades.cli:main"
 
-[tool.setuptools]
-package-dir = {"" = "src"}
+[tool.hatch.version]
+path = "src/emojirades/__init__.py"
 
-[tool.setuptools.dynamic]
-version = {attr = "emojirades.VERSION"}
+[tool.hatch.build.targets.wheel]
+packages = ["src/emojirades"]
 
-[tool.setuptools.packages.find]
-where = ["src"]
-exclude = ["tests*"]
-
-[tool.setuptools.package-data]
-"*" = ["*.ini"]
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src/emojirades",
+]
 
 [tool.ruff]
 line-length = 100

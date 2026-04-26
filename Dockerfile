@@ -23,14 +23,10 @@ ENV PYTHONUNBUFFERED=1
 # Copy the built wheel from the builder stage
 COPY --from=builder /dist/*.whl /tmp/
 
-# Copy Alembic migrations
-COPY --from=builder /app/alembic.ini /app/alembic.ini
-COPY --from=builder /app/migrations /app/migrations
-
 # Install the wheel using pip
 RUN pip install --no-cache-dir /tmp/*.whl && rm /tmp/*.whl
 
-# Set the working directory to where alembic.ini is
+# Set the working directory
 WORKDIR /app
 
 # Set the entrypoint
