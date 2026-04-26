@@ -1,9 +1,15 @@
 import datetime
 
 from sqlalchemy import DateTime, TypeDecorator
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import DeclarativeBase
 
-Base = declarative_base()
+
+class Base(DeclarativeBase):
+    """
+    Modern SQLAlchemy 2.0 Declarative Base.
+    """
+
+    pass
 
 
 class AwareDateTime(TypeDecorator):

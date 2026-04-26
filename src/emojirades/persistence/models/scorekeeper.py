@@ -1,58 +1,55 @@
 import datetime
+from typing import Optional
 
-from sqlalchemy import Column, Identity, Index, Integer, Text
+from sqlalchemy import Identity, Integer, Text
+from sqlalchemy.orm import Mapped, mapped_column
 
 from .base import AwareDateTime, Base
 
 
 class ScoreboardModel(Base):
-    # pylint: disable=too-few-public-methods
     __tablename__ = "scoreboard"
 
-    workspace_id = Column(Text, primary_key=True)
-    channel_id = Column(Text, primary_key=True)
-    user_id = Column(Text, primary_key=True)
+    workspace_id: Mapped[str] = mapped_column(Text, primary_key=True, autoincrement=False)
+    channel_id: Mapped[str] = mapped_column(Text, primary_key=True, autoincrement=False)
+    user_id: Mapped[str] = mapped_column(Text, primary_key=True, autoincrement=False)
 
-    score = Column(Integer, nullable=False, default=0)
+    score: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
-    last_updated = Column(
+    last_updated: Mapped[datetime.datetime] = mapped_column(
         AwareDateTime,
         nullable=False,
         default=lambda: datetime.datetime.now(datetime.timezone.utc),
         onupdate=lambda: datetime.datetime.now(datetime.timezone.utc),
     )
 
-    Index("idx_scoreboard_channel", "workspace_id", "channel_id", unique=True)
-
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
-            f"ScoreboardModel(w_id={self.workspace_id!r}, c_id={self.channel_id!r}, "
-            f"u_id={self.user_id!r}, score={self.score!r})"
+            f"ScoreboardModel(workspace_id={self.workspace_id!r}, "
+            f"channel_id={self.channel_id!r}, user_id={self.user_id!r}, "
+            f"score={self.score!r})"
         )
 
 
 class ScoreboardHistoryModel(Base):
-    # pylint: disable=too-few-public-methods
     __tablename__ = "scoreboard_history"
 
-    event_id = Column(Integer, Identity(), primary_key=True)
+    event_id: Mapped[int] = mapped_column(Identity(), primary_key=True)
 
-    workspace_id = Column(Text)
-    channel_id = Column(Text)
-    user_id = Column(Text)
+    workspace_id: Mapped[Optional[str]] = mapped_column(Text)
+    channel_id: Mapped[Optional[str]] = mapped_column(Text)
+    user_id: Mapped[Optional[str]] = mapped_column(Text)
 
-    timestamp = Column(
+    timestamp: Mapped[datetime.datetime] = mapped_column(
         AwareDateTime,
         nullable=False,
         default=lambda: datetime.datetime.now(datetime.timezone.utc),
     )
-    operation = Column(Text, nullable=False)
+    operation: Mapped[str] = mapped_column(Text, nullable=False)
 
-    Index("idx_scoreboard_history_channel", "workspace_id", "channel_id")
-
-    def __repr__(self):
+    def __repr__(self) -> str:
         return (
             f"ScoreboardHistoryModel(w_id={self.workspace_id!r}, "
             f"c_id={self.channel_id!r}, u_id={self.user_id!r}, "
-            f"op={self.operation!r})"
+            f"operation={self.operation!r})"
         )
