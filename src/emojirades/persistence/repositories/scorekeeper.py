@@ -21,7 +21,11 @@ class ScorekeeperRepository:
 
     def clear_cache(self, channel):
         self.scoreboard_cache.pop(channel, None)
-        self.history_cache.pop(channel, None)
+        self.history_cache = {
+            k: v
+            for k, v in self.history_cache.items()
+            if not (isinstance(k, tuple) and k[0] == channel)
+        }
 
     def delete(self, iknowwhatimdoing=False):
         if not iknowwhatimdoing:
