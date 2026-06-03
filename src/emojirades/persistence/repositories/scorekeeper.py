@@ -119,34 +119,34 @@ class ScorekeeperRepository:
             limit = self.SCOREBOARD_LIMIT
 
         if scoreboard := self.scoreboard_cache.get(channel):
-            return scoreboard
+            pass
+        else:
+            stmt = (
+                select(ScoreboardModel)
+                .where(
+                    ScoreboardModel.workspace_id == self.workspace_id,
+                    ScoreboardModel.channel_id == channel,
+                )
+                .order_by(
+                    desc(ScoreboardModel.score),
+                )
+            )
 
-        stmt = (
-            select(ScoreboardModel)
-            .where(
-                ScoreboardModel.workspace_id == self.workspace_id,
-                ScoreboardModel.channel_id == channel,
-            )
-            .order_by(
-                desc(ScoreboardModel.score),
-            )
-        )
+            result = self.session.execute(stmt).fetchall()
+            scoreboard = [
+                (pos, row[0].user_id, row[0].score) for pos, row in enumerate(result, start=1)
+            ]
+
+            if self.caching:
+                self.scoreboard_cache[channel] = scoreboard
 
         if limit:
-            stmt = stmt.limit(limit)
-
-        result = self.session.execute(stmt).fetchall()
-        scoreboard = [
-            (pos, row[0].user_id, row[0].score) for pos, row in enumerate(result, start=1)
-        ]
-
-        if self.caching:
-            self.scoreboard_cache[channel] = scoreboard
+            return scoreboard[:limit]
 
         return scoreboard
 
     def position_on_scoreboard(self, channel, user):
-        scoreboard = self.get_scoreboard(channel)
+        scoreboard = self.get_scoreboard(channel, limit=0)
 
         for pos, user_id, score in scoreboard:
             if user_id == user:

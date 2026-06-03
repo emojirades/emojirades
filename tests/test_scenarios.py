@@ -611,3 +611,19 @@ class TestBotScenarios:
 
         # Edit event should not trigger the transition
         assert bot.step == GamestateStep.GUESSING
+
+    def test_scoreboard_limit_crash_prevention(self, slack_web_api, bot):
+        """Ensures that having >15 players on the scoreboard doesn't cause a crash when a low-score player guesses correctly"""
+        # Give 16 dummy players a score of 10
+        for i in range(16):
+            bot.scorekeeper.overwrite(bot.config.channel, f"U9{i:07d}", 10)
+        bot.commit()
+
+        # Transition to guessing without deleting our scores
+        bot.reset_and_transition_to("guessing", delete=False)
+
+        # Send correct guess from player_3
+        bot.send(bot.events.correct_guess)
+
+        # Assert that the game transitioned back to WAITING step
+        assert bot.step == GamestateStep.WAITING
