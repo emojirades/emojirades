@@ -1,4 +1,5 @@
 import json
+import threading
 
 from sqlalchemy import delete, desc, or_, select
 
@@ -13,6 +14,7 @@ class GamestateRepository:
         self.workspace_id = workspace_id
         self.caching = caching
 
+        self.lock = threading.Lock()
         self.gamestate_cache = {}
         self.history_cache = {}
 
@@ -21,15 +23,17 @@ class GamestateRepository:
         return self.session_factory()
 
     def clear_cache(self, channel):
-        self.gamestate_cache.pop(channel, None)
-        self.history_cache.pop(channel, None)
+        with self.lock:
+            self.gamestate_cache.pop(channel, None)
+            self.history_cache.pop(channel, None)
 
     def delete(self, iknowwhatimdoing=False):
         if not iknowwhatimdoing:
             return
 
-        self.gamestate_cache = {}
-        self.history_cache = {}
+        with self.lock:
+            self.gamestate_cache = {}
+            self.history_cache = {}
 
         self.session.execute(delete(GamestateHistoryModel))
         self.session.execute(delete(GamestateModel))
@@ -151,34 +155,35 @@ class GamestateRepository:
         if limit is None:
             limit = self.HISTORY_LIMIT
 
-        if history := self.history_cache.get(channel):
-            return history
+        with self.lock:
+            if history := self.history_cache.get(channel):
+                return history
 
-        stmt = (
-            select(
-                GamestateHistoryModel.user_id,
-                GamestateHistoryModel.timestamp,
-                GamestateHistoryModel.operation,
+            stmt = (
+                select(
+                    GamestateHistoryModel.user_id,
+                    GamestateHistoryModel.timestamp,
+                    GamestateHistoryModel.operation,
+                )
+                .where(
+                    GamestateHistoryModel.workspace_id == self.workspace_id,
+                    GamestateHistoryModel.channel_id == channel,
+                )
+                .order_by(
+                    desc(GamestateHistoryModel.timestamp),
+                )
             )
-            .where(
-                GamestateHistoryModel.workspace_id == self.workspace_id,
-                GamestateHistoryModel.channel_id == channel,
-            )
-            .order_by(
-                desc(GamestateHistoryModel.timestamp),
-            )
-        )
 
-        if limit:
-            stmt = stmt.limit(limit)
+            if limit:
+                stmt = stmt.limit(limit)
 
-        result = self.session.execute(stmt).fetchall()
+            result = self.session.execute(stmt).fetchall()
 
-        gamestate_history = [(row.user_id, row.timestamp, row.operation) for row in result]
+            gamestate_history = [(row.user_id, row.timestamp, row.operation) for row in result]
 
-        self.history_cache[channel] = gamestate_history
+            self.history_cache[channel] = gamestate_history
 
-        return gamestate_history
+            return gamestate_history
 
     def get_channels(self):
         stmt = select(

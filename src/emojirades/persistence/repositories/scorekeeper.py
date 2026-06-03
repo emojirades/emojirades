@@ -1,3 +1,5 @@
+import threading
+
 from sqlalchemy import asc, delete, desc, select
 
 from ..models import ScoreboardHistoryModel, ScoreboardModel
@@ -12,6 +14,7 @@ class ScorekeeperRepository:
         self.workspace_id = workspace_id
         self.caching = caching
 
+        self.lock = threading.Lock()
         self.scoreboard_cache = {}
         self.history_cache = {}
 
@@ -20,19 +23,21 @@ class ScorekeeperRepository:
         return self.session_factory()
 
     def clear_cache(self, channel):
-        self.scoreboard_cache.pop(channel, None)
-        self.history_cache = {
-            k: v
-            for k, v in self.history_cache.items()
-            if not (isinstance(k, tuple) and k[0] == channel)
-        }
+        with self.lock:
+            self.scoreboard_cache.pop(channel, None)
+            self.history_cache = {
+                k: v
+                for k, v in self.history_cache.items()
+                if not (isinstance(k, tuple) and k[0] == channel)
+            }
 
     def delete(self, iknowwhatimdoing=False):
         if not iknowwhatimdoing:
             return
 
-        self.scoreboard_cache = {}
-        self.history_cache = {}
+        with self.lock:
+            self.scoreboard_cache = {}
+            self.history_cache = {}
 
         self.session.execute(delete(ScoreboardHistoryModel))
         self.session.execute(delete(ScoreboardModel))
@@ -122,27 +127,28 @@ class ScorekeeperRepository:
         if limit is None:
             limit = self.SCOREBOARD_LIMIT
 
-        if scoreboard := self.scoreboard_cache.get(channel):
-            pass
-        else:
-            stmt = (
-                select(ScoreboardModel)
-                .where(
-                    ScoreboardModel.workspace_id == self.workspace_id,
-                    ScoreboardModel.channel_id == channel,
+        with self.lock:
+            if scoreboard := self.scoreboard_cache.get(channel):
+                pass
+            else:
+                stmt = (
+                    select(ScoreboardModel)
+                    .where(
+                        ScoreboardModel.workspace_id == self.workspace_id,
+                        ScoreboardModel.channel_id == channel,
+                    )
+                    .order_by(
+                        desc(ScoreboardModel.score),
+                    )
                 )
-                .order_by(
-                    desc(ScoreboardModel.score),
-                )
-            )
 
-            result = self.session.execute(stmt).fetchall()
-            scoreboard = [
-                (pos, row[0].user_id, row[0].score) for pos, row in enumerate(result, start=1)
-            ]
+                result = self.session.execute(stmt).fetchall()
+                scoreboard = [
+                    (pos, row[0].user_id, row[0].score) for pos, row in enumerate(result, start=1)
+                ]
 
-            if self.caching:
-                self.scoreboard_cache[channel] = scoreboard
+                if self.caching:
+                    self.scoreboard_cache[channel] = scoreboard
 
         if limit:
             return scoreboard[:limit]
@@ -164,39 +170,40 @@ class ScorekeeperRepository:
 
         cache_key = (channel, user, limit, order_by)
 
-        if history := self.history_cache.get(cache_key):
-            return history
+        with self.lock:
+            if history := self.history_cache.get(cache_key):
+                return history
 
-        stmt = select(ScoreboardHistoryModel).where(
-            ScoreboardHistoryModel.workspace_id == self.workspace_id,
-            ScoreboardHistoryModel.channel_id == channel,
-        )
-
-        if user is not None:
-            stmt = stmt.where(
-                ScoreboardHistoryModel.user_id == user,
+            stmt = select(ScoreboardHistoryModel).where(
+                ScoreboardHistoryModel.workspace_id == self.workspace_id,
+                ScoreboardHistoryModel.channel_id == channel,
             )
 
-        if order_by == "asc":
-            stmt = stmt.order_by(asc(ScoreboardHistoryModel.timestamp))
-        elif order_by == "desc":
-            stmt = stmt.order_by(desc(ScoreboardHistoryModel.timestamp))
+            if user is not None:
+                stmt = stmt.where(
+                    ScoreboardHistoryModel.user_id == user,
+                )
 
-        if limit:
-            stmt = stmt.limit(limit)
+            if order_by == "asc":
+                stmt = stmt.order_by(asc(ScoreboardHistoryModel.timestamp))
+            elif order_by == "desc":
+                stmt = stmt.order_by(desc(ScoreboardHistoryModel.timestamp))
 
-        result = self.session.execute(stmt).fetchall()
+            if limit:
+                stmt = stmt.limit(limit)
 
-        scorekeeper_history = [
-            {
-                "user_id": row[0].user_id,
-                "timestamp": row[0].timestamp,
-                "operation": row[0].operation,
-            }
-            for row in result
-        ]
+            result = self.session.execute(stmt).fetchall()
 
-        if self.caching:
-            self.history_cache[cache_key] = scorekeeper_history
+            scorekeeper_history = [
+                {
+                    "user_id": row[0].user_id,
+                    "timestamp": row[0].timestamp,
+                    "operation": row[0].operation,
+                }
+                for row in result
+            ]
 
-        return scorekeeper_history
+            if self.caching:
+                self.history_cache[cache_key] = scorekeeper_history
+
+            return scorekeeper_history
