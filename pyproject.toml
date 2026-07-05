@@ -24,7 +24,7 @@ classifiers = [
 ]
 requires-python = ">=3.12"
 dependencies = [
-    "slack_sdk~=3.42.0",
+    "slack_sdk~=3.43.0",
     "requests>=2.34.2,<2.35.0",
     "boto3~=1.43.21",
     "Unidecode~=1.4.0",
