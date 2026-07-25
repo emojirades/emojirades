@@ -29,7 +29,7 @@ jobs:
           echo "version=${VERSION#v}" >> $GITHUB_OUTPUT
 
       - id: create_release
-        uses: softprops/action-gh-release@v3.0.1
+        uses: softprops/action-gh-release@v3.0.2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: v${{ steps.version.outputs.version }}
@@ -78,7 +78,7 @@ jobs:
           asset_name: emojirades-${{ needs.release.outputs.version }}-py3-none-any.whl
           asset_content_type: application/x-pywheel+zip
 
-      - uses: pypa/gh-action-pypi-publish@v1.14.0
+      - uses: pypa/gh-action-pypi-publish@v1.14.1
         with:
           user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }}
