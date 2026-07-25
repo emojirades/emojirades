@@ -12,6 +12,14 @@ from tests.slack import (
     cleanup_mock_web_api_server,
     setup_mock_web_api_server,
 )
+from tests.slack_ws import start_mock_ws_server, stop_mock_ws_server
+
+
+@pytest.fixture(scope="session", autouse=True)
+def slack_ws_server():
+    server_thread = start_mock_ws_server()
+    yield server_thread
+    stop_mock_ws_server(server_thread)
 
 
 class TestBot:
