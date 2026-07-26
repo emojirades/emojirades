@@ -236,7 +236,9 @@ class EmojiradesBot:
         for workspace in self.workspaces.values():
             workspace["slack"].start(blocking=blocking)
 
-    def listen_for_onboarding(self, workspaces_uri, db_uri=None, blocking=True):
+    def listen_for_onboarding(
+        self, workspaces_uri, db_uri=None, blocking=True, wait_time_seconds=20
+    ):
         sqs = boto3.client("sqs")
 
         response = sqs.get_queue_url(QueueName=self.onboarding_queue)
@@ -244,13 +246,13 @@ class EmojiradesBot:
 
         repository = get_workspace_repository(workspaces_uri)
 
-        if blocking:
-            oneshot = False
-        else:
-            oneshot = True
+        oneshot = not blocking
 
-        while not oneshot:
-            response = sqs.receive_message(QueueUrl=queue_url)
+        while True:
+            response = sqs.receive_message(
+                QueueUrl=queue_url,
+                WaitTimeSeconds=wait_time_seconds,
+            )
 
             for message in response.get("Messages", []):
                 try:
@@ -284,4 +286,5 @@ class EmojiradesBot:
                 )
                 self.logger.debug("Deleted onboarding request from SQS Queue")
 
-            time.sleep(60)
+            if oneshot:
+                break
