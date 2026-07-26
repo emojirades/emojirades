@@ -62,6 +62,9 @@ class GamestateRepository:
         return self.session.execute(stmt)
 
     def get_gamestate(self, channel):
+        if channel is None:
+            return None
+
         # session.get handles both local (identity map) and database lookups
         # It's more robust than manual caching with merge for composite PKs
         gamestate = self.session.get(GamestateModel, (self.workspace_id, channel))
@@ -80,7 +83,12 @@ class GamestateRepository:
         return gamestate
 
     def get_xyz(self, channel, xyz):
+        if channel is None:
+            return None
+
         gamestate = self.get_gamestate(channel)
+        if gamestate is None:
+            return None
 
         return getattr(gamestate, xyz)
 
