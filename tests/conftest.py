@@ -1,6 +1,7 @@
 import json
 import logging
-import time
+import shutil
+import threading
 
 import pytest
 
@@ -37,8 +38,12 @@ class TestBot:
         return self.gamestate.repository.get_xyz(self.config.channel, xyz)
 
     def send(self, event):
+        done = threading.Event()
+        ws = self.bot.workspaces.get(self.config.team)
+        if ws:
+            ws["event_processed_hook"] = lambda e: done.set()
         self.slack.rtm.send(event)
-        time.sleep(0.2)
+        done.wait(timeout=0.5)
 
     def commit(self):
         self.gamestate.repository.session.commit()
@@ -66,7 +71,6 @@ class TestBot:
         if delete:
             self.gamestate.repository.delete(iknowwhatimdoing=True)
             self.scorekeeper.repository.delete(iknowwhatimdoing=True)
-            time.sleep(0.2)
 
         if state == "waiting":
             events = [self.events.new_game]
@@ -92,10 +96,7 @@ class TestBot:
 
         for event in events:
             print(f"Replaying: {event}")
-            self.slack.rtm.send(event)
-
-            # Let the threads catch up
-            time.sleep(0.2)
+            self.send(event)
 
         # Verify after fast forward there's no dodgy channels
         gamestates = self.gamestate.repository.get_gamestates(current_workspace=False)
@@ -104,27 +105,33 @@ class TestBot:
             assert gamestate[0].channel_id[0] in ("C", "G")
 
 
-@pytest.fixture
-def slack_web_api(request, test_data):
-    config, _ = test_data
-
+@pytest.fixture(scope="session")
+def mock_web_api_server():
     class Foo:
-        def __init__(self, conf):
+        def __init__(self, conf=None):
             self.config = conf
             self.responses = []
             self.reactions = []
             self.ephemeral_responses = []
 
-    foo = Foo(config)
+    foo = Foo()
     setup_mock_web_api_server(foo)
-
     yield foo
-
     cleanup_mock_web_api_server(foo)
 
 
 @pytest.fixture
-def bot(auth_uri, db_uri, test_data):
+def slack_web_api(mock_web_api_server, test_data):
+    config, _ = test_data
+    mock_web_api_server.config = config
+    mock_web_api_server.responses.clear()
+    mock_web_api_server.reactions.clear()
+    mock_web_api_server.ephemeral_responses.clear()
+    yield mock_web_api_server
+
+
+@pytest.fixture
+def bot(auth_uri, db_uri, test_data, mock_web_api_server):
     config, events = test_data
 
     logger = configure_parent_logger(logging.DEBUG, "Emojirades")
@@ -158,7 +165,22 @@ def bot(auth_uri, db_uri, test_data):
 
     yield test_bot
 
-    test_bot.slack.rtm.close()
+    slack_client = test_bot.slack
+    rtm = getattr(slack_client, "rtm", None)
+    if rtm:
+        if rtm.current_session and rtm.current_session.sock:
+            try:
+                import socket
+
+                rtm.current_session.sock.shutdown(socket.SHUT_RDWR)
+            except Exception:
+                pass
+        rtm.close()
+        for attr in ["current_session_runner", "current_app_monitor", "message_processor"]:
+            runner = getattr(rtm, attr, None)
+            if runner and hasattr(runner, "event"):
+                runner.event.set()
+
     session.close()
 
 
@@ -177,15 +199,20 @@ def auth_uri(tmp_path, bot_token):
     return str(uri)
 
 
-@pytest.fixture
-def db_uri(tmp_path):
-    db_file = tmp_path / "emojirades.db"
-
+@pytest.fixture(scope="session")
+def template_db(tmp_path_factory):
+    db_dir = tmp_path_factory.mktemp("db")
+    db_file = db_dir / "template.db"
     db_uri = f"sqlite:///{db_file}"
-
     EmojiradesBot.init_db(db_uri)
+    return db_file
 
-    return db_uri
+
+@pytest.fixture
+def db_uri(tmp_path, template_db):
+    db_file = tmp_path / "emojirades.db"
+    shutil.copyfile(template_db, db_file)
+    return f"sqlite:///{db_file}"
 
 
 @pytest.fixture

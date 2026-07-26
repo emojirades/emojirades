@@ -92,6 +92,9 @@ class EmojiradesBot:
 
             if not event.valid():
                 client.logger.debug("Skipping event due to being invalid")
+                hook = workspace.get("event_processed_hook")
+                if hook:
+                    hook(event)
                 return
 
             # Get a per-thread session
@@ -172,6 +175,9 @@ class EmojiradesBot:
                     )
             finally:
                 session_factory.remove()
+                hook = workspace.get("event_processed_hook")
+                if hook:
+                    hook(event)
 
         workspace["slack"].rtm.on("message")(handle_event)
 

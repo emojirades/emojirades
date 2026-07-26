@@ -225,6 +225,10 @@ class MockHandler(SimpleHTTPRequestHandler):
         self._handle()
 
 
+class ReusableHTTPServer(HTTPServer):
+    allow_reuse_address = True
+
+
 class MockServerThread(threading.Thread):
     def __init__(self, test: TestCase, handler: Type[SimpleHTTPRequestHandler] = MockHandler):
         threading.Thread.__init__(self)
@@ -233,10 +237,12 @@ class MockServerThread(threading.Thread):
         self.test = test
 
     def run(self):
-        self.server = HTTPServer(("localhost", 8888), self.handler)
-        self.test.server_url = "http://localhost:8888"
-        self.test.host, self.test.port = self.server.socket.getsockname()
-        self.test.server_started.set()  # threading.Event()
+        try:
+            self.server = ReusableHTTPServer(("localhost", 8888), self.handler)
+            self.test.server_url = "http://localhost:8888"
+            self.test.host, self.test.port = self.server.socket.getsockname()
+        finally:
+            self.test.server_started.set()
 
         self.test = None
         try:
@@ -245,7 +251,8 @@ class MockServerThread(threading.Thread):
             self.server.server_close()
 
     def stop(self):
-        self.server.shutdown()
+        if hasattr(self, "server"):
+            self.server.shutdown()
         self.join()
 
 
@@ -253,7 +260,9 @@ def setup_mock_web_api_server(test: TestCase):
     test.server_started = threading.Event()
     test.thread = MockServerThread(test)
     test.thread.start()
-    test.server_started.wait()
+    test.server_started.wait(timeout=5.0)
+    if not hasattr(test.thread, "server"):
+        raise RuntimeError("Failed to start MockServerThread on port 8888")
 
 
 def cleanup_mock_web_api_server(test: TestCase):

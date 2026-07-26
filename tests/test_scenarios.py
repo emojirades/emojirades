@@ -199,7 +199,7 @@ class TestBotScenarios:
 
         # Ensure each expected reaction exists
         while not slack_web_api.reactions:
-            time.sleep(0.5)
+            time.sleep(0.005)
 
         for i, (channel, emoji, ts) in enumerate(reactions):
             assert channel == slack_web_api.reactions[total_reactions + i][0]
@@ -263,7 +263,7 @@ class TestBotScenarios:
 
         # Ensure each expected reaction exists
         while not slack_web_api.reactions:
-            time.sleep(0.5)
+            time.sleep(0.005)
 
         for i, (channel, emoji, ts) in enumerate(reactions):
             assert channel == slack_web_api.reactions[total_reactions + i][0]
@@ -513,7 +513,7 @@ class TestBotScenarios:
         )
 
         while not slack_web_api.reactions:
-            time.sleep(0.5)
+            time.sleep(0.005)
 
         # First reaction is for setting the emojirade
         # We test the second one (this one)
