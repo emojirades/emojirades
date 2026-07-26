@@ -19,9 +19,8 @@ class MockHandler(SimpleHTTPRequestHandler):
     logger = logging.getLogger(__name__)
 
     def is_valid_token(self):
-        return "authorization" in self.headers and str(self.headers["authorization"]).startswith(
-            "Bearer xoxb-"
-        )
+        auth = str(self.headers.get("authorization", ""))
+        return auth.startswith("Bearer xoxb-") or auth.startswith("Bearer xapp-")
 
     def is_invalid_rtm_start(self):
         return (
@@ -56,6 +55,10 @@ class MockHandler(SimpleHTTPRequestHandler):
             "rtm_start_failure": {
                 "ok": False,
                 "error": "invalid_auth",
+            },
+            "/apps.connections.open": {
+                "ok": True,
+                "url": "ws://localhost:8765/",
             },
             "/auth.test": {
                 "ok": True,
