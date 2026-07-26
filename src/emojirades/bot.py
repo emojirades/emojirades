@@ -4,7 +4,9 @@ import time
 
 import boto3
 from pythonjsonlogger import json as jsonlogger
-from slack_sdk.rtm_v2 import RTMClient
+from slack_sdk.socket_mode import SocketModeClient
+from slack_sdk.socket_mode.request import SocketModeRequest
+from slack_sdk.socket_mode.response import SocketModeResponse
 
 from emojirades.commands import BaseCommand
 from emojirades.commands.registry import CommandRegistry
@@ -72,7 +74,7 @@ class EmojiradesBot:
         if slack.workspace_id in self.workspaces:
             self.logger.info("Deleting previous workspace: %s", slack.workspace_id)
 
-            self.workspaces[slack.workspace_id]["slack"].rtm.close()
+            self.workspaces[slack.workspace_id]["slack"].close()
             time.sleep(1)
             del self.workspaces[slack.workspace_id]
 
@@ -88,8 +90,18 @@ class EmojiradesBot:
 
         logger = self.logger
 
-        def handle_event(client: RTMClient, event: dict):
-            event = Event(event, client)
+        def handle_socket_mode_request(client: SocketModeClient, request: SocketModeRequest):
+            ack_response = SocketModeResponse(envelope_id=request.envelope_id)
+            client.send_socket_mode_response(ack_response)
+
+            if isinstance(request.payload, dict) and "event" in request.payload:
+                event_data = request.payload["event"]
+            elif isinstance(request.payload, dict):
+                event_data = request.payload
+            else:
+                return
+
+            event = Event(event_data, workspace["slack"])
 
             if not event.valid():
                 client.logger.debug("Skipping event due to being invalid")
@@ -174,7 +186,9 @@ class EmojiradesBot:
                 if hook:
                     hook(event)
 
-        workspace["slack"].rtm.on("message")(handle_event)
+        workspace["slack"].socket_mode.socket_mode_request_listeners.append(
+            handle_socket_mode_request
+        )
 
         return workspace["slack"]
 

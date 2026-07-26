@@ -42,7 +42,7 @@ class TestBot:
         ws = self.bot.workspaces.get(self.config.team)
         if ws:
             ws["event_processed_hook"] = lambda e: done.set()
-        self.slack.rtm.send(event)
+        self.slack.send_event(event)
         done.wait(timeout=0.5)
 
     def commit(self):
@@ -166,27 +166,18 @@ def bot(auth_uri, db_uri, test_data, mock_web_api_server):
     yield test_bot
 
     slack_client = test_bot.slack
-    rtm = getattr(slack_client, "rtm", None)
-    if rtm:
-        if rtm.current_session and rtm.current_session.sock:
-            try:
-                import socket
-
-                rtm.current_session.sock.shutdown(socket.SHUT_RDWR)
-            except Exception:
-                pass
-        rtm.close()
-        for attr in ["current_session_runner", "current_app_monitor", "message_processor"]:
-            runner = getattr(rtm, attr, None)
-            if runner and hasattr(runner, "event"):
-                runner.event.set()
+    if slack_client:
+        slack_client.close()
 
     session.close()
 
 
 @pytest.fixture(scope="session")
 def bot_token():
-    return {"bot_access_token": "xoxb-000000000000-aaaaaaaaaaaaaaaaaaaaaaaa"}
+    return {
+        "bot_access_token": "xoxb-000000000000-aaaaaaaaaaaaaaaaaaaaaaaa",
+        "app_token": "xapp-000000000000-bbbbbbbbbbbbbbbbbbbbbbbb",
+    }
 
 
 @pytest.fixture
