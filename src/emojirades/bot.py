@@ -1,8 +1,6 @@
 import json
 import logging
-import sys
 import time
-import traceback
 
 import boto3
 from pythonjsonlogger import json as jsonlogger
@@ -143,9 +141,16 @@ class EmojiradesBot:
 
                 session.commit()
             except Exception as e:  # pylint: disable=broad-exception-caught
-                logger.exception("Error handling event: %s", event.data)
-                print(f"Error handling event: {e}", file=sys.stderr)
-                traceback.print_exc()
+                logger.exception(
+                    "Error handling event: %s",
+                    event.data,
+                    extra={
+                        "event_type": getattr(event, "type", None),
+                        "channel": getattr(event, "channel", None),
+                        "player_id": getattr(event, "player_id", None),
+                        "error_type": e.__class__.__name__,
+                    },
+                )
                 session.rollback()
 
                 try:
@@ -156,13 +161,15 @@ class EmojiradesBot:
                             "problem processing that message :sob:"
                         ),
                     )
-                except Exception as e:  # pylint: disable=broad-exception-caught
-                    logger.exception("Failed to send error message back to Slack")
-                    print(
-                        f"Failed to send error message back to Slack: {e}",
-                        file=sys.stderr,
+                except Exception as post_err:  # pylint: disable=broad-exception-caught
+                    logger.exception(
+                        "Failed to send error message back to Slack",
+                        extra={
+                            "channel": getattr(event, "channel", None),
+                            "player_id": getattr(event, "player_id", None),
+                            "error_type": post_err.__class__.__name__,
+                        },
                     )
-                    traceback.print_exc()
             finally:
                 session_factory.remove()
 
