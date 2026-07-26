@@ -14,6 +14,7 @@ from emojirades.persistence import (
     get_workspace_repository,
     migrate,
     populate,
+    transaction,
 )
 from emojirades.scorekeeper import Scorekeeper
 from emojirades.slack.event import Event
@@ -97,52 +98,48 @@ class EmojiradesBot:
                     hook(event)
                 return
 
-            # Get a per-thread session
-            session = session_factory()
-
             try:
-                event.resolve_overrides(workspace["gamestate"])
+                with transaction(session_factory):
+                    event.resolve_overrides(workspace["gamestate"])
 
-                logger.debug("Handling event: %s", event.data)
+                    logger.debug("Handling event: %s", event.data)
 
-                for command in EmojiradesBot.match_event(event, workspace):
-                    client.logger.debug("Matched %s for event %s", command, event.data)
+                    for command in EmojiradesBot.match_event(event, workspace):
+                        client.logger.debug("Matched %s for event %s", command, event.data)
 
-                    for channel, response in command.execute():
-                        client.logger.debug("------------------------")
-                        client.logger.debug(
-                            "Command %s executed with response: %s",
-                            command,
-                            (channel, response),
-                        )
+                        for channel, response in command.execute():
+                            client.logger.debug("------------------------")
+                            client.logger.debug(
+                                "Command %s executed with response: %s",
+                                command,
+                                (channel, response),
+                            )
 
-                        if channel is not None:
-                            channel = EmojiradesBot.decode_channel(channel, workspace)
-                        else:
-                            channel = EmojiradesBot.decode_channel(event.channel, workspace)
+                            if channel is not None:
+                                channel = EmojiradesBot.decode_channel(channel, workspace)
+                            else:
+                                channel = EmojiradesBot.decode_channel(event.channel, workspace)
 
-                        if isinstance(response, str):
-                            # Plain strings are assumed as 'chat_postMessage'
-                            client.web_client.chat_postMessage(channel=channel, text=response)
-                            continue
+                            if isinstance(response, str):
+                                # Plain strings are assumed as 'chat_postMessage'
+                                client.web_client.chat_postMessage(channel=channel, text=response)
+                                continue
 
-                        func = getattr(client.web_client, response["func"], None)
+                            func = getattr(client.web_client, response["func"], None)
 
-                        if func is None:
-                            raise RuntimeError(f"Unmapped function '{response['func']}'")
+                            if func is None:
+                                raise RuntimeError(f"Unmapped function '{response['func']}'")
 
-                        args = response.get("args", [])
-                        kwargs = response.get("kwargs", {})
+                            args = response.get("args", [])
+                            kwargs = response.get("kwargs", {})
 
-                        if kwargs.get("channel") is None:
-                            kwargs["channel"] = channel
+                            if kwargs.get("channel") is None:
+                                kwargs["channel"] = channel
 
-                        if response["func"] == "chat_postEphemeral" and "user" not in kwargs:
-                            kwargs["user"] = event.player_id
+                            if response["func"] == "chat_postEphemeral" and "user" not in kwargs:
+                                kwargs["user"] = event.player_id
 
-                        func(*args, **kwargs)
-
-                session.commit()
+                            func(*args, **kwargs)
             except Exception as e:  # pylint: disable=broad-exception-caught
                 logger.exception(
                     "Error handling event: %s",
@@ -154,7 +151,6 @@ class EmojiradesBot:
                         "error_type": e.__class__.__name__,
                     },
                 )
-                session.rollback()
 
                 try:
                     client.web_client.chat_postMessage(
@@ -174,7 +170,6 @@ class EmojiradesBot:
                         },
                     )
             finally:
-                session_factory.remove()
                 hook = workspace.get("event_processed_hook")
                 if hook:
                     hook(event)

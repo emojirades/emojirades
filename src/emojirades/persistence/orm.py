@@ -2,6 +2,7 @@ import datetime
 import json
 import os
 import threading
+from contextlib import contextmanager
 
 from alembic import command
 from alembic.config import Config
@@ -30,6 +31,19 @@ def get_engine(db_uri, echo=False):
 
 def get_session_factory(db_uri):
     return scoped_session(sessionmaker(bind=get_engine(db_uri)))
+
+
+@contextmanager
+def transaction(session_factory):
+    session = session_factory()
+    try:
+        yield session
+        session.commit()
+    except Exception:
+        session.rollback()
+        raise
+    finally:
+        session_factory.remove()
 
 
 def discover_migration_ini():

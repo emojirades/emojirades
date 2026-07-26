@@ -25,6 +25,9 @@ from .orm import (
 from .orm import (
     populate as populate,
 )
+from .orm import (
+    transaction as transaction,
+)
 from .repositories import (
     GamestateRepository as GamestateRepository,
 )
