@@ -1,5 +1,8 @@
+import importlib
 import logging
+import pkgutil
 import re
+import sys
 from abc import ABC
 from functools import lru_cache
 
@@ -12,6 +15,14 @@ def get_compiled_pattern(pattern_str):
 
 
 class BaseCommand(ABC):
+    registered_commands = []
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        if getattr(cls, "patterns", None) and not isinstance(cls.patterns, property):
+            if cls not in BaseCommand.registered_commands:
+                BaseCommand.registered_commands.append(cls)
+
     def __init__(self, event: Event, workspace: dict):
         self.logger = logging.getLogger("EmojiradesBot.Command")
 
@@ -110,3 +121,13 @@ class BaseCommand(ABC):
 
     def __str__(self):
         return type(self).__name__
+
+
+def _import_submodules():
+    package = sys.modules[__name__]
+    if hasattr(package, "__path__"):
+        for _, module_name, _ in pkgutil.walk_packages(package.__path__, package.__name__ + "."):
+            importlib.import_module(module_name)
+
+
+_import_submodules()
