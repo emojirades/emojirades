@@ -78,7 +78,7 @@ jobs:
           asset_name: emojirades-${{ needs.release.outputs.version }}-py3-none-any.whl
           asset_content_type: application/x-pywheel+zip
 
-      - uses: pypa/gh-action-pypi-publish@v1.14.1
+      - uses: pypa/gh-action-pypi-publish@v1.14.2
         with:
           user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }}
