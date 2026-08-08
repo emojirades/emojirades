@@ -30,7 +30,7 @@ dependencies = [
     "Unidecode~=1.4.0",
     "expiringdict~=1.2.2",
     "SQLAlchemy~=2.0.9",
-    "alembic~=1.18.1",
+    "alembic~=1.19.0",
     "psycopg2-binary~=2.9.5",
     "python-json-logger~=4.1.0",
 ]
