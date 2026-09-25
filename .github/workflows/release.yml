@@ -8,13 +8,13 @@ on:
 
 jobs:
   release:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
 
     steps:
       - uses: actions/checkout@v7
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v9.0.0
+        uses: astral-sh/setup-uv@v10.2.0
 
       - name: Set up Python
         uses: actions/setup-python@v7
@@ -29,7 +29,7 @@ jobs:
           echo "version=${VERSION#v}" >> $GITHUB_OUTPUT
 
       - id: create_release
-        uses: softprops/action-gh-release@v3.0.2
+        uses: softprops/action-gh-release@v3.0.3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: v${{ steps.version.outputs.version }}
@@ -41,14 +41,14 @@ jobs:
       release_upload_url: ${{ steps.create_release.outputs.upload_url }}
 
   build_python:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: release
 
     steps:
       - uses: actions/checkout@v7
 
       - name: Install uv
-        uses: astral-sh/setup-uv@v9.0.0
+        uses: astral-sh/setup-uv@v10.2.0
 
       - name: Set up Python
         uses: actions/setup-python@v7
@@ -78,13 +78,13 @@ jobs:
           asset_name: emojirades-${{ needs.release.outputs.version }}-py3-none-any.whl
           asset_content_type: application/x-pywheel+zip
 
-      - uses: pypa/gh-action-pypi-publish@v1.14.1
+      - uses: pypa/gh-action-pypi-publish@v1.14.2
         with:
           user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }}
 
   build_container:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     needs: release
 
     steps:
