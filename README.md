@@ -37,6 +37,7 @@ uv run emojirades init --db-uri "sqlite:///emojirades.db"
 ```bash
 uv run emojirades single --db-uri "sqlite:///emojirades.db" --auth-uri "auth.json"
 ```
+*Note: `auth.json` must contain both `bot_access_token` (`xoxb-...`) and `app_token` (`xapp-...`) for Slack Socket Mode.*
 
 ### Run (Docker)
 ```bash
