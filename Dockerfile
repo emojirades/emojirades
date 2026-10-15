@@ -15,7 +15,7 @@ RUN uv build --wheel --out-dir /dist
 
 
 # Stage 2: Final production image
-FROM python:3.14-slim-trixie
+FROM python:3.15-slim-trixie
 
 # Set environment variables for better logging and container behavior
 ENV PYTHONUNBUFFERED=1
