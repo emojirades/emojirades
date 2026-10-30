@@ -24,7 +24,7 @@ classifiers = [
 ]
 requires-python = ">=3.12"
 dependencies = [
-    "slack_sdk~=3.45.0",
+    "slack_sdk~=3.46.0",
     "requests>=2.34.2,<2.35.0",
     "boto3~=1.43.21",
     "Unidecode~=1.4.0",
@@ -37,9 +37,9 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "pre-commit~=4.6.0",
-    "pytest~=9.1.1",
-    "ruff~=0.16.0",
+    "pre-commit~=4.7.0",
+    "pytest~=9.2.0",
+    "ruff~=0.17.3",
     "websockets~=17.0",
 ]
 
