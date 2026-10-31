@@ -25,7 +25,15 @@ def get_engine(db_uri, echo=False):
     with _engines_lock:
         key = (db_uri, echo)
         if key not in _engines:
-            _engines[key] = create_engine(db_uri, echo=echo, future=True)
+            _engines[key] = create_engine(
+                db_uri,
+                echo=echo,
+                future=True,
+                # Connections can sit idle in the pool for days. Validate them before
+                # handing them out so a connection closed by the server/network is
+                # transparently replaced instead of failing the event being handled.
+                pool_pre_ping=True,
+            )
         return _engines[key]
 
 
