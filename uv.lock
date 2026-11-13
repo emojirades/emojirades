@@ -18,30 +18,30 @@ wheels = [
 
 [[package]]
 name = "boto3"
-version = "1.43.56"
+version = "1.44.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "botocore" },
     { name = "jmespath" },
     { name = "s3transfer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/53/05/23e1aa8c9e4b0399a61e7fd65c4f9cc0625121f24760e37471f776404abb/boto3-1.43.56.tar.gz", hash = "sha256:57c90df9fb026f2e6ae22530861198130203733c5c9ec4e5cca3a4037f5a8db4", size = 112673, upload-time = "2026-07-24T19:31:48.606Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/58/f3/625dd5a18c17e703f10029e16ccd991802e784b27cc627045f16d60a5d4c/boto3-1.44.3.tar.gz", hash = "sha256:bba566b5cba78db05c5f6c44d219c8f6fb2cd2b923106f767289e4cd0b87b093", size = 112741, upload-time = "2026-11-13T20:16:51.884Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b8/57/3a960c9f581c00f2a591901b46e035ff79ab3956d16607f12306b3b8d483/boto3-1.43.56-py3-none-any.whl", hash = "sha256:feb699d4ab241ef5c1b80bb58277be2aaad365cd4b672d7817e0bc59ee45131b", size = 140026, upload-time = "2026-07-24T19:31:47.155Z" },
+    { url = "https://files.pythonhosted.org/packages/9a/b5/2807516d854b60f430917590fcfe470bc60c5383cd6b27dc57aa6dc6afea/boto3-1.44.3-py3-none-any.whl", hash = "sha256:8c9c4844c7ce184494b102983696d6cdb09f5307ec7f238ca4ad5849fb14e26b", size = 140155, upload-time = "2026-11-13T20:16:50.577Z" },
 ]
 
 [[package]]
 name = "botocore"
-version = "1.43.56"
+version = "1.44.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jmespath" },
     { name = "python-dateutil" },
     { name = "urllib3" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b9/cc/7f84a5d3071fe878380e9f610ab36ca87b8cbbc4aa81ba2727f90e1f3ea3/botocore-1.43.56.tar.gz", hash = "sha256:6c01f85f0ff9863076f4c761e74ee3aa96c5ccc1ad09fc1efd62ef8f2d22bf57", size = 15733117, upload-time = "2026-07-24T19:31:38.125Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/03/e8/130935f123174b900f55fef077c33af43825e5b68fe963bcc1fc3e4634eb/botocore-1.44.3.tar.gz", hash = "sha256:44d86fff55ce2d014bd72183ebc164b21b36598253b8234d4f59e8600e09b8b3", size = 16668982, upload-time = "2026-11-13T20:16:47.549Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/5c/cd/86fe9e659e9699f62f8dd5ecd8c6725474334b23cab8aa71d82b5f56f1a4/botocore-1.43.56-py3-none-any.whl", hash = "sha256:aafc741f1b10f6fd63253eaf6ea029680c1ff436d87e1b8969d62aefa0c76976", size = 15418773, upload-time = "2026-07-24T19:31:34.758Z" },
+    { url = "https://files.pythonhosted.org/packages/20/65/e39cc0e0d16cf9efe0afab0edef48b89491b548e2c7d7ddc23bbb2c6422c/botocore-1.44.3-py3-none-any.whl", hash = "sha256:793eac2a7ca167e9376b136cf000e1675e9ffe8d7ec609160cc1ee00b93ace28", size = 16368633, upload-time = "2026-11-13T20:16:43.695Z" },
 ]
 
 [[package]]
@@ -167,7 +167,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "alembic", specifier = "~=1.20.0" },
-    { name = "boto3", specifier = "~=1.43.21" },
+    { name = "boto3", specifier = "~=1.44.3" },
     { name = "expiringdict", specifier = "~=1.2.2" },
     { name = "pre-commit", marker = "extra == 'dev'", specifier = "~=4.7.0" },
     { name = "psycopg2-binary", specifier = "~=2.9.5" },
@@ -175,7 +175,7 @@ requires-dist = [
     { name = "python-json-logger", specifier = "~=4.2.0" },
     { name = "requests", specifier = ">=2.34.2,<2.35.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = "~=0.17.3" },
-    { name = "slack-sdk", specifier = "~=3.46.0" },
+    { name = "slack-sdk", specifier = "~=3.47.0" },
     { name = "sqlalchemy", specifier = "~=2.1.0" },
     { name = "unidecode", specifier = "~=1.4.0" },
     { name = "websockets", marker = "extra == 'dev'", specifier = "~=17.0" },
@@ -571,11 +571,11 @@ wheels = [
 
 [[package]]
 name = "slack-sdk"
-version = "3.46.0"
+version = "3.47.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/7a/43/9eb4f5172ec64d8c25f9fa397d3ca283782d356a60809e4b68ade81fde1a/slack_sdk-3.46.0.tar.gz", hash = "sha256:25215ca293d2954ed759b87573b4c833cb3f82ebff371355936515c688411dbb", size = 266040, upload-time = "2026-10-30T05:08:27.384Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/2e/0c/133eb1a6ccf5854bafd908f2dc5bf9d5c28e8531eefb9edad954d5fa45cb/slack_sdk-3.47.0.tar.gz", hash = "sha256:824e91a94a5b72a65531e8db0dd63dc4dc6bbad1a219b19582b48d5661c1c707", size = 274403, upload-time = "2026-11-13T08:45:17.62Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a3/5c/0be529c9a48ccd7b452c6ca47ad1ab5e5e2f7f2cf53d8f34970aebffd0e8/slack_sdk-3.46.0-py2.py3-none-any.whl", hash = "sha256:6286d89da97ea193c853609131515e6f1b3edf86866d6e5aad0dba9dcf1cb72d", size = 325190, upload-time = "2026-10-30T05:08:25.985Z" },
+    { url = "https://files.pythonhosted.org/packages/12/c3/4de4ce25fdbbd3f4060cb220aa13a814b972e7c6184deae1e03665225861/slack_sdk-3.47.0-py2.py3-none-any.whl", hash = "sha256:8cfab3224d149962ef4313c1430d9ff65b8c3baf09f25988a920858ffa90aaa9", size = 333533, upload-time = "2026-11-13T08:45:15.979Z" },
 ]
 
 [[package]]
